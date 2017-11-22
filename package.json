@@ -20,13 +20,17 @@
   },
   "dependencies": {
     "class-validator": "^0.7.3",
+    "debug": "^3.1.0",
+    "lodash": "^4.17.4",
     "openapi3-ts": "^0.6.2",
     "reflect-metadata": "^0.1.10",
     "routing-controllers": "^0.7.6",
     "tslib": "^1.8.0"
   },
   "devDependencies": {
+    "@types/debug": "^0.0.30",
     "@types/jest": "^21.1.7",
+    "@types/lodash": "^4.14.85",
     "@types/node": "^8.0.53",
     "@types/prettier": "^1.8.0",
     "@types/reflect-metadata": "^0.0.5",

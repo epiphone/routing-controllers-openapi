@@ -3,5 +3,12 @@
     "tslint:latest",
     "tslint-config-standard",
     "tslint-config-prettier"
-  ]
+  ],
+  "rules": {
+    "max-classes-per-file": false,
+    "member-access": false,
+    "no-any": {"severity": "warning"},
+    "no-console": {"severity": "warning"},
+    "no-var-requires": false
+  }
 }
