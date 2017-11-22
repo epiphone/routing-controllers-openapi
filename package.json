@@ -1,0 +1,44 @@
+{
+  "name": "routing-controllers-openapi",
+  "version": "1.0.0",
+  "description": "Runtime OpenAPI v3 schema generation for routing-controllers",
+  "main": "build/index.js",
+  "repository": "git@github.com:epiphone/routing-controllers-openapi",
+  "author": "Aleksi Pekkala <aleksipekkala@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "clean": "rimraf coverage build",
+    "build": "yarn clean && tsc -p tsconfig.json",
+    "format": "prettier --write {src,test}/**/*.ts",
+    "lint": "tslint --project . --type-check src/**/*.ts",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
+  "dependencies": {
+    "class-validator": "^0.7.3",
+    "openapi3-ts": "^0.6.2",
+    "reflect-metadata": "^0.1.10",
+    "routing-controllers": "^0.7.6",
+    "tslib": "^1.8.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^21.1.7",
+    "@types/node": "^8.0.53",
+    "@types/prettier": "^1.8.0",
+    "@types/reflect-metadata": "^0.0.5",
+    "@types/rimraf": "^2.0.2",
+    "jest": "^21.2.1",
+    "prettier": "1.8.2",
+    "rimraf": "^2.6.2",
+    "ts-jest": "^21.2.3",
+    "tslint": "^5.8.0",
+    "tslint-config-prettier": "^1.6.0",
+    "tslint-config-standard": "^7.0.0",
+    "tsutils": "^2.12.2",
+    "typescript": "^2.6.1"
+  }
+}
