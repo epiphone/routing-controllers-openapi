@@ -1,7 +1,8 @@
 {
   "name": "routing-controllers-openapi",
   "version": "1.0.0",
-  "description": "Runtime OpenAPI v3 schema generation for routing-controllers",
+  "description": "Runtime OpenAPI v3 spec generation for routing-controllers",
+  "keywords": ["routing-controllers", "class-validator", "openapi", "swagger"],
   "main": "build/index.js",
   "repository": "git@github.com:epiphone/routing-controllers-openapi",
   "author": "Aleksi Pekkala <aleksipekkala@gmail.com>",

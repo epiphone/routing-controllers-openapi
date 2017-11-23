@@ -9,9 +9,9 @@ import { defaultConverters, ISchemaConverters } from './defaultConverters'
 
 export interface IOptions {
   /**
-   * A map of additional metadata-to-schema
-   * converters that can be used to supplement or override the default ones. The
-   * key should correspond to the 'type' property of a ValidationMetadata object.
+   * A map of additional metadata-to-schema converters that can be used to
+   * supplement or override the default ones. The key should correspond to the
+   * 'type' property of a ValidationMetadata object.
    */
   additionalConverters?: ISchemaConverters
 }

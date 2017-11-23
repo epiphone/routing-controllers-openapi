@@ -34,8 +34,8 @@ const schemas = validationMetadatasToSchemas(
   _.get(storage, 'validationMetadatas')
 )
 
-describe('classValidatorToSchema', () => {
-  it('generates a schema for each validated class', () => {
+describe('classValidatorConverter', () => {
+  it('generates OpenAPI schemas from class-validator metadata', () => {
     expect(schemas).toEqual({
       Post: {
         properties: {

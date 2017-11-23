@@ -12,16 +12,39 @@ export interface ISchemaConverters {
 export type SchemaConverter = (meta: ValidationMetadata) => SchemaObject
 
 export const defaultConverters: ISchemaConverters = {
-  arrayNotEmpty: () => ({ minItems: 1 }),
-  arrayUnique: () => ({ uniqueItems: true }),
+  [ValidationTypes.ARRAY_NOT_EMPTY]: () => ({
+    minItems: 1
+  }),
+  [ValidationTypes.ARRAY_UNIQUE]: () => ({
+    uniqueItems: true
+  }),
   [ValidationTypes.CONDITIONAL_VALIDATION]: () => ({}),
-  isBoolean: () => ({ type: 'boolean' }),
-  isEmail: () => ({ format: 'email', type: 'string' }),
-  isIn: meta => ({ enum: meta.constraints[0], type: 'string' }),
-  isNotEmpty: () => ({ minLength: 1, type: 'string' }),
-  isString: () => ({ type: 'string' }),
-  maxLength: meta => ({ maxLength: meta.constraints[0], type: 'string' }),
-  minLength: meta => ({ minLength: meta.constraints[0], type: 'string' }),
+  [ValidationTypes.IS_BOOLEAN]: () => ({
+    type: 'boolean'
+  }),
+  [ValidationTypes.IS_EMAIL]: () => ({
+    format: 'email',
+    type: 'string'
+  }),
+  [ValidationTypes.IS_IN]: meta => ({
+    enum: meta.constraints[0],
+    type: 'string'
+  }),
+  [ValidationTypes.IS_NOT_EMPTY]: () => ({
+    minLength: 1,
+    type: 'string'
+  }),
+  [ValidationTypes.IS_STRING]: () => ({
+    type: 'string'
+  }),
+  [ValidationTypes.MAX_LENGTH]: meta => ({
+    maxLength: meta.constraints[0],
+    type: 'string'
+  }),
+  [ValidationTypes.MIN_LENGTH]: meta => ({
+    minLength: meta.constraints[0],
+    type: 'string'
+  }),
   [ValidationTypes.NESTED_VALIDATION]: meta => {
     if (_.isFunction(meta.target)) {
       const childType = metadata.getPropType(

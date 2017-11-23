@@ -11,3 +11,4 @@ Runtime OpenAPI v3 schema generation for routing-controllers.
 - [ ] [validation messages](https://github.com/pleerock/class-validator#validation-messages)
 - [x] conditional validation: `isOptional`
 - [ ] handling mismatch e.g. `@IsString() id: number`
+- [ ] response values, content-types
