@@ -4,10 +4,10 @@
 Runtime OpenAPI v3 schema generation for routing-controllers.
 
 ## TODO
-- [ ] parse paths
-- [ ] parse `class-validator` schemas
+- [ ] parse `routing-controllers` paths
+- [x] parse `class-validator` schemas
 - [ ] documents (incl. Mongoose sample)
 - [ ] sample
 - [ ] [validation messages](https://github.com/pleerock/class-validator#validation-messages)
-  - basically all other `class-validator` features; inheritance, conditional validation, ...
+- [x] conditional validation: `isOptional`
 - [ ] handling mismatch e.g. `@IsString() id: number`

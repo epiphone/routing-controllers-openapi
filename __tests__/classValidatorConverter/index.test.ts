@@ -7,9 +7,9 @@ import {
   MinLength,
   ValidateNested
 } from 'class-validator'
-const debug = require('debug')('routing-controllers-openapi')
+import * as _ from 'lodash'
 
-import { metadataToJSONSchema } from '../src/classValidatorToSchema'
+import { validationMetadatasToSchemas } from '../../src/classValidatorConverter'
 
 class User {
   @IsString() id: string
@@ -22,19 +22,21 @@ class User {
   tags: string[]
 }
 
+// @ts-ignore: not referenced
 class Post {
   @IsOptional()
   @ValidateNested()
   user: User
 }
+
 const storage = getFromContainer(MetadataStorage)
-// debug('storage', storage)
-// debug('metadataArgs', getMetadataArgsStorage())
-const schema = metadataToJSONSchema(storage)
+const schemas = validationMetadatasToSchemas(
+  _.get(storage, 'validationMetadatas')
+)
 
 describe('classValidatorToSchema', () => {
   it('generates a schema for each validated class', () => {
-    expect(schema).toEqual({
+    expect(schemas).toEqual({
       Post: {
         properties: {
           user: {
