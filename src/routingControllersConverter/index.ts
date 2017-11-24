@@ -1,15 +1,14 @@
 // tslint:disable:no-submodule-imports
+import * as _ from 'lodash'
+import * as oa from 'openapi3-ts'
 import {
   getMetadataArgsStorage,
   MetadataArgsStorage,
   RoutingControllersOptions
 } from 'routing-controllers'
-import * as _ from 'lodash'
-import * as oa from 'openapi3-ts'
 import { ActionMetadataArgs } from 'routing-controllers/metadata/args/ActionMetadataArgs'
 
-// const bodyParam = _.find(getMetadataArgsStorage().params, { type: 'body' })
-// const bodyClass = Reflect.getMetadata('design:paramtypes', bodyParam.object, bodyParam.method)[bodyParam.index]
+import { applyParamConverters, defaultParamConverters } from './converters'
 
 export function routingControllersToSpec(
   storage?: MetadataArgsStorage,
@@ -17,8 +16,7 @@ export function routingControllersToSpec(
   info: oa.InfoObject = { title: '', version: '1.0.0' }
 ): oa.OpenAPIObject {
   storage = storage || getMetadataArgsStorage()
-  // TODO routeprefix, defaults.required
-  // console.log('storage', storage)
+
   return {
     components: { schemas: {} },
     info,
@@ -50,20 +48,55 @@ function getOperation(
 ) {
   const defaultOperation: oa.OperationObject = {
     operationId: `${action.target.name}.${action.method}`,
-    responses: { 200: { content: {} } },
-    summary: _.capitalize(_.startCase(action.method))
+    responses: { 200: { content: { 'application/json': {} } } }, // TODO handle HTTPStatus and ContentType
+    summary: _.capitalize(_.startCase(action.method)),
+    tags: [getControllerTag(action.target)]
   }
 
   const params = storage.filterParamsWithTargetAndMethod(
     action.target,
     action.method
   )
-  const responseHandlers = storage.filterResponseHandlersWithTargetAndMethod(
-    action.target,
-    action.method
-  )
 
-  // TODO implement...
+  // TODO handle responseHandlerMetadata:
+  // const responseHandlers = storage.filterResponseHandlersWithTargetAndMethod(
+  //   action.target,
+  //   action.method
+  // )
 
-  return defaultOperation
+  const converters = { ...defaultParamConverters }
+
+  return {
+    ...defaultOperation,
+    ...applyParamConverters(params, converters) // TODO handle required global
+  }
 }
+
+/**
+ * Given a controller class, return a OpenAPI Schema tag.
+ */
+function getControllerTag(controller: any): string {
+  return _.startCase(controller.name.replace(/Controller$/, ''))
+}
+
+// /**
+//  * Return a list of path parameter objects parsed from given path string.
+//  * @param path Express-style path, e.g. '/users/:id/'
+//  */
+// function parsePathParameters (path: string): [string, oa.ParameterObject[]] {
+//   const params = path.match(/:[A-Za-z0-9_]+/gi) || []
+//   const paramObjects = params.map((p) => {
+//     const name = p.substr(1)
+//     path = path.replace(p, `{${name}}`)
+
+//     const paramObj: oa.ParameterObject = {
+//       in: 'path',
+//       name,
+//       required: true,
+//       schema: {type: 'string'}
+//     }
+//     return paramObj
+//   })
+
+//   return [path, paramObjects]
+// }

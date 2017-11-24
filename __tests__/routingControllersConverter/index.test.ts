@@ -2,6 +2,7 @@ import { IsString } from 'class-validator'
 import {
   Body,
   Get,
+  getMetadataArgsStorage,
   HttpCode,
   JsonController,
   Param,
@@ -52,8 +53,19 @@ class UsersController {
   }
 }
 
+@JsonController('/users/:userId/posts')
+class UserPostsController {
+  @Get('/:postId')
+  getUserPost(
+    @Param('userId') _userId: number,
+    @Param('postId') _postId: string
+  ) {
+    return
+  }
+}
+
 const spec = routingControllersToSpec(
-  undefined,
+  getMetadataArgsStorage(),
   { routePrefix: '/api' },
   {
     title: 'My app',
@@ -93,6 +105,15 @@ describe('routingControllersConverter', () => {
           },
           post: {
             operationId: 'UsersController.createUser',
+            requestBody: {
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/CreateUserBody' }
+                }
+              },
+              description: 'CreateUserBody',
+              required: true
+            },
             responses: {
               '201': {
                 content: { 'application/json': {} },
@@ -132,6 +153,42 @@ describe('routingControllersConverter', () => {
                 in: 'path',
                 name: 'userId',
                 required: true,
+                schema: { type: 'number' }
+              }
+            ],
+            requestBody: {
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/CreatePostBody' }
+                }
+              },
+              description: 'CreatePostBody',
+              required: false
+            },
+            responses: {
+              '200': {
+                content: { 'application/json': {} },
+                description: expect.any(String) // TODO read description
+              }
+            },
+            summary: 'Create user post',
+            tags: ['Users']
+          }
+        },
+        '/api/users/{userId}/posts/{postId}': {
+          get: {
+            operationId: 'UserPostsController.getUserPost',
+            parameters: [
+              {
+                in: 'path',
+                name: 'userId',
+                required: true,
+                schema: { type: 'number' }
+              },
+              {
+                in: 'path',
+                name: 'postId',
+                required: true,
                 schema: { type: 'string' }
               }
             ],
@@ -141,8 +198,8 @@ describe('routingControllersConverter', () => {
                 description: expect.any(String) // TODO read description
               }
             },
-            summary: 'Create user post',
-            tags: ['Users']
+            summary: 'Get user post',
+            tags: ['User Posts']
           }
         }
       }

@@ -30,18 +30,15 @@ export function validationMetadatasToSchemas(
   }
   const schemas: { [key: string]: SchemaObject } = _(metadatas)
     .groupBy('target.name')
-    .map((metas, schemaName) => {
-      const properties = _(metas)
+    .map((schemaMetas, schemaName) => {
+      const properties = _(schemaMetas)
         .groupBy('propertyName')
-        .mapValues(d =>
-          // @ts-ignore: array spread
-          _.merge(...d.map(m => getSchemaProperties(m, converters)))
-        )
+        .mapValues(propMetas => applySchemaConverters(propMetas, converters))
         .value()
 
       const schema = {
         properties,
-        required: getRequiredPropNames(metas),
+        required: getRequiredPropNames(schemaMetas),
         type: 'object'
       }
 
@@ -54,19 +51,24 @@ export function validationMetadatasToSchemas(
 }
 
 /**
- * Convert class-validator metadata into OpenAPI Schema properties.
+ * Convert a property's class-validator metadata into an OpenAPI Schema property.
  */
-function getSchemaProperties(
-  meta: ValidationMetadata,
+function applySchemaConverters(
+  propertyMetadatas: ValidationMetadata[],
   converters: ISchemaConverters
 ): SchemaObject {
-  if (!converters[meta.type]) {
-    debug('No schema converter found for validation metadata', meta)
-    return {}
+  const convert = (meta: ValidationMetadata) => {
+    if (!converters[meta.type]) {
+      debug('No schema converter found for validation metadata', meta)
+      return {}
+    }
+
+    const items = converters[meta.type](meta)
+    return meta.each ? { items, type: 'array' } : items
   }
 
-  const items = converters[meta.type](meta)
-  return meta.each ? { items, type: 'array' } : items
+  // @ts-ignore: array spread
+  return _.merge(...propertyMetadatas.map(convert))
 }
 
 /**
