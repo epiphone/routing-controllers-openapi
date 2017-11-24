@@ -50,27 +50,14 @@ export const defaultParamConverters: IParamConverters = {
   queries: _meta => ({})
 }
 
-/**
- * Convert a property's class-validator metadata into an OpenAPI Schema property.
- */
-export function applyParamConverters(
-  operationParamMetadatas: ParamMetadataArgs[],
+export function parseParamMetadata(
+  param: ParamMetadataArgs,
   converters: IParamConverters
 ): Partial<oa.OperationObject> {
-  const convert = (param: ParamMetadataArgs) => {
-    if (!converters[param.type]) {
-      debug('No schema converter found for param metadata', param)
-      return {}
-    }
-
-    return converters[param.type](param)
+  if (!converters[param.type]) {
+    debug('No schema converter found for param metadata', param)
+    return {}
   }
 
-  const items = _.reverse(operationParamMetadatas.map(convert))
-  // @ts-ignore: array spread
-  return _.mergeWith(...items, (obj, src) => {
-    if (_.isArray(obj)) {
-      return obj.concat(src)
-    }
-  })
+  return converters[param.type](param)
 }

@@ -1,4 +1,4 @@
-// tslint:disable:no-submodule-imports
+// tslint:disable:ban-types no-submodule-imports
 import * as _ from 'lodash'
 import * as oa from 'openapi3-ts'
 import {
@@ -6,9 +6,10 @@ import {
   MetadataArgsStorage,
   RoutingControllersOptions
 } from 'routing-controllers'
-import { ActionMetadataArgs } from 'routing-controllers/metadata/args/ActionMetadataArgs'
 
-import { applyParamConverters, defaultParamConverters } from './converters'
+import { defaultParamConverters, parseParamMetadata } from './converters'
+
+const PATH_PARAM_REGEX = /:([A-Za-z0-9_]+)/gi
 
 export function routingControllersToSpec(
   storage?: MetadataArgsStorage,
@@ -31,72 +32,72 @@ function getPaths(
 ): oa.PathObject {
   const actions = storage.actions.map(action => {
     const controller = _.find(storage.controllers, { target: action.target })
-    const route = (options.routePrefix || '') + controller!.route + action.route
-    const operation = getOperation(action, storage, options)
+    const path = (options.routePrefix || '') + controller!.route + action.route
 
-    return { [route]: { [action.type]: operation } }
+    const defaultOperation: oa.OperationObject = {
+      operationId: `${action.target.name}.${action.method}`,
+      parameters: _.map(path.match(PATH_PARAM_REGEX), param => ({
+        in: 'path',
+        name: param.replace(':', ''),
+        required: true,
+        schema: { type: 'string' } // TODO parse type from param regexp suffix?
+      })),
+      responses: { 200: { content: { 'application/json': {} } } }, // TODO handle HTTPStatus and ContentType
+      summary: _.capitalize(_.startCase(action.method)),
+      tags: [getControllerTag(action.target)]
+    }
+
+    const params = storage.filterParamsWithTargetAndMethod(
+      action.target,
+      action.method
+    )
+
+    // TODO handle responseHandlerMetadata:
+    // const responseHandlers = storage.filterResponseHandlersWithTargetAndMethod(
+    //   action.target,
+    //   action.method
+    // )
+
+    const converters = { ...defaultParamConverters }
+    const items = params.map(d => parseParamMetadata(d, converters))
+    const operation = mergeOperationItems([defaultOperation, ...items])
+
+    const schemaPath = path.replace(PATH_PARAM_REGEX, '{$1}')
+    return { [schemaPath]: { [action.type]: operation } }
   })
 
   // @ts-ignore: spread operator
   return _.merge(...actions)
 }
 
-function getOperation(
-  action: ActionMetadataArgs,
-  storage: MetadataArgsStorage,
-  options: RoutingControllersOptions
-) {
-  const defaultOperation: oa.OperationObject = {
-    operationId: `${action.target.name}.${action.method}`,
-    responses: { 200: { content: { 'application/json': {} } } }, // TODO handle HTTPStatus and ContentType
-    summary: _.capitalize(_.startCase(action.method)),
-    tags: [getControllerTag(action.target)]
-  }
-
-  const params = storage.filterParamsWithTargetAndMethod(
-    action.target,
-    action.method
-  )
-
-  // TODO handle responseHandlerMetadata:
-  // const responseHandlers = storage.filterResponseHandlersWithTargetAndMethod(
-  //   action.target,
-  //   action.method
-  // )
-
-  const converters = { ...defaultParamConverters }
-
-  return {
-    ...defaultOperation,
-    ...applyParamConverters(params, converters) // TODO handle required global
-  }
-}
-
 /**
- * Given a controller class, return a OpenAPI Schema tag.
+ * Return an OpenAPI Schema tag for given controller class.
  */
-function getControllerTag(controller: any): string {
+function getControllerTag(controller: Function): string {
   return _.startCase(controller.name.replace(/Controller$/, ''))
 }
 
-// /**
-//  * Return a list of path parameter objects parsed from given path string.
-//  * @param path Express-style path, e.g. '/users/:id/'
-//  */
-// function parsePathParameters (path: string): [string, oa.ParameterObject[]] {
-//   const params = path.match(/:[A-Za-z0-9_]+/gi) || []
-//   const paramObjects = params.map((p) => {
-//     const name = p.substr(1)
-//     path = path.replace(p, `{${name}}`)
-
-//     const paramObj: oa.ParameterObject = {
-//       in: 'path',
-//       name,
-//       required: true,
-//       schema: {type: 'string'}
-//     }
-//     return paramObj
-//   })
-
-//   return [path, paramObjects]
-// }
+/**
+ * Merge operation items with special handling for the parameters array.
+ */
+export function mergeOperationItems(
+  items: Array<Partial<oa.OperationObject>>
+): Partial<oa.OperationObject> {
+  // @ts-ignore: array spread
+  return _.mergeWith(...items, (to, from, key) => {
+    if (key === 'parameters') {
+      return _.reduce(
+        from,
+        (acc, obj) => {
+          const index = _.findIndex(acc, { in: obj.in, name: obj.name })
+          if (index >= 0) {
+            acc[index] = _.merge(acc[index], obj)
+            return acc
+          }
+          return acc.concat(obj)
+        },
+        to
+      )
+    }
+  })
+}

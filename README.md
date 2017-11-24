@@ -12,3 +12,4 @@ Runtime OpenAPI v3 schema generation for routing-controllers.
 - [x] conditional validation: `isOptional`
 - [ ] handling mismatch e.g. `@IsString() id: number`
 - [ ] response values, content-types
+- [ ] handle regexp suffix in path params, e.g. `/users/:id(\d+)` https://expressjs.com/en/guide/routing.html

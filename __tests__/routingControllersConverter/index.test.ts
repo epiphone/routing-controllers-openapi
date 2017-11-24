@@ -29,7 +29,12 @@ class ListUsersQueryParams {
 class UsersController {
   @Get('/')
   listUsers(@QueryParams() _query?: ListUsersQueryParams) {
-    return [1, 2]
+    return
+  }
+
+  @Get('/:from-:to')
+  listUsersInRange(@Param('to') _to: number) {
+    return
   }
 
   @Get('/:userId')
@@ -45,7 +50,6 @@ class UsersController {
 
   @Post('/:userId/posts')
   createUserPost(
-    @Param('userId') _userId: number,
     @Body({ required: false })
     _body: CreatePostBody
   ) {
@@ -105,6 +109,7 @@ describe('routingControllersConverter', () => {
           },
           post: {
             operationId: 'UsersController.createUser',
+            parameters: [],
             requestBody: {
               content: {
                 'application/json': {
@@ -120,7 +125,34 @@ describe('routingControllersConverter', () => {
                 description: expect.any(String) // TODO read description
               }
             },
-            summary: 'Create users',
+            summary: 'Create user',
+            tags: ['Users']
+          }
+        },
+        '/api/users/{from}-{to}': {
+          get: {
+            operationId: 'UsersController.listUsersInRange',
+            parameters: [
+              {
+                in: 'path',
+                name: 'from',
+                required: true,
+                schema: { type: 'string' }
+              },
+              {
+                in: 'path',
+                name: 'to',
+                required: true,
+                schema: { type: 'number' }
+              }
+            ],
+            responses: {
+              '200': {
+                content: { 'application/json': {} },
+                description: expect.any(String) // TODO read description
+              }
+            },
+            summary: 'List users in range',
             tags: ['Users']
           }
         },
@@ -153,7 +185,7 @@ describe('routingControllersConverter', () => {
                 in: 'path',
                 name: 'userId',
                 required: true,
-                schema: { type: 'number' }
+                schema: { type: 'string' }
               }
             ],
             requestBody: {
