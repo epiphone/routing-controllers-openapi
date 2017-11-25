@@ -50,7 +50,7 @@ class UsersController {
 
   @Post('/:userId/posts')
   createUserPost(
-    @Body({ required: false })
+    @Body({ required: true })
     _body: CreatePostBody
   ) {
     return
@@ -90,18 +90,17 @@ describe('routingControllersConverter', () => {
             parameters: [
               {
                 in: 'query',
-                name: 'types',
+                name: 'ListUsersQueryParams',
                 required: false,
                 schema: {
-                  items: { type: 'string' },
-                  type: 'array'
+                  $ref: '#/components/schemas/ListUsersQueryParams'
                 }
               }
             ],
             responses: {
               '200': {
                 content: { 'application/json': {} },
-                description: expect.any(String) // TODO read description
+                description: 'Successful response'
               }
             },
             summary: 'List users',
@@ -109,7 +108,6 @@ describe('routingControllersConverter', () => {
           },
           post: {
             operationId: 'UsersController.createUser',
-            parameters: [],
             requestBody: {
               content: {
                 'application/json': {
@@ -117,12 +115,12 @@ describe('routingControllersConverter', () => {
                 }
               },
               description: 'CreateUserBody',
-              required: true
+              required: false
             },
             responses: {
               '201': {
                 content: { 'application/json': {} },
-                description: expect.any(String) // TODO read description
+                description: 'Successful response'
               }
             },
             summary: 'Create user',
@@ -149,7 +147,7 @@ describe('routingControllersConverter', () => {
             responses: {
               '200': {
                 content: { 'application/json': {} },
-                description: expect.any(String) // TODO read description
+                description: 'Successful response'
               }
             },
             summary: 'List users in range',
@@ -170,7 +168,7 @@ describe('routingControllersConverter', () => {
             responses: {
               '200': {
                 content: { 'application/json': {} },
-                description: expect.any(String) // TODO read description
+                description: 'Successful response'
               }
             },
             summary: 'Get user',
@@ -195,12 +193,12 @@ describe('routingControllersConverter', () => {
                 }
               },
               description: 'CreatePostBody',
-              required: false
+              required: true
             },
             responses: {
               '200': {
                 content: { 'application/json': {} },
-                description: expect.any(String) // TODO read description
+                description: 'Successful response'
               }
             },
             summary: 'Create user post',
@@ -227,7 +225,7 @@ describe('routingControllersConverter', () => {
             responses: {
               '200': {
                 content: { 'application/json': {} },
-                description: expect.any(String) // TODO read description
+                description: 'Successful response'
               }
             },
             summary: 'Get user post',

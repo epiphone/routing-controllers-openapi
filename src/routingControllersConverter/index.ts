@@ -1,103 +1,185 @@
-// tslint:disable:ban-types no-submodule-imports
+// tslint:disable:no-submodule-imports
 import * as _ from 'lodash'
 import * as oa from 'openapi3-ts'
 import {
-  getMetadataArgsStorage,
   MetadataArgsStorage,
   RoutingControllersOptions
 } from 'routing-controllers'
+import { ActionMetadataArgs } from 'routing-controllers/metadata/args/ActionMetadataArgs'
+import { ControllerMetadataArgs } from 'routing-controllers/metadata/args/ControllerMetadataArgs'
+import { ParamMetadataArgs } from 'routing-controllers/metadata/args/ParamMetadataArgs'
+import { ResponseHandlerMetadataArgs } from 'routing-controllers/metadata/args/ResponseHandleMetadataArgs'
 
-import { defaultParamConverters, parseParamMetadata } from './converters'
+import { getParamTypes } from '../metadata'
 
-const PATH_PARAM_REGEX = /:([A-Za-z0-9_]+)/gi
+export interface IRoute {
+  readonly action: ActionMetadataArgs
+  readonly controller: ControllerMetadataArgs
+  readonly options: RoutingControllersOptions
+  readonly params: ParamMetadataArgs[]
+  readonly responseHandlers: ResponseHandlerMetadataArgs[]
+}
 
 export function routingControllersToSpec(
-  storage?: MetadataArgsStorage,
+  storage: MetadataArgsStorage,
   options: RoutingControllersOptions = {},
   info: oa.InfoObject = { title: '', version: '1.0.0' }
 ): oa.OpenAPIObject {
-  storage = storage || getMetadataArgsStorage()
+  const routes = parseRoutes(storage, options)
+  const routePaths = routes.map(route => ({
+    [getFullPath(route)]: {
+      [route.action.type]: getOperation(route)
+    }
+  }))
 
-  return {
+  // @ts-ignore: array spread
+  const paths = _.merge(...routePaths)
+
+  const spec = {
     components: { schemas: {} },
     info,
     openapi: '3.0.0',
-    paths: getPaths(storage, options)
+    paths
   }
+
+  return spec
 }
 
-function getPaths(
+export function parseRoutes(
   storage: MetadataArgsStorage,
   options: RoutingControllersOptions
-): oa.PathObject {
-  const actions = storage.actions.map(action => {
-    const controller = _.find(storage.controllers, { target: action.target })
-    const path = (options.routePrefix || '') + controller!.route + action.route
-
-    const defaultOperation: oa.OperationObject = {
-      operationId: `${action.target.name}.${action.method}`,
-      parameters: _.map(path.match(PATH_PARAM_REGEX), param => ({
-        in: 'path',
-        name: param.replace(':', ''),
-        required: true,
-        schema: { type: 'string' } // TODO parse type from param regexp suffix?
-      })),
-      responses: { 200: { content: { 'application/json': {} } } }, // TODO handle HTTPStatus and ContentType
-      summary: _.capitalize(_.startCase(action.method)),
-      tags: [getControllerTag(action.target)]
-    }
-
-    const params = storage.filterParamsWithTargetAndMethod(
+): IRoute[] {
+  return storage.actions.map(action => ({
+    action,
+    controller: _.find(storage.controllers, { target: action.target })!,
+    options,
+    params: storage.filterParamsWithTargetAndMethod(
+      action.target,
+      action.method
+    ),
+    responseHandlers: storage.filterResponseHandlersWithTargetAndMethod(
       action.target,
       action.method
     )
-
-    // TODO handle responseHandlerMetadata:
-    // const responseHandlers = storage.filterResponseHandlersWithTargetAndMethod(
-    //   action.target,
-    //   action.method
-    // )
-
-    const converters = { ...defaultParamConverters }
-    const items = params.map(d => parseParamMetadata(d, converters))
-    const operation = mergeOperationItems([defaultOperation, ...items])
-
-    const schemaPath = path.replace(PATH_PARAM_REGEX, '{$1}')
-    return { [schemaPath]: { [action.type]: operation } }
-  })
-
-  // @ts-ignore: spread operator
-  return _.merge(...actions)
+  }))
 }
 
 /**
- * Return an OpenAPI Schema tag for given controller class.
+ * Return the OpenAPI Operation object for given route.
  */
-function getControllerTag(controller: Function): string {
-  return _.startCase(controller.name.replace(/Controller$/, ''))
+export function getOperation(route: IRoute): oa.OperationObject {
+  const operation: oa.OperationObject = {
+    operationId: `${route.action.target.name}.${route.action.method}`,
+    parameters: [...getPathParams(route), ...getQueryParams(route)],
+    requestBody: getRequestBody(route) || undefined,
+    responses: {
+      200: {
+        // TODO handle HTTPStatus and ContentType
+        content: { 'application/json': {} },
+        description: 'Successful response'
+      }
+    },
+    summary: _.capitalize(_.startCase(route.action.method)),
+    tags: getTags(route)
+  }
+
+  // clean empty and undefined properties:
+  return _.omitBy(operation, _.isEmpty) as oa.OperationObject
 }
 
 /**
- * Merge operation items with special handling for the parameters array.
+ * Return the full OpenAPI-formatted path of given route.
  */
-export function mergeOperationItems(
-  items: Array<Partial<oa.OperationObject>>
-): Partial<oa.OperationObject> {
-  // @ts-ignore: array spread
-  return _.mergeWith(...items, (to, from, key) => {
-    if (key === 'parameters') {
-      return _.reduce(
-        from,
-        (acc, obj) => {
-          const index = _.findIndex(acc, { in: obj.in, name: obj.name })
-          if (index >= 0) {
-            acc[index] = _.merge(acc[index], obj)
-            return acc
-          }
-          return acc.concat(obj)
-        },
-        to
-      )
+export function getFullPath(route: IRoute): string {
+  const { action, controller, options } = route
+  const path = (options.routePrefix || '') + controller.route + action.route
+  return path.replace(/:([A-Za-z0-9_]+)/gi, '{$1}')
+}
+
+/**
+ * Return the path parameters of given route.
+ *
+ * Path parameters are first parsed from the path string itself, and then
+ * supplemented with possible @Param() decorator values.
+ */
+export function getPathParams(route: IRoute): oa.ParameterObject[] {
+  const path = getFullPath(route)
+  const paramNames = _.map(path.match(/{[A-Za-z0-9_]+}/gi), d => d.slice(1, -1))
+
+  return paramNames.map(name => {
+    const param = {
+      in: 'path',
+      name,
+      required: true,
+      schema: { type: 'string' } // TODO parse type from param regexp suffix?
     }
+
+    const meta = _.find(route.params, { name, type: 'param' })
+    if (meta) {
+      const typeCls = getParamTypes(meta.object, meta.method)[meta.index]
+      const type = _.isNumber(typeCls.prototype) ? 'number' : 'string' // TODO improve handling
+      param.required = isRequired(meta, route.options)
+      param.schema.type = type
+    }
+
+    return param
   })
+}
+
+/**
+ * Return the query parameters of given route.
+ * @param route
+ */
+export function getQueryParams(route: IRoute): oa.ParameterObject[] {
+  // TODO handle individual @QueryParam decorators
+  const meta = _.find(route.params, { type: 'queries' })
+  if (meta) {
+    const type = getParamTypes(meta.object, meta.method)[meta.index]
+    return [
+      {
+        in: 'query',
+        name: type.name,
+        required: meta.required !== false, // TODO handle global required option
+        schema: { $ref: '#/components/schemas/' + type.name }
+      }
+    ]
+  }
+  return []
+}
+
+/**
+ * Return the requestBody of given route, if it has one.
+ */
+export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
+  const meta = _.find(route.params, { type: 'body' })
+  if (meta) {
+    const type = getParamTypes(meta.object, meta.method)[meta.index]
+    return {
+      content: {
+        'application/json': {
+          schema: { $ref: '#/components/schemas/' + type.name } // TODO reuse
+        }
+      },
+      description: type.name,
+      required: isRequired(meta, route.options)
+    }
+  }
+}
+
+/**
+ * Return OpenAPI Schema tags for given route.
+ */
+export function getTags(route: IRoute): string[] {
+  return [_.startCase(route.controller.target.name.replace(/Controller$/, ''))]
+}
+
+/**
+ * Return true if given metadata argument is required, checking for global setting.
+ */
+function isRequired(
+  meta: { required?: boolean },
+  options: RoutingControllersOptions
+) {
+  const globalRequired = _.get(options, 'defaults.paramOptions.required')
+  return globalRequired ? meta.required !== false : !!meta.required
 }
