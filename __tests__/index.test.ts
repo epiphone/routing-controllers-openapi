@@ -10,7 +10,7 @@ import {
   QueryParams
 } from 'routing-controllers'
 
-import { routingControllersToSpec } from '../../src'
+import { routingControllersToSpec } from '../src'
 
 class CreateUserBody {
   email: string

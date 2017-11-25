@@ -2,8 +2,14 @@
   "name": "routing-controllers-openapi",
   "version": "1.0.0",
   "description": "Runtime OpenAPI v3 spec generation for routing-controllers",
-  "keywords": ["routing-controllers", "class-validator", "openapi", "swagger"],
+  "keywords": [
+    "routing-controllers",
+    "class-validator",
+    "openapi",
+    "swagger"
+  ],
   "main": "build/index.js",
+  "types": "build/index.d.ts",
   "repository": "git@github.com:epiphone/routing-controllers-openapi",
   "author": "Aleksi Pekkala <aleksipekkala@gmail.com>",
   "license": "MIT",
@@ -12,6 +18,7 @@
     "build": "yarn clean && tsc -p tsconfig.json",
     "format": "prettier --write {src,test}/**/*.ts",
     "lint": "tslint --project . --type-check src/**/*.ts",
+    "prepare": "yarn build",
     "test": "jest --coverage",
     "test:watch": "jest --watch"
   },
@@ -20,7 +27,6 @@
     "singleQuote": true
   },
   "dependencies": {
-    "class-validator": "^0.7.3",
     "debug": "^3.1.0",
     "lodash": "^4.17.4",
     "openapi3-ts": "^0.6.2",
@@ -36,6 +42,7 @@
     "@types/prettier": "^1.8.0",
     "@types/reflect-metadata": "^0.0.5",
     "@types/rimraf": "^2.0.2",
+    "class-validator": "^0.7.3",
     "jest": "^21.2.1",
     "prettier": "1.8.2",
     "rimraf": "^2.6.2",

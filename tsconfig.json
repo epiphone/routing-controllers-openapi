@@ -26,8 +26,7 @@
     "noUnusedParameters": true
   },
   "include": [
-    "src/**/*",
-    "__tests__/**/*"
+    "src/**/*"
   ],
   "compileOnSave": false
 }
