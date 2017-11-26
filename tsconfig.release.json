@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "es6",
+    "outDir": "build",
+    "rootDir": "src",
+    "removeComments": true,
+    "declaration": true
+  },
+  "include": [
+    "src/**/*"
+  ]
+}

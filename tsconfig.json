@@ -1,11 +1,8 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "outDir": "build",
-    "rootDir": "src",
     "moduleResolution": "node",
     "module": "commonjs",
-    "declaration": true,
     "importHelpers": true,
     "inlineSourceMap": true,
     "listFiles": false,
@@ -26,7 +23,8 @@
     "noUnusedParameters": true
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "__tests__/**/*"
   ],
   "compileOnSave": false
 }
