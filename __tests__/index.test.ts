@@ -22,14 +22,16 @@ const routes = parseRoutes(storage, options)
 
 describe('index', () => {
   it('generates an OpenAPI spec from routing-controllers metadata', () => {
-    const info = { title: 'My app', version: '1.2.0' }
-    const spec = routingControllersToSpec(storage, options, info)
-
     // Include component schemas parsed with class-validator-jsonschema:
     const metadatas = (getFromContainer(MetadataStorage) as any)
       .validationMetadatas
-    spec.components!.schemas = validationMetadatasToSchemas(metadatas, {
+    const schemas = validationMetadatasToSchemas(metadatas, {
       refPointerPrefix: '#/components/schemas'
+    })
+
+    const spec = routingControllersToSpec(storage, options, {
+      components: { schemas },
+      info: { title: 'My app', version: '1.2.0' }
     })
     expect(spec).toEqual(require('./fixtures/spec.json'))
   })

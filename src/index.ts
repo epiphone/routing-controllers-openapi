@@ -23,15 +23,15 @@ export interface IRoute {
  * Convert routing-controllers metadata into an OpenAPI specification.
  *
  * @param storage routing-controllers metadata storage
- * @param options routing-controllers options
- * @param info OpenAPI Info object
+ * @param routingControllerOptions routing-controllers options
+ * @param additionalProperties Additional OpenAPI Spec properties
  */
 export function routingControllersToSpec(
   storage: MetadataArgsStorage,
-  options: RoutingControllersOptions = {},
-  info: oa.InfoObject = { title: '', version: '1.0.0' }
+  routingControllerOptions: RoutingControllersOptions = {},
+  additionalProperties: Partial<oa.OpenAPIObject> = {}
 ): oa.OpenAPIObject {
-  const routes = parseRoutes(storage, options)
+  const routes = parseRoutes(storage, routingControllerOptions)
   const routePaths = routes.map(route => ({
     [getFullPath(route)]: {
       [route.action.type]: getOperation(route)
@@ -41,12 +41,14 @@ export function routingControllersToSpec(
   // @ts-ignore: array spread
   const paths = _.merge(...routePaths)
 
-  return {
+  const spec = {
     components: { schemas: {} },
-    info,
+    info: { title: '', version: '1.0.0' },
     openapi: '3.0.0',
     paths
   }
+
+  return _.merge(spec, additionalProperties)
 }
 
 /**
