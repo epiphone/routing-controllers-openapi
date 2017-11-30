@@ -163,6 +163,6 @@ const spec = routingControllersToSpec(storage, routingControllerOptions, {
 
 ## Related projects
 
-- Inspired by [`tsoa`](https://github.com/lukeautry/tsoa)
-- Add your Mongoose models in the spec with [`mongoose-schema-jsonschema`](https://github.com/DScheglov/mongoose-schema-jsonschema)
-- [`openapi3-ts`](https://github.com/metadevpro/openapi3-ts/) Typescript OpenAPI utilities
+- Inspired by [`tsoa`](https://github.com/lukeautry/tsoa) and [`trafficlight`](https://github.com/swimlane/trafficlight)
+- Include your Mongoose models in the spec with [`mongoose-schema-jsonschema`](https://github.com/DScheglov/mongoose-schema-jsonschema)
+- [`openapi3-ts`](https://github.com/metadevpro/openapi3-ts/) provides handy OpenAPI utilities for Typescript
