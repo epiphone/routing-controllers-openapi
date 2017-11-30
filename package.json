@@ -19,6 +19,7 @@
     "format": "prettier --write {src,test}/**/*.ts",
     "lint": "tslint --project . --type-check src/**/*.ts",
     "prepare": "yarn build",
+    "send-coverage": "codecov -f coverage/*.json",
     "test": "jest --coverage",
     "test:watch": "jest --watch"
   },
@@ -43,6 +44,7 @@
     "@types/reflect-metadata": "^0.0.5",
     "@types/rimraf": "^2.0.2",
     "class-validator": "^0.7.3",
+    "codecov": "^3.0.0",
     "jest": "^21.2.1",
     "prettier": "1.8.2",
     "rimraf": "^2.6.2",
