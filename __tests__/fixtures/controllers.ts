@@ -2,6 +2,8 @@
 import { IsEmail, IsOptional, IsString } from 'class-validator'
 import {
   Body,
+  ContentType,
+  Controller,
   Get,
   HttpCode,
   JsonController,
@@ -32,6 +34,7 @@ export class ListUsersQueryParams {
 @JsonController('/users')
 export class UsersController {
   @Get('/')
+  @ContentType('text/cvs')
   listUsers(@QueryParams() _query?: ListUsersQueryParams) {
     return
   }
@@ -65,7 +68,7 @@ export class UsersController {
   }
 }
 
-@JsonController('/users/:userId/posts')
+@Controller('/users/:userId/posts')
 export class UserPostsController {
   @Get('/:postId')
   getUserPost(

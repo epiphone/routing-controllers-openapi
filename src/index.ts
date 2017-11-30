@@ -19,6 +19,13 @@ export interface IRoute {
   readonly responseHandlers: ResponseHandlerMetadataArgs[]
 }
 
+/**
+ * Convert routing-controllers metadata into an OpenAPI specification.
+ *
+ * @param storage routing-controllers metadata storage
+ * @param options routing-controllers options
+ * @param info OpenAPI Info object
+ */
 export function routingControllersToSpec(
   storage: MetadataArgsStorage,
   options: RoutingControllersOptions = {},
@@ -34,14 +41,12 @@ export function routingControllersToSpec(
   // @ts-ignore: array spread
   const paths = _.merge(...routePaths)
 
-  const spec = {
+  return {
     components: { schemas: {} },
     info,
     openapi: '3.0.0',
     paths
   }
-
-  return spec
 }
 
 /**
@@ -49,15 +54,15 @@ export function routingControllersToSpec(
  */
 export function parseRoutes(
   storage: MetadataArgsStorage,
-  options: RoutingControllersOptions
+  options: RoutingControllersOptions = {}
 ): IRoute[] {
   return storage.actions.map(action => ({
     action,
     controller: _.find(storage.controllers, { target: action.target })!,
     options,
-    params: storage.filterParamsWithTargetAndMethod(
-      action.target,
-      action.method
+    params: _.sortBy(
+      storage.filterParamsWithTargetAndMethod(action.target, action.method),
+      'index'
     ),
     responseHandlers: storage.filterResponseHandlersWithTargetAndMethod(
       action.target,
@@ -83,13 +88,7 @@ export function getOperation(route: IRoute): oa.OperationObject {
     operationId: getOperationId(route),
     parameters: [...getPathParams(route), ...getQueryParams(route)],
     requestBody: getRequestBody(route) || undefined,
-    responses: {
-      200: {
-        // TODO handle HTTPStatus and ContentType
-        content: { 'application/json': {} },
-        description: 'Successful response'
-      }
-    },
+    responses: getResponses(route),
     summary: getSummary(route),
     tags: getTags(route)
   }
@@ -147,7 +146,7 @@ export function getQueryParams(route: IRoute): oa.ParameterObject[] {
       return {
         in: 'query',
         name: name || '',
-        required: required !== false, // TODO handle global required option
+        required: isRequired({ required }, route.options),
         schema: { type }
       }
     })
@@ -160,7 +159,7 @@ export function getQueryParams(route: IRoute): oa.ParameterObject[] {
     queries.push({
       in: 'query',
       name: type.name,
-      required: required !== false, // TODO handle global required option
+      required: isRequired({ required }, route.options),
       schema: { $ref: '#/components/schemas/' + type.name }
     })
   }
@@ -188,6 +187,27 @@ export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
 }
 
 /**
+ * Return OpenAPI Responses object of given route.
+ */
+export function getResponses(route: IRoute): oa.ResponsesObject {
+  const isJSON = route.controller.type === 'json'
+  const defaultContentType = isJSON
+    ? 'application/json'
+    : 'text/html; charset=utf-8'
+  const contentMeta = _.find(route.responseHandlers, { type: 'content-type' })
+  const contentType = contentMeta ? contentMeta.value : defaultContentType
+
+  const successMeta = _.find(route.responseHandlers, { type: 'success-code' })
+  const successStatus = successMeta ? successMeta.value + '' : '200'
+  return {
+    [successStatus]: {
+      content: { [contentType]: {} },
+      description: 'Successful response'
+    }
+  }
+}
+
+/**
  * Return OpenAPI Operation summary string for given route.
  */
 export function getSummary(route: IRoute): string {
@@ -195,14 +215,15 @@ export function getSummary(route: IRoute): string {
 }
 
 /**
- * Return OpenAPI Schema tags for given route.
+ * Return OpenAPI tags for given route.
  */
 export function getTags(route: IRoute): string[] {
   return [_.startCase(route.controller.target.name.replace(/Controller$/, ''))]
 }
 
 /**
- * Return true if given metadata argument is required, checking for global setting.
+ * Return true if given metadata argument is required, checking for global
+ * setting if local setting is not defined.
  */
 function isRequired(
   meta: { required?: boolean },

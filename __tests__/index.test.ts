@@ -7,7 +7,6 @@ import { getMetadataArgsStorage } from 'routing-controllers'
 import {
   getFullPath,
   getOperationId,
-  getPathParams,
   parseRoutes,
   routingControllersToSpec
 } from '../src'
@@ -20,17 +19,18 @@ const options = {
   routePrefix: '/api'
 }
 const routes = parseRoutes(storage, options)
-const info = { title: 'My app', version: '1.2.0' }
-const spec = routingControllersToSpec(storage, options, info)
-
-// Include component schemas parsed with class-validator-jsonschema:
-const metadatas = (getFromContainer(MetadataStorage) as any).validationMetadatas
-spec.components!.schemas = validationMetadatasToSchemas(metadatas, {
-  refPointerPrefix: '#/components/schemas'
-})
 
 describe('index', () => {
   it('generates an OpenAPI spec from routing-controllers metadata', () => {
+    const info = { title: 'My app', version: '1.2.0' }
+    const spec = routingControllersToSpec(storage, options, info)
+
+    // Include component schemas parsed with class-validator-jsonschema:
+    const metadatas = (getFromContainer(MetadataStorage) as any)
+      .validationMetadatas
+    spec.components!.schemas = validationMetadatasToSchemas(metadatas, {
+      refPointerPrefix: '#/components/schemas'
+    })
     expect(spec).toEqual(require('./fixtures/spec.json'))
   })
 
