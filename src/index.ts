@@ -44,6 +44,9 @@ export function routingControllersToSpec(
   return spec
 }
 
+/**
+ * Parse routing-controllers metadata into an IRoute objects array.
+ */
 export function parseRoutes(
   storage: MetadataArgsStorage,
   options: RoutingControllersOptions
@@ -64,11 +67,20 @@ export function parseRoutes(
 }
 
 /**
- * Return the OpenAPI Operation object for given route.
+ * Return full OpenAPI-formatted path of given route.
+ */
+export function getFullPath(route: IRoute): string {
+  const { action, controller, options } = route
+  const path = (options.routePrefix || '') + controller.route + action.route
+  return path.replace(/:([A-Za-z0-9_]+)/gi, '{$1}')
+}
+
+/**
+ * Return OpenAPI Operation object for given route.
  */
 export function getOperation(route: IRoute): oa.OperationObject {
   const operation: oa.OperationObject = {
-    operationId: `${route.action.target.name}.${route.action.method}`,
+    operationId: getOperationId(route),
     parameters: [...getPathParams(route), ...getQueryParams(route)],
     requestBody: getRequestBody(route) || undefined,
     responses: {
@@ -78,7 +90,7 @@ export function getOperation(route: IRoute): oa.OperationObject {
         description: 'Successful response'
       }
     },
-    summary: _.capitalize(_.startCase(route.action.method)),
+    summary: getSummary(route),
     tags: getTags(route)
   }
 
@@ -87,16 +99,14 @@ export function getOperation(route: IRoute): oa.OperationObject {
 }
 
 /**
- * Return the full OpenAPI-formatted path of given route.
+ * Return OpenAPI Operation ID for given route.
  */
-export function getFullPath(route: IRoute): string {
-  const { action, controller, options } = route
-  const path = (options.routePrefix || '') + controller.route + action.route
-  return path.replace(/:([A-Za-z0-9_]+)/gi, '{$1}')
+export function getOperationId(route: IRoute): string {
+  return `${route.action.target.name}.${route.action.method}`
 }
 
 /**
- * Return the path parameters of given route.
+ * Return path parameters of given route.
  *
  * Path parameters are first parsed from the path string itself, and then
  * supplemented with possible @Param() decorator values.
@@ -126,28 +136,40 @@ export function getPathParams(route: IRoute): oa.ParameterObject[] {
 }
 
 /**
- * Return the query parameters of given route.
- * @param route
+ * Return query parameters of given route.
  */
 export function getQueryParams(route: IRoute): oa.ParameterObject[] {
-  // TODO handle individual @QueryParam decorators
-  const meta = _.find(route.params, { type: 'queries' })
-  if (meta) {
-    const type = getParamTypes(meta.object, meta.method)[meta.index]
-    return [
-      {
+  const queries: oa.ParameterObject[] = _(route.params)
+    .filter({ type: 'query' })
+    .map(({ index, name, object, required, method }) => {
+      const typeCls = getParamTypes(object, method)[index]
+      const type = _.isNumber(typeCls.prototype) ? 'number' : 'string' // TODO improve handling
+      return {
         in: 'query',
-        name: type.name,
-        required: meta.required !== false, // TODO handle global required option
-        schema: { $ref: '#/components/schemas/' + type.name }
+        name: name || '',
+        required: required !== false, // TODO handle global required option
+        schema: { type }
       }
-    ]
+    })
+    .value()
+
+  const queriesMeta = _.find(route.params, { type: 'queries' })
+  if (queriesMeta) {
+    const { index, object, required, method } = queriesMeta
+    const type = getParamTypes(object, method)[index]
+    queries.push({
+      in: 'query',
+      name: type.name,
+      required: required !== false, // TODO handle global required option
+      schema: { $ref: '#/components/schemas/' + type.name }
+    })
   }
-  return []
+
+  return queries
 }
 
 /**
- * Return the requestBody of given route, if it has one.
+ * Return OpenAPI requestBody of given route, if it has one.
  */
 export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
   const meta = _.find(route.params, { type: 'body' })
@@ -163,6 +185,13 @@ export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
       required: isRequired(meta, route.options)
     }
   }
+}
+
+/**
+ * Return OpenAPI Operation summary string for given route.
+ */
+export function getSummary(route: IRoute): string {
+  return _.capitalize(_.startCase(route.action.method))
 }
 
 /**
@@ -183,6 +212,9 @@ function isRequired(
   return globalRequired ? meta.required !== false : !!meta.required
 }
 
+/**
+ * Parse given target object's property's param types from metadata.
+ */
 function getParamTypes(target: object, property: string) {
   return Reflect.getMetadata('design:paramtypes', target, property)
 }

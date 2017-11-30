@@ -44,6 +44,7 @@
     "@types/reflect-metadata": "^0.0.5",
     "@types/rimraf": "^2.0.2",
     "class-validator": "^0.7.3",
+    "class-validator-jsonschema": "^1.1.0",
     "codecov": "^3.0.0",
     "jest": "^21.2.1",
     "prettier": "1.8.2",

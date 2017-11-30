@@ -16,7 +16,8 @@ module.exports = {
     '<rootDir>/__tests__'
   ],
   testPathIgnorePatterns: [
-    '/node_modules/'
+    '/node_modules/',
+    '/__tests__/fixtures/'
   ],
   coverageDirectory: 'coverage',
   collectCoverageFrom: [

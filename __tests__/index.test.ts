@@ -1,238 +1,101 @@
-import { IsString } from 'class-validator'
+// tslint:disable:no-implicit-dependencies
+import { getFromContainer, MetadataStorage } from 'class-validator'
+import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
+import * as _ from 'lodash'
+import { getMetadataArgsStorage } from 'routing-controllers'
+
 import {
-  Body,
-  Get,
-  getMetadataArgsStorage,
-  HttpCode,
-  JsonController,
-  Param,
-  Post,
-  QueryParams
-} from 'routing-controllers'
+  getFullPath,
+  getOperationId,
+  getPathParams,
+  parseRoutes,
+  routingControllersToSpec
+} from '../src'
+import { UserPostsController, UsersController } from './fixtures/controllers'
 
-import { routingControllersToSpec } from '../src'
-
-class CreateUserBody {
-  email: string
+// Construct OpenAPI spec:
+const storage = getMetadataArgsStorage()
+const options = {
+  controllers: [UsersController, UserPostsController],
+  routePrefix: '/api'
 }
+const routes = parseRoutes(storage, options)
+const info = { title: 'My app', version: '1.2.0' }
+const spec = routingControllersToSpec(storage, options, info)
 
-class CreatePostBody {
-  @IsString({ each: true })
-  content: string
-}
+// Include component schemas parsed with class-validator-jsonschema:
+const metadatas = (getFromContainer(MetadataStorage) as any).validationMetadatas
+spec.components!.schemas = validationMetadatasToSchemas(metadatas, {
+  refPointerPrefix: '#/components/schemas'
+})
 
-class ListUsersQueryParams {
-  types: string[]
-}
-
-@JsonController('/users')
-class UsersController {
-  @Get('/')
-  listUsers(@QueryParams() _query?: ListUsersQueryParams) {
-    return
-  }
-
-  @Get('/:from-:to')
-  listUsersInRange(@Param('to') _to: number) {
-    return
-  }
-
-  @Get('/:userId')
-  getUser(@Param('userId') _userId: number) {
-    return
-  }
-
-  @HttpCode(201)
-  @Post('/')
-  createUser(@Body() _body: CreateUserBody) {
-    return
-  }
-
-  @Post('/:userId/posts')
-  createUserPost(
-    @Body({ required: true })
-    _body: CreatePostBody
-  ) {
-    return
-  }
-}
-
-@JsonController('/users/:userId/posts')
-class UserPostsController {
-  @Get('/:postId')
-  getUserPost(
-    @Param('userId') _userId: number,
-    @Param('postId') _postId: string
-  ) {
-    return
-  }
-}
-
-const spec = routingControllersToSpec(
-  getMetadataArgsStorage(),
-  { routePrefix: '/api' },
-  {
-    title: 'My app',
-    version: '1.2.0'
-  }
-)
-
-describe('routingControllersConverter', () => {
+describe('index', () => {
   it('generates an OpenAPI spec from routing-controllers metadata', () => {
-    expect(spec).toEqual({
-      components: { schemas: {} },
-      info: { title: 'My app', version: '1.2.0' },
-      openapi: '3.0.0',
-      paths: {
-        '/api/users/': {
-          get: {
-            operationId: 'UsersController.listUsers',
-            parameters: [
-              {
-                in: 'query',
-                name: 'ListUsersQueryParams',
-                required: false,
-                schema: {
-                  $ref: '#/components/schemas/ListUsersQueryParams'
-                }
-              }
-            ],
-            responses: {
-              '200': {
-                content: { 'application/json': {} },
-                description: 'Successful response'
-              }
-            },
-            summary: 'List users',
-            tags: ['Users']
-          },
-          post: {
-            operationId: 'UsersController.createUser',
-            requestBody: {
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/CreateUserBody' }
-                }
-              },
-              description: 'CreateUserBody',
-              required: false
-            },
-            responses: {
-              '201': {
-                content: { 'application/json': {} },
-                description: 'Successful response'
-              }
-            },
-            summary: 'Create user',
-            tags: ['Users']
-          }
-        },
-        '/api/users/{from}-{to}': {
-          get: {
-            operationId: 'UsersController.listUsersInRange',
-            parameters: [
-              {
-                in: 'path',
-                name: 'from',
-                required: true,
-                schema: { type: 'string' }
-              },
-              {
-                in: 'path',
-                name: 'to',
-                required: true,
-                schema: { type: 'number' }
-              }
-            ],
-            responses: {
-              '200': {
-                content: { 'application/json': {} },
-                description: 'Successful response'
-              }
-            },
-            summary: 'List users in range',
-            tags: ['Users']
-          }
-        },
-        '/api/users/{userId}': {
-          get: {
-            operationId: 'UsersController.getUser',
-            parameters: [
-              {
-                in: 'path',
-                name: 'userId',
-                required: true,
-                schema: { type: 'number' }
-              }
-            ],
-            responses: {
-              '200': {
-                content: { 'application/json': {} },
-                description: 'Successful response'
-              }
-            },
-            summary: 'Get user',
-            tags: ['Users']
-          }
-        },
-        '/api/users/{userId}/posts': {
-          post: {
-            operationId: 'UsersController.createUserPost',
-            parameters: [
-              {
-                in: 'path',
-                name: 'userId',
-                required: true,
-                schema: { type: 'string' }
-              }
-            ],
-            requestBody: {
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/CreatePostBody' }
-                }
-              },
-              description: 'CreatePostBody',
-              required: true
-            },
-            responses: {
-              '200': {
-                content: { 'application/json': {} },
-                description: 'Successful response'
-              }
-            },
-            summary: 'Create user post',
-            tags: ['Users']
-          }
-        },
-        '/api/users/{userId}/posts/{postId}': {
-          get: {
-            operationId: 'UserPostsController.getUserPost',
-            parameters: [
-              {
-                in: 'path',
-                name: 'userId',
-                required: true,
-                schema: { type: 'number' }
-              },
-              {
-                in: 'path',
-                name: 'postId',
-                required: true,
-                schema: { type: 'string' }
-              }
-            ],
-            responses: {
-              '200': {
-                content: { 'application/json': {} },
-                description: 'Successful response'
-              }
-            },
-            summary: 'Get user post',
-            tags: ['User Posts']
-          }
-        }
+    expect(spec).toEqual(require('./fixtures/spec.json'))
+  })
+
+  it('parses actions in declared order from controller metadata', () => {
+    const actions = routes.map(d => d.action)
+    expect(actions).toEqual([
+      {
+        method: 'listUsers',
+        route: '/',
+        target: UsersController,
+        type: 'get'
+      },
+      {
+        method: 'listUsersInRange',
+        route: '/:from-:to',
+        target: UsersController,
+        type: 'get'
+      },
+      {
+        method: 'getUser',
+        route: '/:userId',
+        target: UsersController,
+        type: 'get'
+      },
+      {
+        method: 'createUser',
+        route: '/',
+        target: UsersController,
+        type: 'post'
+      },
+      {
+        method: 'createUserPost',
+        route: '/:userId/posts',
+        target: UsersController,
+        type: 'post'
+      },
+      {
+        method: 'getUserPost',
+        route: '/:postId',
+        target: UserPostsController,
+        type: 'get'
       }
-    })
+    ])
+  })
+
+  it('gets full OpenAPI-formatted paths', () => {
+    const route = _.cloneDeep(routes[0])
+    expect(getFullPath(route)).toEqual('/api/users/')
+
+    route.options.routePrefix = undefined
+    expect(getFullPath(route)).toEqual('/users/')
+
+    route.controller.route = ''
+    expect(getFullPath(route)).toEqual('/')
+
+    route.action.route = '/all'
+    expect(getFullPath(route)).toEqual('/all')
+  })
+
+  it('gets OpenAPI Operation IDs', () => {
+    const route = _.cloneDeep(routes[0])
+    expect(getOperationId(route)).toEqual('UsersController.listUsers')
+
+    route.action.target = class AnotherController {}
+    route.action.method = 'anotherMethod'
+    expect(getOperationId(route)).toEqual('AnotherController.anotherMethod')
   })
 })

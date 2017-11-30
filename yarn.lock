@@ -525,6 +525,17 @@ class-transformer@~0.1.6:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/class-transformer/-/class-transformer-0.1.8.tgz#be04dd2afb7b301e4c8c79c5349fedaac3d5a7e1"
 
+class-validator-jsonschema@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/class-validator-jsonschema/-/class-validator-jsonschema-1.1.0.tgz#940f79358726b96c36b5f10eb6ec5b5c7d70bfa9"
+  dependencies:
+    class-validator "^0.7.3"
+    debug "^3.1.0"
+    lodash "^4.17.4"
+    openapi3-ts "^0.6.2"
+    reflect-metadata "^0.1.10"
+    tslib "^1.8.0"
+
 class-validator@^0.7.0, class-validator@^0.7.3:
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/class-validator/-/class-validator-0.7.3.tgz#3c2821b8cf35fd8d5f4fcb8063bc57fb50049e7e"
