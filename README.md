@@ -1,5 +1,5 @@
 # routing-controllers-openapi
-[![Build Status](https://travis-ci.org/epiphone/routing-controllers-openapi.svg?token=LxSHquEwyhSfU8JddMyx&branch=master)](https://travis-ci.com/epiphone/routing-controllers-openapi) [![codecov](https://codecov.io/gh/epiphone/routing-controllers-openapi/branch/master/graph/badge.svg)](https://codecov.io/gh/epiphone/routing-controllers-openapi) [![npm version](https://badge.fury.io/js/routing-controllers-openapi.svg)](https://badge.fury.io/js/routing-controllers-openapi)
+[![Build Status](https://travis-ci.org/epiphone/routing-controllers-openapi.svg?branch=master)](https://travis-ci.org/epiphone/routing-controllers-openapi) [![codecov](https://codecov.io/gh/epiphone/routing-controllers-openapi/branch/master/graph/badge.svg)](https://codecov.io/gh/epiphone/routing-controllers-openapi) [![npm version](https://badge.fury.io/js/routing-controllers-openapi.svg)](https://badge.fury.io/js/routing-controllers-openapi)
 
 Runtime OpenAPI v3 schema generation for routing-controllers. **Work in progress!**
 
