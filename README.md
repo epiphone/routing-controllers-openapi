@@ -1,7 +1,7 @@
 # routing-controllers-openapi
 [![Build Status](https://travis-ci.org/epiphone/routing-controllers-openapi.svg?branch=master)](https://travis-ci.org/epiphone/routing-controllers-openapi) [![codecov](https://codecov.io/gh/epiphone/routing-controllers-openapi/branch/master/graph/badge.svg)](https://codecov.io/gh/epiphone/routing-controllers-openapi) [![npm version](https://badge.fury.io/js/routing-controllers-openapi.svg)](https://badge.fury.io/js/routing-controllers-openapi)
 
-Runtime OpenAPI v3 schema generation for routing-controllers. **Work in progress!**
+Runtime OpenAPI v3 schema generation for routing-controllers.
 
 ## Installation
 
@@ -143,26 +143,26 @@ const spec = routingControllersToSpec(storage, routingControllerOptions, {
 
 ## Supported features
 
-- [x] `@Controller`/`@JsonController` base route and default content-type
-- [x] `options.routePrefix`
-- [x] `@Get`, `@Post` and other action decorators
-- [x] parse path parameters straight from path strings and optionally supplement with `@Param` decorator
-- [x] `@QueryParam` and `@QueryParams`
-- [x] `@Body`
-- [x] parse response keywords from `@HttpCode` and `@ContentType` values
-- [x] global `options.defaults.paramOptions.required` option and local override with `{required: true}` in decorator params
-- [x] parse `summary`, `operationId` and `tags` keywords from controller/method names
+- `@Controller`/`@JsonController` base route and default content-type
+- `options.routePrefix`
+- `@Get`, `@Post` and other action decorators
+- Parse path parameters straight from path strings and optionally supplement with `@Param` decorator
+- `@QueryParam` and `@QueryParams`
+- `@Body`
+- Parse response keywords from `@HttpCode` and `@ContentType` values
+- Global `options.defaults.paramOptions.required` option and local override with `{required: true}` in decorator params
+- Parse `summary`, `operationId` and `tags` keywords from controller/method names
 
 ## TODO
-- [ ] improved documents, including samples
-- [ ] response type and status decorators
-- [ ] `@HeaderParam` and other header decorators such as `@ContentType`
-- [ ] auth decorators
-- [ ] regex routes and [suffixes in path params](https://expressjs.com/en/guide/routing.html), e.g. `/users/:id(\d+)`
-- [ ] a decorator function for overriding schema keywords
+- Improve documents, add samples
+- Response type and status decorators
+- `@HeaderParam`, `@ContentType` and other header decorators
+- Auth decorators
+- Regex routes and [suffixes in path params](https://expressjs.com/en/guide/routing.html), e.g. `/users/:id(\d+)`
+- A decorator function for overriding schema keywords
 
 ## Related projects
 
-- inspired by [`tsoa`](https://github.com/lukeautry/tsoa)
-- use your Mongoose models in the spec with [mongoose-schema-jsonschema](https://github.com/DScheglov/mongoose-schema-jsonschema)
+- Inspired by [`tsoa`](https://github.com/lukeautry/tsoa)
+- Add your Mongoose models in the spec with [`mongoose-schema-jsonschema`](https://github.com/DScheglov/mongoose-schema-jsonschema)
 - [`openapi3-ts`](https://github.com/metadevpro/openapi3-ts/) Typescript OpenAPI utilities
