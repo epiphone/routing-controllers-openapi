@@ -1,7 +1,7 @@
 # routing-controllers-openapi
 [![Build Status](https://travis-ci.org/epiphone/routing-controllers-openapi.svg?branch=master)](https://travis-ci.org/epiphone/routing-controllers-openapi) [![codecov](https://codecov.io/gh/epiphone/routing-controllers-openapi/branch/master/graph/badge.svg)](https://codecov.io/gh/epiphone/routing-controllers-openapi) [![npm version](https://badge.fury.io/js/routing-controllers-openapi.svg)](https://badge.fury.io/js/routing-controllers-openapi)
 
-Runtime OpenAPI v3 schema generation for routing-controllers.
+Runtime OpenAPI v3 schema generation for [routing-controllers](https://github.com/typestack/routing-controllers).
 
 ## Installation
 
@@ -28,6 +28,8 @@ class UsersController {
     // ...
   }
 }
+
+// Generate a schema:
 
 const storage = getMetadataArgsStorage()
 const spec = routingControllersToSpec(storage)
@@ -124,7 +126,7 @@ export function routingControllersToSpec(
 
 ### Validation classes
 
-Use [`class-validator-jsonschema`](https://github.com/epiphone/class-validator-jsonschema) to convert your validation classes into OpenAPI-compatible schemas:
+Use [class-validator-jsonschema](https://github.com/epiphone/class-validator-jsonschema) to convert your validation classes into OpenAPI-compatible schemas:
 
 ```typescript
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
@@ -163,6 +165,6 @@ const spec = routingControllersToSpec(storage, routingControllerOptions, {
 
 ## Related projects
 
-- Inspired by [`tsoa`](https://github.com/lukeautry/tsoa) and [`trafficlight`](https://github.com/swimlane/trafficlight)
-- Include your Mongoose models in the spec with [`mongoose-schema-jsonschema`](https://github.com/DScheglov/mongoose-schema-jsonschema)
-- [`openapi3-ts`](https://github.com/metadevpro/openapi3-ts/) provides handy OpenAPI utilities for Typescript
+- Inspired by [tsoa](https://github.com/lukeautry/tsoa) and [trafficlight](https://github.com/swimlane/trafficlight)
+- Include your Mongoose models in the spec with [mongoose-schema-jsonschema](https://github.com/DScheglov/mongoose-schema-jsonschema)
+- [openapi3-ts](https://github.com/metadevpro/openapi3-ts/) provides handy OpenAPI utilities for Typescript
