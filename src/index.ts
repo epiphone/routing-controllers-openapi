@@ -162,7 +162,7 @@ export function getQueryParams(route: IRoute): oa.ParameterObject[] {
       in: 'query',
       name: type.name,
       required: isRequired({ required }, route.options),
-      schema: { $ref: '#/components/schemas/' + type.name }
+      schema: makeRef(type.name)
     })
   }
 
@@ -177,11 +177,7 @@ export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
   if (meta) {
     const type = getParamTypes(meta.object, meta.method)[meta.index]
     return {
-      content: {
-        'application/json': {
-          schema: { $ref: '#/components/schemas/' + type.name } // TODO reuse
-        }
-      },
+      content: { 'application/json': { schema: makeRef(type.name) } },
       description: type.name,
       required: isRequired(meta, route.options)
     }
@@ -233,6 +229,13 @@ function isRequired(
 ) {
   const globalRequired = _.get(options, 'defaults.paramOptions.required')
   return globalRequired ? meta.required !== false : !!meta.required
+}
+
+/**
+ * Return a JSON Schema reference object pointing to given schema.
+ */
+function makeRef(schemaName: string): oa.ReferenceObject {
+  return { $ref: '#/components/schemas/' + schemaName }
 }
 
 /**
