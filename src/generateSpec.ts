@@ -1,7 +1,10 @@
+// tslint:disable:no-submodule-imports
 import * as _ from 'lodash'
 import * as oa from 'openapi3-ts'
 import 'reflect-metadata'
+import { ParamMetadataArgs } from 'routing-controllers/metadata/args/ParamMetadataArgs'
 
+import { applyOpenAPIDecorator } from './decorators'
 import { IRoute } from './index'
 
 /**
@@ -26,8 +29,10 @@ export function getOperation(route: IRoute): oa.OperationObject {
     tags: getTags(route)
   }
 
+  const decoratedOperation = applyOpenAPIDecorator(operation, route)
+
   // clean empty and undefined properties:
-  return _.omitBy(operation, _.isEmpty) as oa.OperationObject
+  return _.omitBy(decoratedOperation, _.isEmpty) as oa.OperationObject
 }
 
 /**
@@ -62,7 +67,7 @@ export function getPathParams(route: IRoute): oa.ParameterObject[] {
   const paramNames = _.map(path.match(/{[A-Za-z0-9_]+}/gi), d => d.slice(1, -1))
 
   return paramNames.map(name => {
-    const param = {
+    const param: oa.ParameterObject = {
       in: 'path',
       name,
       required: true,
@@ -71,10 +76,8 @@ export function getPathParams(route: IRoute): oa.ParameterObject[] {
 
     const meta = _.find(route.params, { name, type: 'param' })
     if (meta) {
-      const typeCls = getParamTypes(meta.object, meta.method)[meta.index]
-      const type = _.isNumber(typeCls.prototype) ? 'number' : 'string' // TODO improve handling
       param.required = isRequired(meta, route)
-      param.schema.type = type
+      param.schema = getParamSchema(meta)
     }
 
     return param
@@ -87,27 +90,25 @@ export function getPathParams(route: IRoute): oa.ParameterObject[] {
 export function getQueryParams(route: IRoute): oa.ParameterObject[] {
   const queries: oa.ParameterObject[] = _(route.params)
     .filter({ type: 'query' })
-    .map(({ index, name, object, required, method }) => {
-      const typeCls = getParamTypes(object, method)[index]
-      const type = _.isNumber(typeCls.prototype) ? 'number' : 'string' // TODO improve handling
+    .map(queryMeta => {
+      const schema = getParamSchema(queryMeta)
       return {
         in: 'query',
-        name: name || '',
-        required: isRequired({ required }, route),
-        schema: { type }
+        name: queryMeta.name || '',
+        required: isRequired(queryMeta, route),
+        schema
       }
     })
     .value()
 
   const queriesMeta = _.find(route.params, { type: 'queries' })
   if (queriesMeta) {
-    const { index, object, required, method } = queriesMeta
-    const type = getParamTypes(object, method)[index]
+    const schema = getParamSchema(queriesMeta)
     queries.push({
       in: 'query',
-      name: type.name,
-      required: isRequired({ required }, route),
-      schema: makeRef(type.name)
+      name: _.last(_.split(schema.$ref, '/')) || '',
+      required: isRequired(queriesMeta, route),
+      schema
     })
   }
 
@@ -120,10 +121,10 @@ export function getQueryParams(route: IRoute): oa.ParameterObject[] {
 export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
   const meta = _.find(route.params, { type: 'body' })
   if (meta) {
-    const type = getParamTypes(meta.object, meta.method)[meta.index]
+    const schema = getParamSchema(meta)
     return {
-      content: { 'application/json': { schema: makeRef(type.name) } },
-      description: type.name,
+      content: { 'application/json': { schema } },
+      description: _.last(_.split(schema.$ref, '/')),
       required: isRequired(meta, route)
     }
   }
@@ -186,15 +187,23 @@ function isRequired(meta: { required?: boolean }, route: IRoute) {
 }
 
 /**
- * Return a JSON Schema reference object pointing to given schema.
+ * Parse given parameter's OpenAPI Schema object using types metadata.
  */
-function makeRef(schemaName: string): oa.ReferenceObject {
-  return { $ref: '#/components/schemas/' + schemaName }
-}
+function getParamSchema(param: ParamMetadataArgs): oa.SchemaObject {
+  const { index, object, method } = param
 
-/**
- * Parse given target object's property's param types from metadata.
- */
-function getParamTypes(target: object, property: string) {
-  return Reflect.getMetadata('design:paramtypes', target, property)
+  const type = Reflect.getMetadata('design:paramtypes', object, method)[index]
+  if (_.isFunction(type)) {
+    if (_.isString(type.prototype) || _.isSymbol(type.prototype)) {
+      return { type: 'string' }
+    } else if (_.isNumber(type.prototype)) {
+      return { type: 'number' }
+    } else if (_.isBoolean(type.prototype)) {
+      return { type: 'boolean' }
+    }
+    if (type.name !== 'Object') {
+      return { $ref: '#/components/schemas/' + type.name }
+    }
+  }
+  return {}
 }

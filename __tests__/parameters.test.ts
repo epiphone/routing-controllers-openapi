@@ -21,10 +21,12 @@ describe('parameters', () => {
     @JsonController('/users')
     // @ts-ignore: not referenced
     class UsersController {
-      @Get('/:userId')
+      @Get('/:userId/:booleanParam/:anyParam')
       getPost(
         @Param('userId') _userId: number,
         @Param('invalidParam') _invalidParam: string,
+        @Param('booleanParam') _booleanParam: boolean,
+        @Param('anyParam') _anyParam: any,
         @QueryParam('limit') _limit: number,
         @QueryParams() _queryRef?: ListUsersQueryParams
       ) {
@@ -42,6 +44,18 @@ describe('parameters', () => {
         name: 'userId',
         required: true,
         schema: { type: 'string' }
+      },
+      {
+        in: 'path',
+        name: 'booleanParam',
+        required: true,
+        schema: { type: 'string' }
+      },
+      {
+        in: 'path',
+        name: 'anyParam',
+        required: true,
+        schema: { type: 'string' }
       }
     ])
   })
@@ -53,6 +67,18 @@ describe('parameters', () => {
         name: 'userId',
         required: true,
         schema: { type: 'number' }
+      },
+      {
+        in: 'path',
+        name: 'booleanParam',
+        required: true,
+        schema: { type: 'boolean' }
+      },
+      {
+        in: 'path',
+        name: 'anyParam',
+        required: true,
+        schema: {}
       }
     ])
   })
