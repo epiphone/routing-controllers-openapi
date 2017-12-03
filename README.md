@@ -143,6 +143,35 @@ const spec = routingControllersToSpec(storage, routingControllerOptions, {
 })
 ```
 
+### Decorating with additional keywords
+
+Use the `@OpenAPI` decorator to supply your actions with additional keywords:
+
+```typescript
+import { OpenAPI } from 'routing-controllers-openapi'
+
+@JsonController('/users')
+export class UsersController {
+
+  @Get('/')
+  @OpenAPI({
+    description: 'List all available users',
+    responses: {
+      '400': {
+        description: 'Bad request'
+      }
+    }
+  })
+  listUsers() {
+    // ...
+  }
+}
+```
+
+The parameter object consists of any number of properties from the [Operation object](https://swagger.io/specification/#operationObject). These properties are then merged into the spec, overwriting any existing values.
+
+Alternatively you can call `@OpenAPI` with a function of type `(source: OperationObject, route: IRoute) => OperationObject`, i.e. a function receiving the existing spec as well as the target route, spitting out an updated spec. This function parameter can be used to implement for example your own merging logic or custom decorators.
+
 ## Supported features
 
 - `@Controller`/`@JsonController` base route and default content-type
@@ -156,12 +185,10 @@ const spec = routingControllersToSpec(storage, routingControllerOptions, {
 - Parse `summary`, `operationId` and `tags` keywords from controller/method names
 
 ## TODO
-- Improve documents, add samples
-- Response type and status decorators
+- Response type decorator
 - `@HeaderParam`, `@ContentType` and other header decorators
 - Auth decorators
 - Regex routes and [suffixes in path params](https://expressjs.com/en/guide/routing.html), e.g. `/users/:id(\d+)`
-- A decorator function for overriding schema keywords
 
 ## Related projects
 

@@ -8,6 +8,7 @@ import {
 import { getSpec } from './generateSpec'
 import { parseRoutes } from './parseMetadata'
 
+export * from './decorators'
 export * from './generateSpec'
 export * from './parseMetadata'
 

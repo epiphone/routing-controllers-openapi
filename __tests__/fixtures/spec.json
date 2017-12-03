@@ -55,6 +55,7 @@
   "paths": {
     "/api/users/": {
       "get": {
+        "description": "List all users",
         "operationId": "UsersController.listUsers",
         "parameters": [
           {
@@ -141,6 +142,9 @@
               "application/json": {}
             },
             "description": "Successful response"
+          },
+          "400": {
+            "description": "Bad request"
           }
         },
         "summary": "List users in range",

@@ -13,6 +13,8 @@ import {
   QueryParams
 } from 'routing-controllers'
 
+import { OpenAPI } from '../../src'
+
 export class CreateUserBody {
   @IsEmail() email: string
 }
@@ -35,11 +37,13 @@ export class ListUsersQueryParams {
 export class UsersController {
   @Get('/')
   @ContentType('text/cvs')
+  @OpenAPI({ description: 'List all users' })
   listUsers(@QueryParams() _query?: ListUsersQueryParams) {
     return
   }
 
   @Get('/:from-:to')
+  @OpenAPI({ responses: { '400': { description: 'Bad request' } } })
   listUsersInRange(
     @Param('to') _to: number,
     @QueryParam('userId', { required: true })
