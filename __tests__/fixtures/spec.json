@@ -153,6 +153,34 @@
         ]
       }
     },
+    "/api/users/{version}": {
+      "delete": {
+        "operationId": "UsersController.deleteUsersByVersion",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "pattern": "v?\\d{1}|all",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {}
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Delete users by version",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
     "/api/users/{userId}": {
       "get": {
         "operationId": "UsersController.getUser",
@@ -160,7 +188,7 @@
           {
             "in": "path",
             "name": "userId",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "number"
             }

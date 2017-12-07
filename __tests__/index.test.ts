@@ -5,6 +5,7 @@ import * as _ from 'lodash'
 import { getMetadataArgsStorage } from 'routing-controllers'
 
 import {
+  expressToOpenAPIPath,
   getFullPath,
   getOperationId,
   parseRoutes,
@@ -53,7 +54,7 @@ describe('index', () => {
       },
       {
         method: 'getUser',
-        route: '/:userId',
+        route: '/:userId?',
         target: UsersController,
         type: 'get'
       },
@@ -68,6 +69,12 @@ describe('index', () => {
         route: '/:userId/posts',
         target: UsersController,
         type: 'post'
+      },
+      {
+        method: 'deleteUsersByVersion',
+        route: '/:version(v?\\d{1}|all)',
+        target: UsersController,
+        type: 'delete'
       },
       {
         method: 'getUserPost',
@@ -90,6 +97,26 @@ describe('index', () => {
 
     route.action.route = '/all'
     expect(getFullPath(route)).toEqual('/all')
+  })
+
+  it('converts Express paths into OpenAPI paths', () => {
+    expect(expressToOpenAPIPath('')).toEqual('')
+    expect(expressToOpenAPIPath('/')).toEqual('/')
+    expect(expressToOpenAPIPath('123')).toEqual('123')
+    expect(expressToOpenAPIPath('/users')).toEqual('/users')
+    expect(expressToOpenAPIPath('/users/:userId')).toEqual('/users/{userId}')
+    expect(expressToOpenAPIPath('/users/:userId/:from-:to')).toEqual(
+      '/users/{userId}/{from}-{to}'
+    )
+    expect(expressToOpenAPIPath('/users/:userId/:limit?')).toEqual(
+      '/users/{userId}/{limit}'
+    )
+    expect(expressToOpenAPIPath('/users/:userId(\\d+)')).toEqual(
+      '/users/{userId}'
+    )
+    expect(expressToOpenAPIPath('/users/:type(user|admin)')).toEqual(
+      '/users/{type}'
+    )
   })
 
   it('gets OpenAPI Operation IDs', () => {

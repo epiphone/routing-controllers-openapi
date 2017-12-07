@@ -14,19 +14,17 @@ describe('parameters', () => {
   let route: IRoute
 
   beforeAll(() => {
-    getMetadataArgsStorage().reset()
-
     class ListUsersQueryParams {}
 
     @JsonController('/users')
     // @ts-ignore: not referenced
     class UsersController {
-      @Get('/:userId/:booleanParam/:anyParam')
+      @Get('/:string/:regex(\\d{6})/:optional?/:number/:boolean/:any')
       getPost(
-        @Param('userId') _userId: number,
-        @Param('invalidParam') _invalidParam: string,
-        @Param('booleanParam') _booleanParam: boolean,
-        @Param('anyParam') _anyParam: any,
+        @Param('number') _numberParam: number,
+        @Param('invalid') _invalidParam: string,
+        @Param('boolean') _booleanParam: boolean,
+        @Param('any') _anyParam: any,
         @QueryParam('limit') _limit: number,
         @QueryParams() _queryRef?: ListUsersQueryParams
       ) {
@@ -41,19 +39,37 @@ describe('parameters', () => {
     expect(getPathParams({ ...route, params: [] })).toEqual([
       {
         in: 'path',
-        name: 'userId',
+        name: 'string',
         required: true,
         schema: { type: 'string' }
       },
       {
         in: 'path',
-        name: 'booleanParam',
+        name: 'regex',
+        required: true,
+        schema: { pattern: '\\d{6}', type: 'string' }
+      },
+      {
+        in: 'path',
+        name: 'optional',
+        required: false,
+        schema: { type: 'string' }
+      },
+      {
+        in: 'path',
+        name: 'number',
         required: true,
         schema: { type: 'string' }
       },
       {
         in: 'path',
-        name: 'anyParam',
+        name: 'boolean',
+        required: true,
+        schema: { type: 'string' }
+      },
+      {
+        in: 'path',
+        name: 'any',
         required: true,
         schema: { type: 'string' }
       }
@@ -64,19 +80,37 @@ describe('parameters', () => {
     expect(getPathParams(route)).toEqual([
       {
         in: 'path',
-        name: 'userId',
+        name: 'string',
+        required: true,
+        schema: { type: 'string' }
+      },
+      {
+        in: 'path',
+        name: 'regex',
+        required: true,
+        schema: { pattern: '\\d{6}', type: 'string' }
+      },
+      {
+        in: 'path',
+        name: 'optional',
+        required: false,
+        schema: { type: 'string' }
+      },
+      {
+        in: 'path',
+        name: 'number',
         required: true,
         schema: { type: 'number' }
       },
       {
         in: 'path',
-        name: 'booleanParam',
+        name: 'boolean',
         required: true,
         schema: { type: 'boolean' }
       },
       {
         in: 'path',
-        name: 'anyParam',
+        name: 'any',
         required: true,
         schema: {}
       }
@@ -84,7 +118,7 @@ describe('parameters', () => {
   })
 
   it('ignores @Param if corresponding name is not found in path string', () => {
-    expect(_.filter(getPathParams(route), { name: 'invalidParam' })).toEqual([])
+    expect(_.filter(getPathParams(route), { name: 'invalid' })).toEqual([])
   })
 
   it('parses query param from @QueryParam decorator', () => {

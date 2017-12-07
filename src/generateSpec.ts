@@ -1,19 +1,24 @@
 // tslint:disable:no-submodule-imports
 import * as _ from 'lodash'
 import * as oa from 'openapi3-ts'
+import * as pathToRegexp from 'path-to-regexp'
 import 'reflect-metadata'
 import { ParamMetadataArgs } from 'routing-controllers/metadata/args/ParamMetadataArgs'
 
 import { applyOpenAPIDecorator } from './decorators'
 import { IRoute } from './index'
 
+/** Return full Express path of given route. */
+export function getFullExpressPath(route: IRoute): string {
+  const { action, controller, options } = route
+  return (options.routePrefix || '') + controller.route + action.route
+}
+
 /**
  * Return full OpenAPI-formatted path of given route.
  */
 export function getFullPath(route: IRoute): string {
-  const { action, controller, options } = route
-  const path = (options.routePrefix || '') + controller.route + action.route
-  return path.replace(/:([A-Za-z0-9_]+)/gi, '{$1}')
+  return expressToOpenAPIPath(getFullExpressPath(route))
 }
 
 /**
@@ -63,25 +68,33 @@ export function getPaths(routes: IRoute[]): oa.PathObject {
  * supplemented with possible @Param() decorator values.
  */
 export function getPathParams(route: IRoute): oa.ParameterObject[] {
-  const path = getFullPath(route)
-  const paramNames = _.map(path.match(/{[A-Za-z0-9_]+}/gi), d => d.slice(1, -1))
+  const path = getFullExpressPath(route)
+  const tokens = pathToRegexp.parse(path)
 
-  return paramNames.map(name => {
-    const param: oa.ParameterObject = {
-      in: 'path',
-      name,
-      required: true,
-      schema: { type: 'string' } // TODO parse type from param regexp suffix?
-    }
+  return tokens
+    .filter(_.isObject) // Omit non-parameter plain string tokens
+    .map((token: pathToRegexp.Key) => {
+      const name = token.name + ''
+      const param: oa.ParameterObject = {
+        in: 'path',
+        name,
+        required: !token.optional,
+        schema: { type: 'string' }
+      }
 
-    const meta = _.find(route.params, { name, type: 'param' })
-    if (meta) {
-      param.required = isRequired(meta, route)
-      param.schema = getParamSchema(meta)
-    }
+      if (token.pattern && token.pattern !== '[^\\/]+?') {
+        param.schema = { pattern: token.pattern, type: 'string' }
+      }
 
-    return param
-  })
+      const meta = _.find(route.params, { name, type: 'param' })
+      if (meta) {
+        const metaSchema = getParamSchema(meta)
+        param.schema =
+          'type' in metaSchema ? { ...param.schema, ...metaSchema } : metaSchema
+      }
+
+      return param
+    })
 }
 
 /**
@@ -91,7 +104,7 @@ export function getQueryParams(route: IRoute): oa.ParameterObject[] {
   const queries: oa.ParameterObject[] = _(route.params)
     .filter({ type: 'query' })
     .map(queryMeta => {
-      const schema = getParamSchema(queryMeta)
+      const schema = getParamSchema(queryMeta) as oa.SchemaObject
       return {
         in: 'query',
         name: queryMeta.name || '',
@@ -103,7 +116,7 @@ export function getQueryParams(route: IRoute): oa.ParameterObject[] {
 
   const queriesMeta = _.find(route.params, { type: 'queries' })
   if (queriesMeta) {
-    const schema = getParamSchema(queriesMeta)
+    const schema = getParamSchema(queriesMeta) as oa.ReferenceObject
     queries.push({
       in: 'query',
       name: _.last(_.split(schema.$ref, '/')) || '',
@@ -121,7 +134,7 @@ export function getQueryParams(route: IRoute): oa.ParameterObject[] {
 export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
   const meta = _.find(route.params, { type: 'body' })
   if (meta) {
-    const schema = getParamSchema(meta)
+    const schema = getParamSchema(meta) as oa.ReferenceObject
     return {
       content: { 'application/json': { schema } },
       description: _.last(_.split(schema.$ref, '/')),
@@ -178,6 +191,16 @@ export function getTags(route: IRoute): string[] {
 }
 
 /**
+ * Convert an Express path into an OpenAPI-compatible path.
+ */
+export function expressToOpenAPIPath(expressPath: string) {
+  const tokens = pathToRegexp.parse(expressPath)
+  return tokens
+    .map(d => (_.isString(d) ? d : `${d.prefix}{${d.name}}`))
+    .join('')
+}
+
+/**
  * Return true if given metadata argument is required, checking for global
  * setting if local setting is not defined.
  */
@@ -187,9 +210,12 @@ function isRequired(meta: { required?: boolean }, route: IRoute) {
 }
 
 /**
- * Parse given parameter's OpenAPI Schema object using types metadata.
+ * Parse given parameter's OpenAPI Schema or Reference object using metadata
+ * reflection.
  */
-function getParamSchema(param: ParamMetadataArgs): oa.SchemaObject {
+function getParamSchema(
+  param: ParamMetadataArgs
+): oa.SchemaObject | oa.ReferenceObject {
   const { index, object, method } = param
 
   const type = Reflect.getMetadata('design:paramtypes', object, method)[index]

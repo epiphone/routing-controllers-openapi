@@ -120,7 +120,7 @@ export function routingControllersToSpec(
 ): OpenAPIObject
 ```
 
-`routingControllerOptions` refers to the options object used to configure `routing-controllers`. Pass in the same options here to have your [`routePrefix`](https://github.com/typestack/routing-controllers/#prefix-all-controllers-routes) and [`defaults`](https://github.com/typestack/routing-controllers/#default-settings) options reflected in the resulting OpenAPI spec.
+`routingControllerOptions` refers to the options object used to configure routing-controllers. Pass in the same options here to have your [`routePrefix`](https://github.com/typestack/routing-controllers/#prefix-all-controllers-routes) and [`defaults`](https://github.com/typestack/routing-controllers/#default-settings) options reflected in the resulting OpenAPI spec.
 
 `additionalProperties` is a partial [OpenAPI object](https://swagger.io/specification/#openapi-object-17) that gets merged into the result spec. You can for example set your own [`info`](https://swagger.io/specification/#openapi-object-19) or [`components`](https://swagger.io/specification/#components-object-33) keywords here.
 
@@ -178,6 +178,7 @@ Alternatively you can call `@OpenAPI` with a function of type `(source: Operatio
 - `options.routePrefix`
 - `@Get`, `@Post` and other action decorators
 - Parse path parameters straight from path strings and optionally supplement with `@Param` decorator
+  - Regex and optional path parameters (e.g. `/users/:id(\d+)/:type?`) are also supported
 - `@QueryParam` and `@QueryParams`
 - `@Body`
 - Parse response keywords from `@HttpCode` and `@ContentType` values
@@ -185,10 +186,11 @@ Alternatively you can call `@OpenAPI` with a function of type `(source: Operatio
 - Parse `summary`, `operationId` and `tags` keywords from controller/method names
 
 ## TODO
-- Response type decorator
-- `@HeaderParam`, `@ContentType` and other header decorators
-- Auth decorators
-- Regex routes and [suffixes in path params](https://expressjs.com/en/guide/routing.html), e.g. `/users/:id(\d+)`
+- Parsing `@HeaderParam`, `@ContentType` and other header decorators
+- Support for routing-controller's [authorization features](https://github.com/typestack/routing-controllers#using-authorization-features)
+- Parsing endpoint response type, using either the reflection metadata or a custom decorator
+
+Feel free to submit a PR!
 
 ## Related projects
 

@@ -4,6 +4,7 @@ import {
   Body,
   ContentType,
   Controller,
+  Delete,
   Get,
   HttpCode,
   JsonController,
@@ -52,7 +53,7 @@ export class UsersController {
     return
   }
 
-  @Get('/:userId')
+  @Get('/:userId?')
   getUser(@Param('userId') _userId: number) {
     return
   }
@@ -68,6 +69,11 @@ export class UsersController {
     @Body({ required: true })
     _body: CreatePostBody
   ) {
+    return
+  }
+
+  @Delete('/:version(v?\\d{1}|all)')
+  deleteUsersByVersion() {
     return
   }
 }
