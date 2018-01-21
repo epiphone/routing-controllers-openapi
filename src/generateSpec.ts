@@ -11,7 +11,7 @@ import { IRoute } from './index'
 /** Return full Express path of given route. */
 export function getFullExpressPath(route: IRoute): string {
   const { action, controller, options } = route
-  return (options.routePrefix || '') + controller.route + action.route
+  return (options.routePrefix || '') + controller.route + (action.route || '')
 }
 
 /**
