@@ -10,6 +10,7 @@ import {
   JsonController,
   Param,
   Post,
+  Put,
   QueryParam,
   QueryParams
 } from 'routing-controllers'
@@ -39,7 +40,7 @@ export class UsersController {
   @Get('/')
   @ContentType('text/cvs')
   @OpenAPI({ description: 'List all users' })
-  listUsers(@QueryParams() _query?: ListUsersQueryParams) {
+  listUsers( @QueryParams() _query?: ListUsersQueryParams) {
     return
   }
 
@@ -49,18 +50,18 @@ export class UsersController {
     @Param('to') _to: number,
     @QueryParam('userId', { required: true })
     _userId: number
-  ) {
+    ) {
     return
   }
 
   @Get('/:userId?')
-  getUser(@Param('userId') _userId: number) {
+  getUser( @Param('userId') _userId: number) {
     return
   }
 
   @HttpCode(201)
   @Post('/')
-  createUser(@Body() _body: CreateUserBody) {
+  createUser( @Body() _body: CreateUserBody) {
     return
   }
 
@@ -68,7 +69,7 @@ export class UsersController {
   createUserPost(
     @Body({ required: true })
     _body: CreatePostBody
-  ) {
+    ) {
     return
   }
 
@@ -76,6 +77,9 @@ export class UsersController {
   deleteUsersByVersion() {
     return
   }
+
+  @Put()
+  putUserDefault() { return }
 }
 
 @Controller('/users/:userId/posts')
@@ -84,7 +88,7 @@ export class UserPostsController {
   getUserPost(
     @Param('userId') _userId: number,
     @Param('postId') _postId: string
-  ) {
+    ) {
     return
   }
 }

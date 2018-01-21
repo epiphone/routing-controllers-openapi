@@ -53,6 +53,23 @@
   },
   "openapi": "3.0.0",
   "paths": {
+    "/api/users": {
+      "put": {
+        "summary": "Put user default",
+        "operationId": "UsersController.putUserDefault",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {}
+            },
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
     "/api/users/": {
       "get": {
         "description": "List all users",

@@ -77,6 +77,12 @@ describe('index', () => {
         type: 'delete'
       },
       {
+        method: 'putUserDefault',
+        route: undefined,
+        target: UsersController,
+        type: 'put'
+      },
+      {
         method: 'getUserPost',
         route: '/:postId',
         target: UserPostsController,
@@ -123,7 +129,7 @@ describe('index', () => {
     const route = _.cloneDeep(routes[0])
     expect(getOperationId(route)).toEqual('UsersController.listUsers')
 
-    route.action.target = class AnotherController {}
+    route.action.target = class AnotherController { }
     route.action.method = 'anotherMethod'
     expect(getOperationId(route)).toEqual('AnotherController.anotherMethod')
   })
