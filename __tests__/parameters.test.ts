@@ -2,18 +2,27 @@ import * as _ from 'lodash'
 import {
   Get,
   getMetadataArgsStorage,
+  HeaderParam,
+  HeaderParams,
   JsonController,
   Param,
   QueryParam,
   QueryParams
 } from 'routing-controllers'
 
-import { getPathParams, getQueryParams, IRoute, parseRoutes } from '../src'
+import {
+  getHeaderParams,
+  getPathParams,
+  getQueryParams,
+  IRoute,
+  parseRoutes
+} from '../src'
 
 describe('parameters', () => {
   let route: IRoute
 
   beforeAll(() => {
+    class ListUsersHeaderParams {}
     class ListUsersQueryParams {}
 
     @JsonController('/users')
@@ -26,7 +35,10 @@ describe('parameters', () => {
         @Param('boolean') _booleanParam: boolean,
         @Param('any') _anyParam: any,
         @QueryParam('limit') _limit: number,
-        @QueryParams() _queryRef?: ListUsersQueryParams
+        @HeaderParam('Authorization', { required: true })
+        _authorization: string,
+        @QueryParams() _queryRef?: ListUsersQueryParams,
+        @HeaderParams() _headerParams?: ListUsersHeaderParams
       ) {
         return
       }
@@ -136,6 +148,24 @@ describe('parameters', () => {
       name: 'ListUsersQueryParams',
       required: false,
       schema: { $ref: '#/components/schemas/ListUsersQueryParams' }
+    })
+  })
+
+  it('parses header param from @HeaderParam decorator', () => {
+    expect(getHeaderParams(route)[0]).toEqual({
+      in: 'header',
+      name: 'Authorization',
+      required: true,
+      schema: { type: 'string' }
+    })
+  })
+
+  it('parses header param ref from @HeaderParams decorator', () => {
+    expect(getHeaderParams(route)[1]).toEqual({
+      in: 'header',
+      name: 'ListUsersHeaderParams',
+      required: false,
+      schema: { $ref: '#/components/schemas/ListUsersHeaderParams' }
     })
   })
 })

@@ -180,13 +180,13 @@ Alternatively you can call `@OpenAPI` with a function of type `(source: Operatio
 - Parse path parameters straight from path strings and optionally supplement with `@Param` decorator
   - Regex and optional path parameters (e.g. `/users/:id(\d+)/:type?`) are also supported
 - `@QueryParam` and `@QueryParams`
+- `@HeaderParam` and `@HeaderParams`
 - `@Body`
 - Parse response keywords from `@HttpCode` and `@ContentType` values
 - Global `options.defaults.paramOptions.required` option and local override with `{required: true}` in decorator params
 - Parse `summary`, `operationId` and `tags` keywords from controller/method names
 
 ## TODO
-- Parsing `@HeaderParam`, `@ContentType` and other header decorators
 - Support for routing-controller's [authorization features](https://github.com/typestack/routing-controllers#using-authorization-features)
 - Parsing endpoint response type, using either the reflection metadata or a custom decorator
 

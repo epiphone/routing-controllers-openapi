@@ -29,7 +29,9 @@ export function parseRoutes(
 ): IRoute[] {
   return storage.actions.map(action => ({
     action,
-    controller: _.find(storage.controllers, { target: action.target })!,
+    controller: _.find(storage.controllers, {
+      target: action.target
+    }) as ControllerMetadataArgs,
     options,
     params: _.sortBy(
       storage.filterParamsWithTargetAndMethod(action.target, action.method),

@@ -44,6 +44,20 @@
           "types"
         ],
         "type": "object"
+      },
+      "ListUsersHeaderParams": {
+        "properties": {
+          "Authorization": {
+            "type": "string"
+          },
+          "X-Correlation-ID": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "Authorization"
+        ],
+        "type": "object"
       }
     }
   },
@@ -75,6 +89,14 @@
         "description": "List all users",
         "operationId": "UsersController.listUsers",
         "parameters": [
+          {
+            "in": "header",
+            "name": "ListUsersHeaderParams",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ListUsersHeaderParams"
+            }
+          },
           {
             "in": "query",
             "name": "ListUsersQueryParams",
@@ -146,6 +168,14 @@
           },
           {
             "in": "query",
+            "name": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
             "name": "userId",
             "required": true,
             "schema": {
@@ -202,6 +232,22 @@
       "get": {
         "operationId": "UsersController.getUser",
         "parameters": [
+          {
+            "in": "header",
+            "name": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Requested-With",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "in": "path",
             "name": "userId",

@@ -27,7 +27,11 @@ export function getFullPath(route: IRoute): string {
 export function getOperation(route: IRoute): oa.OperationObject {
   const operation: oa.OperationObject = {
     operationId: getOperationId(route),
-    parameters: [...getPathParams(route), ...getQueryParams(route)],
+    parameters: [
+      ...getHeaderParams(route),
+      ...getPathParams(route),
+      ...getQueryParams(route)
+    ],
     requestBody: getRequestBody(route) || undefined,
     responses: getResponses(route),
     summary: getSummary(route),
@@ -59,6 +63,37 @@ export function getPaths(routes: IRoute[]): oa.PathObject {
 
   // @ts-ignore: array spread
   return _.merge(...routePaths)
+}
+
+/**
+ * Return header parameters of given route.
+ */
+export function getHeaderParams(route: IRoute): oa.ParameterObject[] {
+  const headers: oa.ParameterObject[] = _(route.params)
+    .filter({ type: 'header' })
+    .map(headerMeta => {
+      const schema = getParamSchema(headerMeta) as oa.SchemaObject
+      return {
+        in: 'header' as oa.ParameterLocation,
+        name: headerMeta.name || '',
+        required: isRequired(headerMeta, route),
+        schema
+      }
+    })
+    .value()
+
+  const headersMeta = _.find(route.params, { type: 'headers' })
+  if (headersMeta) {
+    const schema = getParamSchema(headersMeta) as oa.ReferenceObject
+    headers.push({
+      in: 'header',
+      name: _.last(_.split(schema.$ref, '/')) || '',
+      required: isRequired(headersMeta, route),
+      schema
+    })
+  }
+
+  return headers
 }
 
 /**
@@ -106,7 +141,7 @@ export function getQueryParams(route: IRoute): oa.ParameterObject[] {
     .map(queryMeta => {
       const schema = getParamSchema(queryMeta) as oa.SchemaObject
       return {
-        in: 'query',
+        in: 'query' as oa.ParameterLocation,
         name: queryMeta.name || '',
         required: isRequired(queryMeta, route),
         schema

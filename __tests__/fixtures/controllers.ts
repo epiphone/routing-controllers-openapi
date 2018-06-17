@@ -6,6 +6,8 @@ import {
   Controller,
   Delete,
   Get,
+  HeaderParam,
+  HeaderParams,
   HttpCode,
   JsonController,
   Param,
@@ -35,12 +37,23 @@ export class ListUsersQueryParams {
   types: string[]
 }
 
+export class ListUsersHeaderParams {
+  @IsString() Authorization: string
+
+  @IsOptional()
+  @IsString()
+  'X-Correlation-ID': string
+}
+
 @JsonController('/users')
 export class UsersController {
   @Get('/')
   @ContentType('text/cvs')
   @OpenAPI({ description: 'List all users' })
-  listUsers( @QueryParams() _query?: ListUsersQueryParams) {
+  listUsers(
+    @QueryParams() _query?: ListUsersQueryParams,
+    @HeaderParams() _header?: ListUsersHeaderParams
+  ) {
     return
   }
 
@@ -48,20 +61,25 @@ export class UsersController {
   @OpenAPI({ responses: { '400': { description: 'Bad request' } } })
   listUsersInRange(
     @Param('to') _to: number,
+    @QueryParam('') _emptyQuery: string,
     @QueryParam('userId', { required: true })
     _userId: number
-    ) {
+  ) {
     return
   }
 
   @Get('/:userId?')
-  getUser( @Param('userId') _userId: number) {
+  getUser(
+    @Param('userId') _userId: number,
+    @HeaderParam('') _emptyHeader: string,
+    @HeaderParam('X-Requested-With') _xRequestedWith: string
+  ) {
     return
   }
 
   @HttpCode(201)
   @Post('/')
-  createUser( @Body() _body: CreateUserBody) {
+  createUser(@Body() _body: CreateUserBody) {
     return
   }
 
@@ -69,7 +87,7 @@ export class UsersController {
   createUserPost(
     @Body({ required: true })
     _body: CreatePostBody
-    ) {
+  ) {
     return
   }
 
@@ -79,7 +97,9 @@ export class UsersController {
   }
 
   @Put()
-  putUserDefault() { return }
+  putUserDefault() {
+    return
+  }
 }
 
 @Controller('/users/:userId/posts')
@@ -88,7 +108,7 @@ export class UserPostsController {
   getUserPost(
     @Param('userId') _userId: number,
     @Param('postId') _postId: string
-    ) {
+  ) {
     return
   }
 }
