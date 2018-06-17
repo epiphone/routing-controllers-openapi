@@ -9,7 +9,6 @@ module.exports = {
       skipBabel: true
     }
   },
-  mapCoverage: true,
   moduleDirectories: ['node_modules', 'src'],
   moduleFileExtensions: ['ts', 'js', 'json'],
   roots: [
