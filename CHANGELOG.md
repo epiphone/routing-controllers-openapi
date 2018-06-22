@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2018-06-22
+### Fixed
+- Fix empty property cleanup removing boolean properties like `deprecated` [#6](https://github.com/epiphone/routing-controllers-openapi/issues/6) (thanks [@WRostom](https://github.com/WRostom)!)
+
 ## [1.3.0] - 2018-06-17
 ### Added
 - Handle `@HeaderParam` and `@HeaderParams` decorators [#2](https://github.com/epiphone/routing-controllers-openapi/issues/2)
