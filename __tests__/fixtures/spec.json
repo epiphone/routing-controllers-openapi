@@ -69,7 +69,9 @@
   "paths": {
     "/api/users": {
       "put": {
-        "summary": "Put user default",
+        "description": "Insert or update a user object - DEPRECATED in v1.0.1",
+        "deprecated": true,
+        "summary": "",
         "operationId": "UsersController.putUserDefault",
         "responses": {
           "200": {

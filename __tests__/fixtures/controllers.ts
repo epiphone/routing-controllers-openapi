@@ -96,6 +96,11 @@ export class UsersController {
     return
   }
 
+  @OpenAPI({
+    deprecated: true,
+    description: 'Insert or update a user object - DEPRECATED in v1.0.1',
+    summary: ''
+  })
   @Put()
   putUserDefault() {
     return

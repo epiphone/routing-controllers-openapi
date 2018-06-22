@@ -13,8 +13,8 @@ describe('options', () => {
   beforeEach(() => {
     getMetadataArgsStorage().reset()
 
-    @JsonController('/users')
     // @ts-ignore: not referenced
+    @JsonController('/users')
     class UsersController {
       @Get('/')
       @OpenAPI({

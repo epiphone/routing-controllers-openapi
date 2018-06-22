@@ -38,10 +38,8 @@ export function getOperation(route: IRoute): oa.OperationObject {
     tags: getTags(route)
   }
 
-  const decoratedOperation = applyOpenAPIDecorator(operation, route)
-
-  // clean empty and undefined properties:
-  return _.omitBy(decoratedOperation, _.isEmpty) as oa.OperationObject
+  const cleanedOperation = _.omitBy(operation, _.isEmpty) as oa.OperationObject
+  return applyOpenAPIDecorator(cleanedOperation, route)
 }
 
 /**
