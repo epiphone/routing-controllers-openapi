@@ -34,7 +34,9 @@
     "path-to-regexp": "^2.2.1",
     "reflect-metadata": "^0.1.12",
     "routing-controllers": "^0.7.7",
-    "tslib": "^1.9.2"
+    "tslib": "^1.9.2",
+    "class-validator": "^0.8.5",
+    "class-validator-jsonschema": "^1.1.1"
   },
   "devDependencies": {
     "@types/debug": "^0.0.30",
@@ -44,8 +46,6 @@
     "@types/prettier": "^1.13.1",
     "@types/reflect-metadata": "^0.1.0",
     "@types/rimraf": "^2.0.2",
-    "class-validator": "^0.8.5",
-    "class-validator-jsonschema": "^1.1.1",
     "codecov": "^3.0.2",
     "jest": "^23.1.0",
     "prettier": "1.13.5",

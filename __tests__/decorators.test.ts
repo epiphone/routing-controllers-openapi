@@ -4,8 +4,8 @@ import {
   JsonController,
   Param
 } from 'routing-controllers'
-
-import { getOperation, getTags, IRoute, OpenAPI, parseRoutes } from '../src'
+import { ModelDto } from './fixtures/models'
+import { getOperation, getTags, IRoute, OpenAPI, ResponseBody, parseRoutes } from '../src'
 
 describe('options', () => {
   let routes: IRoute[]
@@ -13,8 +13,9 @@ describe('options', () => {
   beforeEach(() => {
     getMetadataArgsStorage().reset()
 
-    // @ts-ignore: not referenced
+
     @JsonController('/users')
+    // @ts-ignore: not referenced
     class UsersController {
       @Get('/')
       @OpenAPI({
@@ -32,6 +33,12 @@ describe('options', () => {
       getUser(@Param('userId') _userId: number) {
         return
       }
+
+      @Get('/model/:uuid')
+      @ResponseBody(ModelDto, 200)
+      getModel(@Param('userId') _userId: number) {
+        return new ModelDto();
+      }
     }
 
     routes = parseRoutes(getMetadataArgsStorage())
@@ -45,5 +52,10 @@ describe('options', () => {
   it('applies @OpenAPI decorator function parameter to operation', () => {
     const operation = getOperation(routes[1])
     expect(operation.tags).toEqual(['Users', 'custom-tag'])
+  })
+
+  it('applies @ResponseBody decorator function parameter to operation', () => {
+    const operation = getOperation(routes[2])
+    expect(operation.responses['200']['application/json']).toEqual(require('./fixtures/responseBodySchema.json'))
   })
 })

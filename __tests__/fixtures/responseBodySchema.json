@@ -1,0 +1,19 @@
+{
+    "schema": {
+        "properties": {
+            "email": {
+                "format": "email",
+                "type": "string"
+            },
+            "username": {
+                "type": "string"
+            },
+            "age": {"type": "integer"}
+        },
+        "required": [
+            "email",
+            "username"
+        ],
+        "type": "object"
+    }
+}

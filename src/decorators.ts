@@ -1,5 +1,7 @@
 import * as _ from 'lodash'
+import { getFromContainer, MetadataStorage } from 'class-validator'
 import { OperationObject } from 'openapi3-ts'
+import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
 import 'reflect-metadata'
 
 import { IRoute } from './index'
@@ -51,4 +53,28 @@ function getOpenAPIMetadata(target: object, key: string): OpenAPIParam {
  */
 function setOpenAPIMetadata(value: OpenAPIParam, target: object, key: string) {
   return Reflect.defineMetadata(OPEN_API_KEY, value, target.constructor, key)
+}
+
+/**
+ * Supplement action with response body type annotation.
+ *
+ * @param responseType Class annotated with class-validator annotations
+ */
+export function ResponseBody(responseClass: any, statusCode: number = 200) {
+  const responseSchema = {
+    ['' + statusCode]: { 'application/json': { schema: {} } }
+  }
+  const metadatas = (getFromContainer(MetadataStorage) as any)
+    .validationMetadatas
+  const schemas = validationMetadatasToSchemas(metadatas)
+  if (
+    schemas &&
+    responseClass &&
+    responseClass.name &&
+    schemas[responseClass.name]
+  ) {
+    responseSchema['' + statusCode]['application/json'].schema =
+      schemas[responseClass.name]
+  }
+  return OpenAPI({ responses: responseSchema })
 }
