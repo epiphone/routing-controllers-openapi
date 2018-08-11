@@ -18,7 +18,7 @@ import { routingControllersToSpec } from 'routing-controllers-openapi'
 @JsonController('/users')
 class UsersController {
   @Get('/:userId')
-  listUsers(@Param('userId') userId: string) {
+  getUser(@Param('userId') userId: string) {
     // ...
   }
 
@@ -51,7 +51,7 @@ prints out the following specification:
   "paths": {
     "/users/{userId}": {
       "get": {
-        "operationId": "UsersController.listUsers",
+        "operationId": "UsersController.getUser",
         "parameters": [
           {
             "in": "path",
@@ -107,6 +107,8 @@ prints out the following specification:
   }
 }
 ```
+
+Check [`/sample`](/sample) for a complete sample application.
 
 ### Configuration
 
