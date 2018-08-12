@@ -10,9 +10,11 @@ import { routingControllersToSpec } from 'routing-controllers-openapi'
 
 import { UsersController } from './UsersController'
 
-const app: Express = createExpressServer({
-  controllers: [UsersController]
-})
+const routingControllersOptions = {
+  controllers: [UsersController],
+  routePrefix: '/api'
+}
+const app: Express = createExpressServer(routingControllersOptions)
 
 // Parse class-validator classes into JSON Schema:
 const metadatas = (getFromContainer(MetadataStorage) as any).validationMetadatas
@@ -22,7 +24,7 @@ const schemas = validationMetadatasToSchemas(metadatas, {
 
 // Parse routing-controllers classes into OpenAPI spec:
 const storage = getMetadataArgsStorage()
-const spec = routingControllersToSpec(storage, undefined, {
+const spec = routingControllersToSpec(storage, routingControllersOptions, {
   components: { schemas },
   info: {
     description: 'Generated with `routing-controllers-openapi`',

@@ -3,8 +3,7 @@ import { Body, Get, JsonController, Param, Post } from 'routing-controllers'
 import { OpenAPI } from 'routing-controllers-openapi'
 
 class CreateUserBody {
-  @IsString()
-  name: string
+  @IsString() name: string
 
   @IsOptional()
   @MaxLength(20, { each: true })

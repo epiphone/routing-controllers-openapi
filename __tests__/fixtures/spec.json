@@ -67,6 +67,40 @@
   },
   "openapi": "3.0.0",
   "paths": {
+    "/api": {
+      "get": {
+        "operationId": "RootController.getDefaultPath",
+        "responses": {
+          "200": {
+            "content": {
+              "text/html; charset=utf-8": {}
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get default path",
+        "tags": [
+          "Root"
+        ]
+      }
+    },
+    "/api/stringPath": {
+      "get": {
+        "operationId": "RootController.getStringPath",
+        "responses": {
+          "200": {
+            "content": {
+              "text/html; charset=utf-8": {}
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Get string path",
+        "tags": [
+          "Root"
+        ]
+      }
+    },
     "/api/users": {
       "put": {
         "description": "Insert or update a user object - DEPRECATED in v1.0.1",
