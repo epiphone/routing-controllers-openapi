@@ -21,7 +21,8 @@ export type OpenAPIParam =
  */
 export function OpenAPI(spec: OpenAPIParam) {
   return (target: object, key: string) => {
-    setOpenAPIMetadata(spec, target, key)
+    const currentMeta = getOpenAPIMetadata(target, key)
+    setOpenAPIMetadata([spec, ...currentMeta], target, key)
   }
 }
 
@@ -33,22 +34,24 @@ export function applyOpenAPIDecorator(
   route: IRoute
 ): OperationObject {
   const { action } = route
-  const metadata = getOpenAPIMetadata(action.target.prototype, action.method)
-  return _.isFunction(metadata)
-    ? metadata(originalOperation, route)
-    : _.merge(originalOperation, metadata)
+  const openAPIParams = getOpenAPIMetadata(action.target.prototype, action.method)
+  return openAPIParams.reduce((acc: OperationObject, oaParam: OpenAPIParam) => {
+    return _.isFunction(oaParam)
+      ? oaParam(acc, route)
+      : _.merge({}, acc, oaParam)
+  }, originalOperation) as OperationObject
 }
 
 /**
  * Get the OpenAPI Operation object stored in given target property's metadata.
  */
-function getOpenAPIMetadata(target: object, key: string): OpenAPIParam {
-  return Reflect.getMetadata(OPEN_API_KEY, target.constructor, key) || {}
+function getOpenAPIMetadata(target: object, key: string): OpenAPIParam[] {
+  return Reflect.getMetadata(OPEN_API_KEY, target.constructor, key) || []
 }
 
 /**
  * Store given OpenAPI Operation object into target property's metadata.
  */
-function setOpenAPIMetadata(value: OpenAPIParam, target: object, key: string) {
+function setOpenAPIMetadata(value: OpenAPIParam[], target: object, key: string) {
   return Reflect.defineMetadata(OPEN_API_KEY, value, target.constructor, key)
 }
