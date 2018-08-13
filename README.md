@@ -174,6 +174,23 @@ The parameter object consists of any number of properties from the [Operation ob
 
 Alternatively you can call `@OpenAPI` with a function of type `(source: OperationObject, route: IRoute) => OperationObject`, i.e. a function receiving the existing spec as well as the target route, spitting out an updated spec. This function parameter can be used to implement for example your own merging logic or custom decorators.
 
+#### Multiple `@OpenAPI` decorators
+
+A single handler can be decorated with multiple `@OpenAPI`s. Note though that since decorators are applied top-down, any possible duplicate keys are overwritten by subsequent decorators:
+
+```typescript
+  @OpenAPI({
+    summary: 'This value will be overwritten!',
+    description: 'This value will remain'
+  })
+  @OpenAPI({
+    summary: 'This value will remain'
+  })
+  listUsers() {
+    // ...
+  }
+```
+
 ## Supported features
 
 - `@Controller`/`@JsonController` base route and default content-type
