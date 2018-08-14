@@ -96,6 +96,12 @@ describe('decorators', () => {
       responseSchemaDecorators(@Param('userId') _userId: number) {
         return
       }
+
+      @Get('/responseSchemaArray')
+      @ResponseSchema(ModelDto, {isArray: true})
+      responseSchemaArray(@Param('userId') _userId: number) {
+        return
+      }
     }
 
     routes = parseRoutes(getMetadataArgsStorage())
@@ -145,5 +151,11 @@ describe('decorators', () => {
   it('applies @ResponseSchema using contentType and statusCode from decorators', () => {
     const operation = getOperation(routes[7])
     expect(operation.responses['201'].content['application/pdf']).toEqual({"schema": {"$ref": "#/components/schemas/ModelDto"}})
+  })
+
+  it('applies @ResponseSchema using isArray flag set to true', () => {
+    const operation = getOperation(routes[8])
+    expect(operation.responses['200'].content['application/json']).toEqual({"schema": {"items": {
+      "$ref": "#/components/schemas/ModelDto" },"type": "array",}})
   })
 })
