@@ -1,7 +1,5 @@
 import * as _ from 'lodash'
-import { getFromContainer, MetadataStorage } from 'class-validator'
 import { OperationObject } from 'openapi3-ts'
-import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
 import 'reflect-metadata'
 
 import { IRoute } from './index'
@@ -23,7 +21,8 @@ export type OpenAPIParam =
  */
 export function OpenAPI(spec: OpenAPIParam) {
   return (target: object, key: string) => {
-    setOpenAPIMetadata(spec, target, key)
+    const currentMeta = getOpenAPIMetadata(target, key)
+    setOpenAPIMetadata([spec, ...currentMeta], target, key)
   }
 }
 
@@ -35,46 +34,68 @@ export function applyOpenAPIDecorator(
   route: IRoute
 ): OperationObject {
   const { action } = route
-  const metadata = getOpenAPIMetadata(action.target.prototype, action.method)
-  return _.isFunction(metadata)
-    ? metadata(originalOperation, route)
-    : _.merge(originalOperation, metadata)
+  const openAPIParams = getOpenAPIMetadata(action.target.prototype, action.method)
+  return openAPIParams.reduce((acc: OperationObject, oaParam: OpenAPIParam) => {
+    return _.isFunction(oaParam)
+      ? oaParam(acc, route)
+      : _.merge({}, acc, oaParam)
+  }, originalOperation) as OperationObject
 }
 
 /**
  * Get the OpenAPI Operation object stored in given target property's metadata.
  */
-function getOpenAPIMetadata(target: object, key: string): OpenAPIParam {
-  return Reflect.getMetadata(OPEN_API_KEY, target.constructor, key) || {}
+function getOpenAPIMetadata(target: object, key: string): OpenAPIParam[] {
+  return Reflect.getMetadata(OPEN_API_KEY, target.constructor, key) || []
 }
 
 /**
  * Store given OpenAPI Operation object into target property's metadata.
  */
-function setOpenAPIMetadata(value: OpenAPIParam, target: object, key: string) {
+function setOpenAPIMetadata(value: OpenAPIParam[], target: object, key: string) {
   return Reflect.defineMetadata(OPEN_API_KEY, value, target.constructor, key)
 }
 
 /**
  * Supplement action with response body type annotation.
  *
- * @param responseType Class annotated with class-validator annotations
  */
-export function ResponseBody(responseClass: any, statusCode: number = 200) {
-  const responseSchema = {
-    ['' + statusCode]: { 'application/json': { schema: {} } }
-  }
-  const metadatas = (getFromContainer(MetadataStorage) as any)
-    .validationMetadatas
-  const schemas = validationMetadatasToSchemas(metadatas)
-  if (
-    schemas &&
-    responseClass &&
-    responseClass.name &&
-    schemas[responseClass.name]
-  ) {
-    responseSchema['' + statusCode]['application/json'].schema =
-      schemas[responseClass.name]
-  }
-  return OpenAPI({ responses: responseSchema })
+export function ResponseSchema(responseClass: Function, options?: {
+	statusCode?: number;
+	contentType?: string;
+	isArray?: boolean;
+}) {
+	const setResponseSchema = (source, route: IRoute) => {
+		options = {
+			...{
+				statusCode: _.find(route.responseHandlers, { type: 'success-code' })
+					? _.find(route.responseHandlers, { type: 'success-code' })!.value
+					: 200,
+				contentType: _.find(route.responseHandlers, { type: 'content-type' })
+					? _.find(route.responseHandlers, { type: 'content-type' })!.value
+					: 'application/json',
+				isArray: false,
+			},
+			...(options || {}),
+		};
+		const responseSchema = {
+			['' + options.statusCode]: { content: { [options.contentType!]: { schema: {} } } },
+		};
+		if (responseClass && responseClass.name) {
+			if (options.isArray) {
+				responseSchema['' + options.statusCode].content[options.contentType!].schema = {
+					type: 'array',
+					items: {
+						['$ref']: `#/components/schemas/${responseClass.name}`,
+					},
+				};
+			} else {
+				responseSchema['' + options.statusCode].content[options.contentType!].schema['$ref'] = `#/components/schemas/${
+					responseClass.name
+				}`;
+			}
+		}
+		return { responses: responseSchema };
+	};
+	return OpenAPI(setResponseSchema);
 }

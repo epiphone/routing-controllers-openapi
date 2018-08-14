@@ -117,3 +117,16 @@ export class UserPostsController {
     return
   }
 }
+
+@Controller()
+export class RootController {
+  @Get()
+  getDefaultPath() {
+    return
+  }
+
+  @Get('/stringPath')
+  getStringPath() {
+    return
+  }
+}

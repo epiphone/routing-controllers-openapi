@@ -18,7 +18,7 @@ import { routingControllersToSpec } from 'routing-controllers-openapi'
 @JsonController('/users')
 class UsersController {
   @Get('/:userId')
-  listUsers(@Param('userId') userId: string) {
+  getUser(@Param('userId') userId: string) {
     // ...
   }
 
@@ -51,7 +51,7 @@ prints out the following specification:
   "paths": {
     "/users/{userId}": {
       "get": {
-        "operationId": "UsersController.listUsers",
+        "operationId": "UsersController.getUser",
         "parameters": [
           {
             "in": "path",
@@ -107,6 +107,8 @@ prints out the following specification:
   }
 }
 ```
+
+Check [`/sample`](/sample) for a complete sample application.
 
 ### Configuration
 
@@ -171,6 +173,47 @@ export class UsersController {
 The parameter object consists of any number of properties from the [Operation object](https://swagger.io/specification/#operationObject). These properties are then merged into the spec, overwriting any existing values.
 
 Alternatively you can call `@OpenAPI` with a function of type `(source: OperationObject, route: IRoute) => OperationObject`, i.e. a function receiving the existing spec as well as the target route, spitting out an updated spec. This function parameter can be used to implement for example your own merging logic or custom decorators.
+
+#### Multiple `@OpenAPI` decorators
+
+A single handler can be decorated with multiple `@OpenAPI`s. Note though that since decorators are applied top-down, any possible duplicate keys are overwritten by subsequent decorators:
+
+```typescript
+  @OpenAPI({
+    summary: 'This value will be overwritten!',
+    description: 'This value will remain'
+  })
+  @OpenAPI({
+    summary: 'This value will remain'
+  })
+  listUsers() {
+    // ...
+  }
+```
+
+### Annotating the schema of Responses
+
+ Extracting response types automatically in runtime isn't allowed by Typescript's reflection system at the moment. Specifically the problem is that `routing-controllers-openapi` can't unwrap generic types like Promise<MyModel> or Array<MyModel>: see e.g. [here](https://github.com/Microsoft/TypeScript/issues/10576) for discussion.
+
+Instead you can use the `@ResponseSchema` decorator to supply the schema of objects returned by your actions.
+
+```typescript
+import { ResponseSchema } from 'routing-controllers-openapi'
+
+@JsonController('/users')
+export class UsersController {
+
+  @Get('/')
+  @ResponseSchema(User, { isArray: true })
+  listUsers() {
+    // ...
+  }
+}
+```
+
+`@ResponseSchema` will use the httpStatusCode and contentType from routing-controller's `@HttpCode` and `@ContentType` decoraters if those are set and otherwise fall back to httpStatusCode=200 and contentType='application/json'. You can also manually set these attributes via the optional second `options` argument.
+
+To specify a response schema of array (of the specified first argument Class), set `isArray` to true in the `options` argument.
 
 ## Supported features
 

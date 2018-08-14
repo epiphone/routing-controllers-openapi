@@ -11,7 +11,11 @@ import {
   parseRoutes,
   routingControllersToSpec
 } from '../src'
-import { UserPostsController, UsersController } from './fixtures/controllers'
+import {
+  RootController,
+  UserPostsController,
+  UsersController
+} from './fixtures/controllers'
 
 // Construct OpenAPI spec:
 const storage = getMetadataArgsStorage()
@@ -87,6 +91,18 @@ describe('index', () => {
         route: '/:postId',
         target: UserPostsController,
         type: 'get'
+      },
+      {
+        method: 'getDefaultPath',
+        route: undefined,
+        target: RootController,
+        type: 'get'
+      },
+      {
+        method: 'getStringPath',
+        route: '/stringPath',
+        target: RootController,
+        type: 'get'
       }
     ])
   })
@@ -129,7 +145,7 @@ describe('index', () => {
     const route = _.cloneDeep(routes[0])
     expect(getOperationId(route)).toEqual('UsersController.listUsers')
 
-    route.action.target = class AnotherController { }
+    route.action.target = class AnotherController {}
     route.action.method = 'anotherMethod'
     expect(getOperationId(route)).toEqual('AnotherController.anotherMethod')
   })
