@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import { OperationObject } from 'openapi3-ts'
+import { OperationObject, SchemaObject } from 'openapi3-ts'
 import 'reflect-metadata'
 
 import { IRoute } from './index'
@@ -65,6 +65,7 @@ export function ResponseSchema(responseClass: Function, options?: {
 	contentType?: string;
 	isArray?: boolean;
 }) {
+  // @ts-ignore
 	const setResponseSchema = (source, route: IRoute) => {
 		options = {
 			...{
@@ -79,7 +80,7 @@ export function ResponseSchema(responseClass: Function, options?: {
 			...(options || {}),
 		};
 		const responseSchema = {
-			['' + options.statusCode]: { content: { [options.contentType!]: { schema: {} } } },
+			['' + options.statusCode]: { content: { [options.contentType!]: { schema: {} as SchemaObject } } },
 		};
 		if (responseClass && responseClass.name) {
 			if (options.isArray) {
