@@ -65,7 +65,7 @@ export function ResponseSchema(responseClass: Function, options?: {
 	contentType?: string;
 	isArray?: boolean;
 }) {
-	const setResponseSchema = (source, route: IRoute) => {
+	const setResponseSchema = (source: OperationObject, route: IRoute) => {
 		options = {
 			...{
 				statusCode: _.find(route.responseHandlers, { type: 'success-code' })
