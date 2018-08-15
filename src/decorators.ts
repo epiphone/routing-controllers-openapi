@@ -65,7 +65,6 @@ export function ResponseSchema(responseClass: Function, options?: {
 	contentType?: string;
 	isArray?: boolean;
 }) {
-  // @ts-ignore
 	const setResponseSchema = (source, route: IRoute) => {
 		options = {
 			...{
@@ -96,7 +95,7 @@ export function ResponseSchema(responseClass: Function, options?: {
 				}`;
 			}
 		}
-		return { responses: responseSchema };
+		return _.merge(source, { responses: responseSchema });
 	};
 	return OpenAPI(setResponseSchema);
 }

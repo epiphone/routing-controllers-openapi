@@ -138,6 +138,13 @@ describe('decorators', () => {
     expect(operation['x-custom-key']).toEqual(20)
   })
 
+
+  it('applies @ResponseSchema merging in response schema into source metadata', () => {
+    const operation = getOperation(routes[5])
+    // ensure other metadata doesnt get overwritten by decorator
+    expect(operation.operationId).toEqual('UsersController.responseSchemaDefaults');
+  })
+
   it('applies @ResponseSchema using default contentType and statusCode', () => {
     const operation = getOperation(routes[5])
     expect(operation.responses['200'].content['application/json']).toEqual({"schema": {"$ref": "#/components/schemas/ModelDto"}})
