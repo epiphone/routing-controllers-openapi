@@ -213,6 +213,6 @@ describe('decorators', () => {
   it('applies @ResponseSchema while retaining outer OpenAPI decorator', () => {
     const operation = getOperation(routes[12])
     expect(operation.description).toEqual('somedescription')
-    expect(operation.responses['400'].content['text/csv']).toEqual({"schema": {"$ref": "#/components/schemas/MyModelName1"}})
+    expect(operation.responses['400'].content['text/csv']).toEqual({"schema": {"$ref": "#/components/schemas/MyModelName"}})
   })
 })
