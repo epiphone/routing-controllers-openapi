@@ -239,4 +239,6 @@ Feel free to submit a PR!
 
 - Inspired by [tsoa](https://github.com/lukeautry/tsoa) and [trafficlight](https://github.com/swimlane/trafficlight)
 - Include your Mongoose models in the spec with [mongoose-schema-jsonschema](https://github.com/DScheglov/mongoose-schema-jsonschema)
+- Generate JSON schema from your Typescript sources with [typescript-json-schema](https://github.com/YousefED/typescript-json-schema)
 - [openapi3-ts](https://github.com/metadevpro/openapi3-ts/) provides handy OpenAPI utilities for Typescript
+- Convert OpenAPI 3 spec to **Swagger 2** with [api-spec-converter](https://github.com/LucyBot-Inc/api-spec-converter)
