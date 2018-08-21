@@ -87,11 +87,7 @@ export function ResponseSchema(
         : 200,
       ...options
     }
-    const responseSchema: ResponsesObject = {
-      ['' + options.statusCode]: {
-        content: { [options.contentType!]: { schema: {} } }
-      }
-    }
+    const responseSchema: ResponsesObject = {}
     const responseSchemaName =
       typeof responseClass === 'function' && responseClass.name
         ? responseClass.name
@@ -99,6 +95,9 @@ export function ResponseSchema(
           ? responseClass
           : null
     if (responseSchemaName) {
+      responseSchema['' + options.statusCode] = {
+        content: { [options.contentType!]: { schema: {} } }
+      }
       if (options.isArray) {
         responseSchema['' + options.statusCode].content[
           options.contentType!

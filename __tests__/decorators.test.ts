@@ -131,6 +131,12 @@ describe('decorators', () => {
       responseSchemaNotOverwritingOuterOpenApiDecorator(@Param('userId') _userId: number) {
         return
       }
+
+      @Get('/responseSchemaNoNoModel')
+      @ResponseSchema('', {statusCode: 400, contentType: 'text/csv'})
+      responseSchemaNoNoModel(@Param('userId') _userId: number) {
+        return
+      }
 }
 
     routes = parseRoutes(getMetadataArgsStorage())
@@ -214,5 +220,10 @@ describe('decorators', () => {
     const operation = getOperation(routes[12])
     expect(operation.description).toEqual('somedescription')
     expect(operation.responses['400'].content['text/csv']).toEqual({"schema": {"$ref": "#/components/schemas/MyModelName"}})
+  })
+
+  it('does not appy @ResponseSchema if empty ModelName is passed', () => {
+    const operation = getOperation(routes[13])
+    expect(operation.responses['400']).toEqual(undefined)
   })
 })
