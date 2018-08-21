@@ -102,7 +102,21 @@ describe('decorators', () => {
       responseSchemaArray(@Param('userId') _userId: number) {
         return
       }
-    }
+
+      @Get('/responseSchemaDecoratorAndOptions')
+      @HttpCode(201)
+      @ContentType("application/pdf")
+      @ResponseSchema(ModelDto, {statusCode: 400, contentType: 'text/csv'})
+      responseSchemaDecoratorAndSchema(@Param('userId') _userId: number) {
+        return
+      }
+
+      @Get('/responseSchemaModelAsString')
+      @ResponseSchema('MyModelName', {statusCode: 400, contentType: 'text/csv'})
+      responseSchemaModelAsString(@Param('userId') _userId: number) {
+        return
+      }
+}
 
     routes = parseRoutes(getMetadataArgsStorage())
   })
@@ -164,5 +178,15 @@ describe('decorators', () => {
     const operation = getOperation(routes[8])
     expect(operation.responses['200'].content['application/json']).toEqual({"schema": {"items": {
       "$ref": "#/components/schemas/ModelDto" },"type": "array",}})
+  })
+
+  it('applies @ResponseSchema using contentType and statusCode from options object, overruling options from RC decorators', () => {
+    const operation = getOperation(routes[9])
+    expect(operation.responses['400'].content['text/csv']).toEqual({"schema": {"$ref": "#/components/schemas/ModelDto"}})
+  })
+
+  it('applies @ResponseSchema using a string as ModelName', () => {
+    const operation = getOperation(routes[10])
+    expect(operation.responses['400'].content['text/csv']).toEqual({"schema": {"$ref": "#/components/schemas/MyModelName"}})
   })
 })

@@ -34,7 +34,10 @@ export function applyOpenAPIDecorator(
   route: IRoute
 ): OperationObject {
   const { action } = route
-  const openAPIParams = getOpenAPIMetadata(action.target.prototype, action.method)
+  const openAPIParams = getOpenAPIMetadata(
+    action.target.prototype,
+    action.method
+  )
   return openAPIParams.reduce((acc: OperationObject, oaParam: OpenAPIParam) => {
     return _.isFunction(oaParam)
       ? oaParam(acc, route)
@@ -52,7 +55,11 @@ function getOpenAPIMetadata(target: object, key: string): OpenAPIParam[] {
 /**
  * Store given OpenAPI Operation object into target property's metadata.
  */
-function setOpenAPIMetadata(value: OpenAPIParam[], target: object, key: string) {
+function setOpenAPIMetadata(
+  value: OpenAPIParam[],
+  target: object,
+  key: string
+) {
   return Reflect.defineMetadata(OPEN_API_KEY, value, target.constructor, key)
 }
 
@@ -60,42 +67,53 @@ function setOpenAPIMetadata(value: OpenAPIParam[], target: object, key: string) 
  * Supplement action with response body type annotation.
  *
  */
-export function ResponseSchema(responseClass: Function, options?: {
-	statusCode?: number;
-	contentType?: string;
-	isArray?: boolean;
-}) {
-	const setResponseSchema = (source: OperationObject, route: IRoute) => {
-		options = {
-			...{
-				statusCode: _.find(route.responseHandlers, { type: 'success-code' })
-					? _.find(route.responseHandlers, { type: 'success-code' })!.value
-					: 200,
-				contentType: _.find(route.responseHandlers, { type: 'content-type' })
-					? _.find(route.responseHandlers, { type: 'content-type' })!.value
-					: 'application/json',
-				isArray: false,
-			},
-			...(options || {}),
-		};
-		const responseSchema = {
-			['' + options.statusCode]: { content: { [options.contentType!]: { schema: {} as SchemaObject } } },
-		};
-		if (responseClass && responseClass.name) {
-			if (options.isArray) {
-				responseSchema['' + options.statusCode].content[options.contentType!].schema = {
-					type: 'array',
-					items: {
-						['$ref']: `#/components/schemas/${responseClass.name}`,
+export function ResponseSchema(
+  responseClass: Function | string,
+  options?: {
+    statusCode?: number
+    contentType?: string
+    isArray?: boolean
+  }
+) {
+  const setResponseSchema = (source: OperationObject, route: IRoute) => {
+    options = {
+      contentType: _.find(route.responseHandlers, { type: 'content-type' })
+        ? _.find(route.responseHandlers, { type: 'content-type' })!.value
+        : 'application/json',
+			isArray: false,
+			statusCode: _.find(route.responseHandlers, { type: 'success-code' })
+        ? _.find(route.responseHandlers, { type: 'success-code' })!.value
+        : 200,
+      ...options
+    }
+    const responseSchema = {
+      ['' + options.statusCode]: {
+        content: { [options.contentType!]: { schema: {} as SchemaObject} }
+      }
+    }
+    const responseSchemaName =
+      typeof responseClass === 'function' && responseClass.name
+        ? responseClass.name
+        : typeof responseClass === 'string'
+          ? responseClass
+          : null
+    if (responseSchemaName) {
+      if (options.isArray) {
+        responseSchema['' + options.statusCode].content[
+          options.contentType!
+        ].schema = {
+          items: {
+            ['$ref']: `#/components/schemas/${responseSchemaName}`
 					},
-				};
-			} else {
-				responseSchema['' + options.statusCode].content[options.contentType!].schema['$ref'] = `#/components/schemas/${
-					responseClass.name
-				}`;
-			}
-		}
-		return _.merge(source, { responses: responseSchema });
-	};
-	return OpenAPI(setResponseSchema);
+					type: 'array',
+        }
+      } else {
+        responseSchema['' + options.statusCode].content[
+          options.contentType!
+        ].schema.$ref = `#/components/schemas/${responseSchemaName}`
+      }
+    }
+    return _.merge({}, source, { responses: responseSchema })
+  }
+  return OpenAPI(setResponseSchema)
 }
