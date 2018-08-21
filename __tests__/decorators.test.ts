@@ -116,6 +116,21 @@ describe('decorators', () => {
       responseSchemaModelAsString(@Param('userId') _userId: number) {
         return
       }
+
+
+      @Get('/responseSchemaNotOverwritingInnerOpenApiDecorator')
+      @ResponseSchema('MyModelName', {statusCode: 400, contentType: 'text/csv'})
+      @OpenAPI({description: 'somedescription'})
+      responseSchemaNotOverwritingInnerOpenApiDecorator(@Param('userId') _userId: number) {
+        return
+      }
+
+      @Get('/responseSchemaNotOverwritingOuterOpenApiDecorator')
+      @OpenAPI({description: 'somedescription'})
+      @ResponseSchema('MyModelName', {statusCode: 400, contentType: 'text/csv'})
+      responseSchemaNotOverwritingOuterOpenApiDecorator(@Param('userId') _userId: number) {
+        return
+      }
 }
 
     routes = parseRoutes(getMetadataArgsStorage())
@@ -152,7 +167,6 @@ describe('decorators', () => {
     expect(operation['x-custom-key']).toEqual(20)
   })
 
-
   it('applies @ResponseSchema merging in response schema into source metadata', () => {
     const operation = getOperation(routes[5])
     // ensure other metadata doesnt get overwritten by decorator
@@ -188,5 +202,17 @@ describe('decorators', () => {
   it('applies @ResponseSchema using a string as ModelName', () => {
     const operation = getOperation(routes[10])
     expect(operation.responses['400'].content['text/csv']).toEqual({"schema": {"$ref": "#/components/schemas/MyModelName"}})
+  })
+
+  it('applies @ResponseSchema while retaining inner OpenAPI decorator', () => {
+    const operation = getOperation(routes[11])
+    expect(operation.description).toEqual('somedescription')
+    expect(operation.responses['400'].content['text/csv']).toEqual({"schema": {"$ref": "#/components/schemas/MyModelName"}})
+  })
+
+  it('applies @ResponseSchema while retaining outer OpenAPI decorator', () => {
+    const operation = getOperation(routes[12])
+    expect(operation.description).toEqual('somedescription')
+    expect(operation.responses['400'].content['text/csv']).toEqual({"schema": {"$ref": "#/components/schemas/MyModelName1"}})
   })
 })

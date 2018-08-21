@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import { OperationObject, SchemaObject } from 'openapi3-ts'
+import { OperationObject, ResponsesObject } from 'openapi3-ts'
 import 'reflect-metadata'
 
 import { IRoute } from './index'
@@ -68,6 +68,7 @@ function setOpenAPIMetadata(
  *
  */
 export function ResponseSchema(
+  // tslint:disable-next-line
   responseClass: Function | string,
   options?: {
     statusCode?: number
@@ -80,15 +81,15 @@ export function ResponseSchema(
       contentType: _.find(route.responseHandlers, { type: 'content-type' })
         ? _.find(route.responseHandlers, { type: 'content-type' })!.value
         : 'application/json',
-			isArray: false,
-			statusCode: _.find(route.responseHandlers, { type: 'success-code' })
+      isArray: false,
+      statusCode: _.find(route.responseHandlers, { type: 'success-code' })
         ? _.find(route.responseHandlers, { type: 'success-code' })!.value
         : 200,
       ...options
     }
-    const responseSchema = {
+    const responseSchema: ResponsesObject = {
       ['' + options.statusCode]: {
-        content: { [options.contentType!]: { schema: {} as SchemaObject} }
+        content: { [options.contentType!]: { schema: {} } }
       }
     }
     const responseSchemaName =
@@ -104,8 +105,8 @@ export function ResponseSchema(
         ].schema = {
           items: {
             ['$ref']: `#/components/schemas/${responseSchemaName}`
-					},
-					type: 'array',
+          },
+          type: 'array'
         }
       } else {
         responseSchema['' + options.statusCode].content[
