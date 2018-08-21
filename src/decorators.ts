@@ -91,7 +91,7 @@ export function ResponseSchema(
     const responseSchemaName =
       typeof responseClass === 'function' && responseClass.name
         ? responseClass.name
-        : typeof responseClass === 'string'
+        : typeof responseClass === 'string' && responseClass.length > 0
           ? responseClass
           : null
     if (responseSchemaName) {
