@@ -22,8 +22,7 @@ describe('options', () => {
       @Post('/:userId')
       createUser(
         @QueryParam('from') _from: number,
-        @QueryParam('to', { required: false })
-        _to: number,
+        @QueryParam('to', { required: false }) _to: number,
         @Body() _body: CreateUserBody
       ) {
         return

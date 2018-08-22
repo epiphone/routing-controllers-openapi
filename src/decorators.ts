@@ -77,10 +77,14 @@ export function ResponseSchema(
   }
 ) {
   const setResponseSchema = (source: OperationObject, route: IRoute) => {
+    const isJSON = route.controller.type === 'json'
+    const defaultContentType = isJSON
+      ? 'application/json'
+      : 'text/html; charset=utf-8'
     options = {
       contentType: _.find(route.responseHandlers, { type: 'content-type' })
         ? _.find(route.responseHandlers, { type: 'content-type' })!.value
-        : 'application/json',
+        : defaultContentType,
       isArray: false,
       statusCode: _.find(route.responseHandlers, { type: 'success-code' })
         ? _.find(route.responseHandlers, { type: 'success-code' })!.value
@@ -88,12 +92,12 @@ export function ResponseSchema(
       ...options
     }
     const responseSchema: ResponsesObject = {}
-    const responseSchemaName =
-      typeof responseClass === 'function' && responseClass.name
-        ? responseClass.name
-        : typeof responseClass === 'string' && responseClass.length > 0
-          ? responseClass
-          : null
+    let responseSchemaName = ''
+    if (typeof responseClass === 'function' && responseClass.name) {
+      responseSchemaName = responseClass.name
+    } else if (typeof responseClass === 'string') {
+      responseSchemaName = responseClass
+    }
     if (responseSchemaName) {
       responseSchema['' + options.statusCode] = {
         content: { [options.contentType!]: { schema: {} } }

@@ -212,8 +212,25 @@ export class UsersController {
 ```
 
 `@ResponseSchema` will use the httpStatusCode and contentType from routing-controller's `@HttpCode` and `@ContentType` decoraters if those are set and otherwise fall back to httpStatusCode=200 and contentType='application/json'. You can also manually set these attributes via the optional second `options` argument. Manually setting `contentType` or `statusCode` in the `@ResponseSchema(ModelClass, options)` options object will override the above routing-controller decorators if they are also specified.
-
 To specify a response schema of array (of the specified first argument Class), set `isArray` to true in the `options` argument.
+
+Note that when using `@ResponseSchema` together with `@JSONSchema`, the outer decorator will overwrite keys of inner decorators.
+So in the following example, information from `@ResponseSchema` would be overwritten by `@JSONSchema`.
+```
+@JSONSchema({responses: {
+  '200': {
+    'content': {
+      'application/json': {
+        schema: {
+          '$ref': '#/components/schemas/Pet'
+        }
+      }
+    ]
+  }
+}})
+@ResponseSchema(SomeResponseObject)
+handler() { ... }
+```
 
 ## Supported features
 
