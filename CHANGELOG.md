@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2018-08-24
+### Added
+- [@consense](https://github.com/consense) added a `ResponseSchema` decorator for specifying response body schemas [#8](https://github.com/epiphone/routing-controllers-openapi/issues/8)
+
 ## [1.3.3] - 2018-08-13
 ### Fixed
 - Fix multiple `OpenAPI` decorators overwriting each other [#10](https://github.com/epiphone/routing-controllers-openapi/pull/10)
