@@ -1,8 +1,13 @@
 import * as _ from 'lodash'
-import { OperationObject, ResponsesObject } from 'openapi3-ts'
+import {
+  OperationObject,
+  ReferenceObject,
+  ResponsesObject,
+  SchemaObject
+} from 'openapi3-ts'
 import 'reflect-metadata'
 
-import { IRoute } from './index'
+import { getContentType, getStatusCode, IRoute } from './index'
 
 const OPEN_API_KEY = Symbol('routing-controllers-openapi:OpenAPI')
 
@@ -65,59 +70,52 @@ function setOpenAPIMetadata(
 
 /**
  * Supplement action with response body type annotation.
- *
  */
 export function ResponseSchema(
-  // tslint:disable-next-line
-  responseClass: Function | string,
-  options?: {
-    statusCode?: number
+  responseClass: Function | string, // tslint:disable-line
+  options: {
     contentType?: string
+    description?: string
+    statusCode?: string | number
     isArray?: boolean
-  }
+  } = {}
 ) {
   const setResponseSchema = (source: OperationObject, route: IRoute) => {
-    const isJSON = route.controller.type === 'json'
-    const defaultContentType = isJSON
-      ? 'application/json'
-      : 'text/html; charset=utf-8'
-    options = {
-      contentType: _.find(route.responseHandlers, { type: 'content-type' })
-        ? _.find(route.responseHandlers, { type: 'content-type' })!.value
-        : defaultContentType,
-      isArray: false,
-      statusCode: _.find(route.responseHandlers, { type: 'success-code' })
-        ? _.find(route.responseHandlers, { type: 'success-code' })!.value
-        : 200,
-      ...options
-    }
-    const responseSchema: ResponsesObject = {}
+    const contentType = options.contentType || getContentType(route)
+    const description = options.description || ''
+    const isArray = options.isArray || false
+    const statusCode = (options.statusCode || getStatusCode(route)) + ''
+
     let responseSchemaName = ''
     if (typeof responseClass === 'function' && responseClass.name) {
       responseSchemaName = responseClass.name
     } else if (typeof responseClass === 'string') {
       responseSchemaName = responseClass
     }
+
     if (responseSchemaName) {
-      responseSchema['' + options.statusCode] = {
-        content: { [options.contentType!]: { schema: {} } }
+      const reference: ReferenceObject = {
+        $ref: `#/components/schemas/${responseSchemaName}`
       }
-      if (options.isArray) {
-        responseSchema['' + options.statusCode].content[
-          options.contentType!
-        ].schema = {
-          items: {
-            ['$ref']: `#/components/schemas/${responseSchemaName}`
+      const schema: SchemaObject = isArray
+        ? { items: reference, type: 'array' }
+        : reference
+      const responses: ResponsesObject = {
+        [statusCode]: {
+          content: {
+            [contentType]: {
+              schema
+            }
           },
-          type: 'array'
+          description
         }
-      } else {
-        responseSchema['' + options.statusCode].content[
-          options.contentType!
-        ].schema.$ref = `#/components/schemas/${responseSchemaName}`
       }
+
+      return _.merge({}, source, { responses })
     }
-    return _.merge({}, source, { responses: responseSchema })
+
+    return source
   }
+
   return OpenAPI(setResponseSchema)
 }

@@ -181,18 +181,32 @@ export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
 }
 
 /**
+ * Return the content type of given route.
+ */
+export function getContentType(route: IRoute): string {
+  const defaultContentType =
+    route.controller.type === 'json'
+      ? 'application/json'
+      : 'text/html; charset=utf-8'
+  const contentMeta = _.find(route.responseHandlers, { type: 'content-type' })
+  return contentMeta ? contentMeta.value : defaultContentType
+}
+
+/**
+ * Return the status code of given route.
+ */
+export function getStatusCode(route: IRoute): string {
+  const successMeta = _.find(route.responseHandlers, { type: 'success-code' })
+  return successMeta ? successMeta.value + '' : '200'
+}
+
+/**
  * Return OpenAPI Responses object of given route.
  */
 export function getResponses(route: IRoute): oa.ResponsesObject {
-  const isJSON = route.controller.type === 'json'
-  const defaultContentType = isJSON
-    ? 'application/json'
-    : 'text/html; charset=utf-8'
-  const contentMeta = _.find(route.responseHandlers, { type: 'content-type' })
-  const contentType = contentMeta ? contentMeta.value : defaultContentType
+  const contentType = getContentType(route)
+  const successStatus = getStatusCode(route)
 
-  const successMeta = _.find(route.responseHandlers, { type: 'success-code' })
-  const successStatus = successMeta ? successMeta.value + '' : '200'
   return {
     [successStatus]: {
       content: { [contentType]: {} },

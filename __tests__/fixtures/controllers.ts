@@ -17,7 +17,8 @@ import {
   QueryParams
 } from 'routing-controllers'
 
-import { OpenAPI } from '../../src'
+import { OpenAPI, ResponseSchema } from '../../src'
+import { ModelDto } from './models'
 
 export class CreateUserBody {
   @IsEmail()
@@ -52,6 +53,7 @@ export class UsersController {
   @Get('/')
   @ContentType('text/cvs')
   @OpenAPI({ description: 'List all users' })
+  @ResponseSchema(ModelDto, { isArray: true })
   listUsers(
     @QueryParams() _query?: ListUsersQueryParams,
     @HeaderParams() _header?: ListUsersHeaderParams
@@ -80,6 +82,10 @@ export class UsersController {
 
   @HttpCode(201)
   @Post('/')
+  @ResponseSchema(ModelDto, {
+    description: 'Created user object',
+    statusCode: 201
+  })
   createUser(@Body() _body: CreateUserBody) {
     return
   }

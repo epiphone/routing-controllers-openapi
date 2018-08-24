@@ -58,6 +58,25 @@
           "Authorization"
         ],
         "type": "object"
+      },
+      "ModelDto": {
+        "properties": {
+          "age": {
+            "type": "integer"
+          },
+          "email": {
+            "format": "email",
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "username"
+        ],
+        "type": "object"
       }
     }
   },
@@ -145,9 +164,16 @@
         "responses": {
           "200": {
             "content": {
-              "text/cvs": {}
+              "text/cvs": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModelDto"
+                  },
+                  "type": "array"
+                }
+              }
             },
-            "description": "Successful response"
+            "description": ""
           }
         },
         "summary": "List users",
@@ -171,9 +197,13 @@
         "responses": {
           "201": {
             "content": {
-              "application/json": {}
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelDto"
+                }
+              }
             },
-            "description": "Successful response"
+            "description": "Created user object"
           }
         },
         "summary": "Create user",

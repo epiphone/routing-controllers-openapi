@@ -1,12 +1,14 @@
+import * as _ from 'lodash'
 import {
+  ContentType,
+  Controller,
   Get,
   getMetadataArgsStorage,
-  Controller,
-  JsonController,
-  Param,
   HttpCode,
-  ContentType
+  JsonController,
+  Param
 } from 'routing-controllers'
+
 import {
   getOperation,
   getTags,
@@ -18,7 +20,7 @@ import {
 import { ModelDto } from './fixtures/models'
 
 describe('decorators', () => {
-  let routes: IRoute[]
+  let routes: { [method: string]: IRoute }
 
   beforeEach(() => {
     getMetadataArgsStorage().reset()
@@ -92,7 +94,11 @@ describe('decorators', () => {
       }
 
       @Get('/responseSchemaOptions')
-      @ResponseSchema(ModelDto, { statusCode: 400, contentType: 'text/csv' })
+      @ResponseSchema(ModelDto, {
+        contentType: 'text/csv',
+        description: 'Bad request',
+        statusCode: 400
+      })
       responseSchemaOptions() {
         return
       }
@@ -121,8 +127,8 @@ describe('decorators', () => {
 
       @Get('/responseSchemaModelAsString')
       @ResponseSchema('MyModelName', {
-        statusCode: 400,
-        contentType: 'text/csv'
+        contentType: 'text/csv',
+        statusCode: 400
       })
       responseSchemaModelAsString() {
         return
@@ -130,8 +136,8 @@ describe('decorators', () => {
 
       @Get('/responseSchemaNotOverwritingInnerOpenApiDecorator')
       @ResponseSchema('MyModelName', {
-        statusCode: 400,
-        contentType: 'text/csv'
+        contentType: 'text/csv',
+        statusCode: 400
       })
       @OpenAPI({ description: 'somedescription' })
       responseSchemaNotOverwritingInnerOpenApiDecorator() {
@@ -141,8 +147,8 @@ describe('decorators', () => {
       @Get('/responseSchemaNotOverwritingOuterOpenApiDecorator')
       @OpenAPI({ description: 'somedescription' })
       @ResponseSchema('MyModelName', {
-        statusCode: 400,
-        contentType: 'text/csv'
+        contentType: 'text/csv',
+        statusCode: 400
       })
       responseSchemaNotOverwritingOuterOpenApiDecorator() {
         return
@@ -165,42 +171,42 @@ describe('decorators', () => {
       }
     }
 
-    routes = parseRoutes(getMetadataArgsStorage())
+    routes = _.keyBy(parseRoutes(getMetadataArgsStorage()), 'action.method')
   })
 
   it('merges keywords defined in @OpenAPI decorator into operation', () => {
-    const operation = getOperation(routes[0])
+    const operation = getOperation(routes.listUsers)
     expect(operation.description).toEqual('List all users')
   })
 
   it('applies @OpenAPI decorator function parameter to operation', () => {
-    const operation = getOperation(routes[1])
+    const operation = getOperation(routes.getUser)
     expect(operation.tags).toEqual(['Users', 'custom-tag'])
   })
 
   it('merges consecutive @OpenAPI object parameters top-down', () => {
-    const operation = getOperation(routes[2])
+    const operation = getOperation(routes.multipleOpenAPIsWithObjectParam)
     expect(operation.summary).toEqual('Some summary')
     expect(operation.description).toEqual('Some description')
     expect(operation['x-custom-key']).toEqual('Custom value')
   })
 
   it('applies consecutive @OpenAPI function parameters top-down', () => {
-    const operation = getOperation(routes[3])
+    const operation = getOperation(routes.multipleOpenAPIsWithFunctionParam)
     expect(operation.summary).toEqual('Some summary')
     expect(operation.description).toEqual('Some description')
     expect(operation['x-custom-key']).toEqual(20)
   })
 
   it('merges and applies consecutive @OpenAPI object and function parameters top-down', () => {
-    const operation = getOperation(routes[4])
+    const operation = getOperation(routes.multipleOpenAPIsWithMixedParam)
     expect(operation.summary).toEqual('Some summary')
     expect(operation.description).toEqual('Some description')
     expect(operation['x-custom-key']).toEqual(20)
   })
 
   it('applies @ResponseSchema merging in response schema into source metadata', () => {
-    const operation = getOperation(routes[5])
+    const operation = getOperation(routes.responseSchemaDefaults)
     // ensure other metadata doesnt get overwritten by decorator
     expect(operation.operationId).toEqual(
       'UsersController.responseSchemaDefaults'
@@ -208,28 +214,52 @@ describe('decorators', () => {
   })
 
   it('applies @ResponseSchema using default contentType and statusCode', () => {
-    const operation = getOperation(routes[5])
-    expect(operation.responses['200'].content['application/json']).toEqual({
-      schema: { $ref: '#/components/schemas/ModelDto' }
+    const operation = getOperation(routes.responseSchemaDefaults)
+    expect(operation.responses).toEqual({
+      '200': {
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/ModelDto'
+            }
+          }
+        },
+        description: ''
+      }
     })
   })
 
   it('applies @ResponseSchema using contentType and statusCode from options object', () => {
-    const operation = getOperation(routes[6])
-    expect(operation.responses['400'].content['text/csv']).toEqual({
-      schema: { $ref: '#/components/schemas/ModelDto' }
+    const operation = getOperation(routes.responseSchemaOptions)
+    expect(operation.responses).toEqual({
+      '200': {
+        content: {
+          'application/json': {}
+        },
+        description: 'Successful response'
+      },
+      '400': {
+        content: {
+          'text/csv': {
+            schema: {
+              $ref: '#/components/schemas/ModelDto'
+            }
+          }
+        },
+        description: 'Bad request'
+      }
     })
   })
 
   it('applies @ResponseSchema using contentType and statusCode from decorators', () => {
-    const operation = getOperation(routes[7])
+    const operation = getOperation(routes.responseSchemaDecorators)
     expect(operation.responses['201'].content['application/pdf']).toEqual({
       schema: { $ref: '#/components/schemas/ModelDto' }
     })
   })
 
   it('applies @ResponseSchema using isArray flag set to true', () => {
-    const operation = getOperation(routes[8])
+    const operation = getOperation(routes.responseSchemaArray)
     expect(operation.responses['200'].content['application/json']).toEqual({
       schema: {
         items: {
@@ -241,49 +271,116 @@ describe('decorators', () => {
   })
 
   it('applies @ResponseSchema using contentType and statusCode from options object, overruling options from RC decorators', () => {
-    const operation = getOperation(routes[9])
-    expect(operation.responses['400'].content['text/csv']).toEqual({
-      schema: { $ref: '#/components/schemas/ModelDto' }
+    const operation = getOperation(routes.responseSchemaDecoratorAndSchema)
+    expect(operation.responses).toEqual({
+      '201': {
+        content: {
+          'application/pdf': {}
+        },
+        description: 'Successful response'
+      },
+      '400': {
+        content: {
+          'text/csv': {
+            schema: { $ref: '#/components/schemas/ModelDto' }
+          }
+        },
+        description: ''
+      }
     })
   })
 
   it('applies @ResponseSchema using a string as ModelName', () => {
-    const operation = getOperation(routes[10])
-    expect(operation.responses['400'].content['text/csv']).toEqual({
-      schema: { $ref: '#/components/schemas/MyModelName' }
+    const operation = getOperation(routes.responseSchemaModelAsString)
+    expect(operation.responses).toEqual({
+      '200': {
+        content: {
+          'application/json': {}
+        },
+        description: 'Successful response'
+      },
+      '400': {
+        content: {
+          'text/csv': {
+            schema: { $ref: '#/components/schemas/MyModelName' }
+          }
+        },
+        description: ''
+      }
     })
   })
 
   it('applies @ResponseSchema while retaining inner OpenAPI decorator', () => {
-    const operation = getOperation(routes[11])
+    const operation = getOperation(
+      routes.responseSchemaNotOverwritingInnerOpenApiDecorator
+    )
     expect(operation.description).toEqual('somedescription')
-    expect(operation.responses['400'].content['text/csv']).toEqual({
-      schema: { $ref: '#/components/schemas/MyModelName' }
+    expect(operation.responses).toEqual({
+      '200': {
+        content: {
+          'application/json': {}
+        },
+        description: 'Successful response'
+      },
+      '400': {
+        content: {
+          'text/csv': {
+            schema: { $ref: '#/components/schemas/MyModelName' }
+          }
+        },
+        description: ''
+      }
     })
   })
 
   it('applies @ResponseSchema while retaining outer OpenAPI decorator', () => {
-    const operation = getOperation(routes[12])
+    const operation = getOperation(
+      routes.responseSchemaNotOverwritingOuterOpenApiDecorator
+    )
     expect(operation.description).toEqual('somedescription')
-    expect(operation.responses['400'].content['text/csv']).toEqual({
-      schema: { $ref: '#/components/schemas/MyModelName' }
+    expect(operation.responses).toEqual({
+      '200': {
+        content: {
+          'application/json': {}
+        },
+        description: 'Successful response'
+      },
+      '400': {
+        content: {
+          'text/csv': {
+            schema: { $ref: '#/components/schemas/MyModelName' }
+          }
+        },
+        description: ''
+      }
     })
   })
 
-  it('does not appy @ResponseSchema if empty ModelName is passed', () => {
-    const operation = getOperation(routes[13])
+  it('does not apply @ResponseSchema if empty ModelName is passed', () => {
+    const operation = getOperation(routes.responseSchemaNoNoModel)
     expect(operation.responses).toEqual({
       '200': {
-        content: { 'application/json': {} },
+        content: {
+          'application/json': {}
+        },
         description: 'Successful response'
       }
     })
   })
 
   it('applies @ResponseSchema using default contentType and statusCode from @Controller (non-json)', () => {
-    const operation = getOperation(routes[14])
-    expect(operation.responses['200'].content['text/html; charset=utf-8']).toEqual({
-      schema: { $ref: '#/components/schemas/ModelDto' }
+    const operation = getOperation(routes.responseSchemaDefaultsHtml)
+    expect(operation.responses).toEqual({
+      '200': {
+        content: {
+          'text/html; charset=utf-8': {
+            schema: {
+              $ref: '#/components/schemas/ModelDto'
+            }
+          }
+        },
+        description: ''
+      }
     })
   })
 })
