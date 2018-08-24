@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import { OperationObject } from 'openapi3-ts'
+import { OperationObject, ResponsesObject } from 'openapi3-ts'
 import 'reflect-metadata'
 
 import { IRoute } from './index'
@@ -34,7 +34,10 @@ export function applyOpenAPIDecorator(
   route: IRoute
 ): OperationObject {
   const { action } = route
-  const openAPIParams = getOpenAPIMetadata(action.target.prototype, action.method)
+  const openAPIParams = getOpenAPIMetadata(
+    action.target.prototype,
+    action.method
+  )
   return openAPIParams.reduce((acc: OperationObject, oaParam: OpenAPIParam) => {
     return _.isFunction(oaParam)
       ? oaParam(acc, route)
@@ -52,6 +55,69 @@ function getOpenAPIMetadata(target: object, key: string): OpenAPIParam[] {
 /**
  * Store given OpenAPI Operation object into target property's metadata.
  */
-function setOpenAPIMetadata(value: OpenAPIParam[], target: object, key: string) {
+function setOpenAPIMetadata(
+  value: OpenAPIParam[],
+  target: object,
+  key: string
+) {
   return Reflect.defineMetadata(OPEN_API_KEY, value, target.constructor, key)
+}
+
+/**
+ * Supplement action with response body type annotation.
+ *
+ */
+export function ResponseSchema(
+  // tslint:disable-next-line
+  responseClass: Function | string,
+  options?: {
+    statusCode?: number
+    contentType?: string
+    isArray?: boolean
+  }
+) {
+  const setResponseSchema = (source: OperationObject, route: IRoute) => {
+    const isJSON = route.controller.type === 'json'
+    const defaultContentType = isJSON
+      ? 'application/json'
+      : 'text/html; charset=utf-8'
+    options = {
+      contentType: _.find(route.responseHandlers, { type: 'content-type' })
+        ? _.find(route.responseHandlers, { type: 'content-type' })!.value
+        : defaultContentType,
+      isArray: false,
+      statusCode: _.find(route.responseHandlers, { type: 'success-code' })
+        ? _.find(route.responseHandlers, { type: 'success-code' })!.value
+        : 200,
+      ...options
+    }
+    const responseSchema: ResponsesObject = {}
+    let responseSchemaName = ''
+    if (typeof responseClass === 'function' && responseClass.name) {
+      responseSchemaName = responseClass.name
+    } else if (typeof responseClass === 'string') {
+      responseSchemaName = responseClass
+    }
+    if (responseSchemaName) {
+      responseSchema['' + options.statusCode] = {
+        content: { [options.contentType!]: { schema: {} } }
+      }
+      if (options.isArray) {
+        responseSchema['' + options.statusCode].content[
+          options.contentType!
+        ].schema = {
+          items: {
+            ['$ref']: `#/components/schemas/${responseSchemaName}`
+          },
+          type: 'array'
+        }
+      } else {
+        responseSchema['' + options.statusCode].content[
+          options.contentType!
+        ].schema.$ref = `#/components/schemas/${responseSchemaName}`
+      }
+    }
+    return _.merge({}, source, { responses: responseSchema })
+  }
+  return OpenAPI(setResponseSchema)
 }

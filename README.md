@@ -191,6 +191,47 @@ A single handler can be decorated with multiple `@OpenAPI`s. Note though that si
   }
 ```
 
+### Annotating the schema of Responses
+
+ Extracting response types automatically in runtime isn't allowed by Typescript's reflection system at the moment. Specifically the problem is that `routing-controllers-openapi` can't unwrap generic types like Promise<MyModel> or Array<MyModel>: see e.g. [here](https://github.com/Microsoft/TypeScript/issues/10576) for discussion.
+
+Instead you can use the `@ResponseSchema` decorator to supply the schema of objects returned by your actions.
+
+```typescript
+import { ResponseSchema } from 'routing-controllers-openapi'
+
+@JsonController('/users')
+export class UsersController {
+
+  @Get('/')
+  @ResponseSchema(User, { isArray: true })
+  listUsers() {
+    // ...
+  }
+}
+```
+
+`@ResponseSchema` will use the httpStatusCode and contentType from routing-controller's `@HttpCode` and `@ContentType` decoraters if those are set and otherwise fall back to httpStatusCode=200 and contentType='application/json'. You can also manually set these attributes via the optional second `options` argument. Manually setting `contentType` or `statusCode` in the `@ResponseSchema(ModelClass, options)` options object will override the above routing-controller decorators if they are also specified.
+To specify a response schema of array (of the specified first argument Class), set `isArray` to true in the `options` argument.
+
+Note that when using `@ResponseSchema` together with `@JSONSchema`, the outer decorator will overwrite keys of inner decorators.
+So in the following example, information from `@ResponseSchema` would be overwritten by `@JSONSchema`.
+```
+@JSONSchema({responses: {
+  '200': {
+    'content': {
+      'application/json': {
+        schema: {
+          '$ref': '#/components/schemas/Pet'
+        }
+      }
+    ]
+  }
+}})
+@ResponseSchema(SomeResponseObject)
+handler() { ... }
+```
+
 ## Supported features
 
 - `@Controller`/`@JsonController` base route and default content-type

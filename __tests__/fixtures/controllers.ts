@@ -20,7 +20,8 @@ import {
 import { OpenAPI } from '../../src'
 
 export class CreateUserBody {
-  @IsEmail() email: string
+  @IsEmail()
+  email: string
 }
 
 export class CreatePostBody {
@@ -38,7 +39,8 @@ export class ListUsersQueryParams {
 }
 
 export class ListUsersHeaderParams {
-  @IsString() Authorization: string
+  @IsString()
+  Authorization: string
 
   @IsOptional()
   @IsString()
@@ -62,8 +64,7 @@ export class UsersController {
   listUsersInRange(
     @Param('to') _to: number,
     @QueryParam('') _emptyQuery: string,
-    @QueryParam('userId', { required: true })
-    _userId: number
+    @QueryParam('userId', { required: true }) _userId: number
   ) {
     return
   }
@@ -84,10 +85,7 @@ export class UsersController {
   }
 
   @Post('/:userId/posts')
-  createUserPost(
-    @Body({ required: true })
-    _body: CreatePostBody
-  ) {
+  createUserPost(@Body({ required: true }) _body: CreatePostBody) {
     return
   }
 
