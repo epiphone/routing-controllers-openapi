@@ -159,6 +159,23 @@ describe('decorators', () => {
       responseSchemaNoNoModel() {
         return
       }
+
+      @Get('/multipleResponseSchemas')
+      @ResponseSchema('MySuccessObject', {
+        description: 'Some successful response object',
+        statusCode: 200
+      })
+      @ResponseSchema('BadRequestErrorObject', {
+        contentType: 'text/html',
+        statusCode: 400
+      })
+      @ResponseSchema('NotFoundErrorObject', {
+        contentType: 'text/csv',
+        statusCode: 404
+      })
+      multipleResponseSchemas() {
+        return
+      }
     }
 
     @Controller('/usershtml')
@@ -376,6 +393,42 @@ describe('decorators', () => {
           'text/html; charset=utf-8': {
             schema: {
               $ref: '#/components/schemas/ModelDto'
+            }
+          }
+        },
+        description: ''
+      }
+    })
+  })
+
+  it('applies multiple @ResponseSchema on a single handler', () => {
+    const operation = getOperation(routes.multipleResponseSchemas)
+    expect(operation.responses).toEqual({
+      '200': {
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/MySuccessObject'
+            }
+          }
+        },
+        description: 'Some successful response object'
+      },
+      '400': {
+        content: {
+          'text/html': {
+            schema: {
+              $ref: '#/components/schemas/BadRequestErrorObject'
+            }
+          }
+        },
+        description: ''
+      },
+      '404': {
+        content: {
+          'text/csv': {
+            schema: {
+              $ref: '#/components/schemas/NotFoundErrorObject'
             }
           }
         },

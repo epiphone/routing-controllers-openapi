@@ -191,11 +191,9 @@ A single handler can be decorated with multiple `@OpenAPI`s. Note though that si
   }
 ```
 
-### Annotating the schema of Responses
+### Annotating response schemas
 
- Extracting response types automatically in runtime isn't allowed by Typescript's reflection system at the moment. Specifically the problem is that `routing-controllers-openapi` can't unwrap generic types like Promise<MyModel> or Array<MyModel>: see e.g. [here](https://github.com/Microsoft/TypeScript/issues/10576) for discussion.
-
-Instead you can use the `@ResponseSchema` decorator to supply the schema of objects returned by your actions.
+Extracting response types automatically in runtime isn't currently allowed by Typescript's reflection system. Specifically the problem is that `routing-controllers-openapi` can't unwrap generic types like Promise<MyModel> or Array<MyModel>: see e.g. [here](https://github.com/Microsoft/TypeScript/issues/10576) for discussion. As a workaround you can use the `@ResponseSchema` decorator to supply the response body schema:
 
 ```typescript
 import { ResponseSchema } from 'routing-controllers-openapi'
@@ -203,20 +201,33 @@ import { ResponseSchema } from 'routing-controllers-openapi'
 @JsonController('/users')
 export class UsersController {
 
-  @Get('/')
-  @ResponseSchema(User, { isArray: true })
-  listUsers() {
+  @Get('/:id')
+  @ResponseSchema(User)
+  getUser() {
     // ...
   }
 }
 ```
 
-`@ResponseSchema` will use the httpStatusCode and contentType from routing-controller's `@HttpCode` and `@ContentType` decoraters if those are set and otherwise fall back to httpStatusCode=200 and contentType='application/json'. You can also manually set these attributes via the optional second `options` argument. Manually setting `contentType` or `statusCode` in the `@ResponseSchema(ModelClass, options)` options object will override the above routing-controller decorators if they are also specified.
-To specify a response schema of array (of the specified first argument Class), set `isArray` to true in the `options` argument.
+`@ResponseSchema` takes as an argument either a class-validator class or a plain string schema name. You can also supply an optional secondary `options` argument:
 
-Note that when using `@ResponseSchema` together with `@JSONSchema`, the outer decorator will overwrite keys of inner decorators.
-So in the following example, information from `@ResponseSchema` would be overwritten by `@JSONSchema`.
+```typescript
+  @Post('/')
+  @ResponseSchema(User, {
+    contentType: 'text/csv',
+    description: 'A list of created user objects',
+    isArray: true
+    statusCode: '201'})
+  createUsers() {
+    // ...
+  }
 ```
+
+`contentType` and `statusCode` default to routing-controller's `@ContentType` and `@HttpCode` values. To specify a response schema of an array, set `options.isArray` as `true`. You can also annotate a single handler with multiple `ResponseSchema`s to specify responses with different status codes.
+
+Note that when using `@ResponseSchema` together with `@JSONSchema`, the outer decorator will overwrite keys of inner decorators. So in the following example, information from `@ResponseSchema` would be overwritten by `@JSONSchema`:
+
+```typescript
 @JSONSchema({responses: {
   '200': {
     'content': {
@@ -248,7 +259,6 @@ handler() { ... }
 
 ## TODO
 - Support for routing-controller's [authorization features](https://github.com/typestack/routing-controllers#using-authorization-features)
-- Parsing endpoint response type, using either the reflection metadata or a custom decorator
 
 Feel free to submit a PR!
 
@@ -259,3 +269,4 @@ Feel free to submit a PR!
 - Generate JSON schema from your Typescript sources with [typescript-json-schema](https://github.com/YousefED/typescript-json-schema)
 - [openapi3-ts](https://github.com/metadevpro/openapi3-ts/) provides handy OpenAPI utilities for Typescript
 - Convert OpenAPI 3 spec to **Swagger 2** with [api-spec-converter](https://github.com/LucyBot-Inc/api-spec-converter)
+- Generate Typescript interface definitions from SQL database schema with [schemats](https://github.com/SweetIQ/schemats)
