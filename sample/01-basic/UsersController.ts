@@ -1,9 +1,17 @@
 import { IsOptional, IsString, MaxLength } from 'class-validator'
-import { Body, Get, JsonController, Param, Post } from 'routing-controllers'
+import {
+  Body,
+  Get,
+  JsonController,
+  Param,
+  Post,
+  Put
+} from 'routing-controllers'
 import { OpenAPI } from 'routing-controllers-openapi'
 
 class CreateUserBody {
-  @IsString() name: string
+  @IsString()
+  name: string
 
   @IsOptional()
   @MaxLength(20, { each: true })
@@ -29,10 +37,12 @@ export class UsersController {
 
   @Post('/')
   @OpenAPI({ summary: 'Create a new user' })
-  createUser(
-    @Body({ validate: true })
-    body: CreateUserBody
-  ) {
+  createUser(@Body({ validate: true }) body: CreateUserBody) {
     return { ...body, id: 3 }
+  }
+
+  @Put('/')
+  createManyUsers(@Body({ type: CreateUserBody }) body: CreateUserBody[]) {
+    return {}
   }
 }

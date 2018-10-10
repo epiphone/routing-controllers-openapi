@@ -90,6 +90,13 @@ export class UsersController {
     return
   }
 
+  @Put('/')
+  createManyUsers(
+    @Body({ required: true, type: CreateUserBody }) _body: CreateUserBody[]
+  ) {
+    return
+  }
+
   @Post('/:userId/posts')
   createUserPost(@Body({ required: true }) _body: CreatePostBody) {
     return

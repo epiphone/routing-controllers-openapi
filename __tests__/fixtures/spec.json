@@ -10,9 +10,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "content"
-        ],
+        "required": ["content"],
         "type": "object"
       },
       "CreateUserBody": {
@@ -22,9 +20,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "email"
-        ],
+        "required": ["email"],
         "type": "object"
       },
       "ListUsersQueryParams": {
@@ -40,9 +36,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "types"
-        ],
+        "required": ["types"],
         "type": "object"
       },
       "ListUsersHeaderParams": {
@@ -54,9 +48,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "Authorization"
-        ],
+        "required": ["Authorization"],
         "type": "object"
       },
       "ModelDto": {
@@ -72,10 +64,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "email",
-          "username"
-        ],
+        "required": ["email", "username"],
         "type": "object"
       }
     }
@@ -98,9 +87,7 @@
           }
         },
         "summary": "Get default path",
-        "tags": [
-          "Root"
-        ]
+        "tags": ["Root"]
       }
     },
     "/api/stringPath": {
@@ -115,9 +102,7 @@
           }
         },
         "summary": "Get string path",
-        "tags": [
-          "Root"
-        ]
+        "tags": ["Root"]
       }
     },
     "/api/users": {
@@ -134,9 +119,7 @@
             "description": "Successful response"
           }
         },
-        "tags": [
-          "Users"
-        ]
+        "tags": ["Users"]
       }
     },
     "/api/users/": {
@@ -177,9 +160,7 @@
           }
         },
         "summary": "List users",
-        "tags": [
-          "Users"
-        ]
+        "tags": ["Users"]
       },
       "post": {
         "operationId": "UsersController.createUser",
@@ -207,9 +188,34 @@
           }
         },
         "summary": "Create user",
-        "tags": [
-          "Users"
-        ]
+        "tags": ["Users"]
+      },
+      "put": {
+        "operationId": "UsersController.createManyUsers",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateUserBody"
+                }
+              }
+            }
+          },
+          "description": "CreateUserBody",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {}
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Create many users",
+        "tags": ["Users"]
       }
     },
     "/api/users/{from}-{to}": {
@@ -261,9 +267,7 @@
           }
         },
         "summary": "List users in range",
-        "tags": [
-          "Users"
-        ]
+        "tags": ["Users"]
       }
     },
     "/api/users/{version}": {
@@ -289,9 +293,7 @@
           }
         },
         "summary": "Delete users by version",
-        "tags": [
-          "Users"
-        ]
+        "tags": ["Users"]
       }
     },
     "/api/users/{userId}": {
@@ -332,9 +334,7 @@
           }
         },
         "summary": "Get user",
-        "tags": [
-          "Users"
-        ]
+        "tags": ["Users"]
       }
     },
     "/api/users/{userId}/posts": {
@@ -370,9 +370,7 @@
           }
         },
         "summary": "Create user post",
-        "tags": [
-          "Users"
-        ]
+        "tags": ["Users"]
       }
     },
     "/api/users/{userId}/posts/{postId}": {
@@ -405,9 +403,7 @@
           }
         },
         "summary": "Get user post",
-        "tags": [
-          "User Posts"
-        ]
+        "tags": ["User Posts"]
       }
     }
   }

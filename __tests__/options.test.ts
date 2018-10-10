@@ -6,10 +6,16 @@ import {
   QueryParam
 } from 'routing-controllers'
 
-import { getPathParams, getQueryParams, IRoute, parseRoutes } from '../src'
+import {
+  getPathParams,
+  getQueryParams,
+  getRequestBody,
+  IRoute,
+  parseRoutes
+} from '../src'
 
 describe('options', () => {
-  let route: IRoute
+  let routes: IRoute[]
 
   beforeEach(() => {
     getMetadataArgsStorage().reset()
@@ -23,16 +29,22 @@ describe('options', () => {
       createUser(
         @QueryParam('from') _from: number,
         @QueryParam('to', { required: false }) _to: number,
-        @Body() _body: CreateUserBody
+        @Body({ type: CreateUserBody }) _body: CreateUserBody[]
       ) {
+        return
+      }
+
+      @Post('/:userId')
+      createManyUsers(@Body() _body: CreateUserBody[]) {
         return
       }
     }
 
-    route = parseRoutes(getMetadataArgsStorage())[0]
+    routes = parseRoutes(getMetadataArgsStorage())
   })
 
   it('sets path parameter always as required regardless of options', () => {
+    const route = routes[0]
     expect(getPathParams(route)[0].required).toEqual(true)
 
     route.options.defaults = { paramOptions: { required: false } }
@@ -40,16 +52,55 @@ describe('options', () => {
   })
 
   it('sets query parameter optional by default', () => {
+    const route = routes[0]
     expect(getQueryParams(route)[0].required).toEqual(false)
   })
 
   it('sets query parameter required as per global options', () => {
+    const route = routes[0]
     route.options.defaults = { paramOptions: { required: true } }
     expect(getQueryParams(route)[0].required).toEqual(true)
   })
 
   it('uses local required option over the global one', () => {
+    const route = routes[0]
     route.options.defaults = { paramOptions: { required: true } }
     expect(getQueryParams(route)[1].required).toEqual(false)
+  })
+
+  it('uses the explicit `type` parameter to override array request body item type', () => {
+    const route = routes[0]
+    expect(getRequestBody(route)).toEqual({
+      content: {
+        'application/json': {
+          schema: {
+            items: {
+              $ref: '#/components/schemas/CreateUserBody'
+            },
+            type: 'array'
+          }
+        }
+      },
+      description: 'CreateUserBody',
+      required: false
+    })
+  })
+
+  it('set inner schema as {} if array request body item type is not explicitly defined', () => {
+    const route = routes[1]
+    expect(getRequestBody(route)).toEqual({
+      content: {
+        'application/json': {
+          schema: {
+            items: {
+              type: 'object'
+            },
+            type: 'array'
+          }
+        }
+      },
+      description: '',
+      required: false
+    })
   })
 })

@@ -171,10 +171,11 @@ export function getQueryParams(route: IRoute): oa.ParameterObject[] {
 export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
   const meta = _.find(route.params, { type: 'body' })
   if (meta) {
-    const schema = getParamSchema(meta) as oa.ReferenceObject
+    const schema = getParamSchema(meta)
+    const { $ref } = 'items' in schema && schema.items ? schema.items : schema
     return {
       content: { 'application/json': { schema } },
-      description: _.last(_.split(schema.$ref, '/')),
+      description: _.last(_.split($ref, '/')),
       required: isRequired(meta, route)
     }
   }
@@ -267,7 +268,7 @@ function isRequired(meta: { required?: boolean }, route: IRoute) {
 function getParamSchema(
   param: ParamMetadataArgs
 ): oa.SchemaObject | oa.ReferenceObject {
-  const { index, object, method } = param
+  const { explicitType, index, object, method } = param
 
   const type = Reflect.getMetadata('design:paramtypes', object, method)[index]
   if (_.isFunction(type)) {
@@ -277,8 +278,12 @@ function getParamSchema(
       return { type: 'number' }
     } else if (_.isBoolean(type.prototype)) {
       return { type: 'boolean' }
-    }
-    if (type.name !== 'Object') {
+    } else if (type.name === 'Array') {
+      const items = explicitType
+        ? { $ref: '#/components/schemas/' + explicitType.name }
+        : { type: 'object' }
+      return { items, type: 'array' }
+    } else if (type.name !== 'Object') {
       return { $ref: '#/components/schemas/' + type.name }
     }
   }
