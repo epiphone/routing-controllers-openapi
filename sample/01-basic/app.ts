@@ -19,7 +19,7 @@ const app: Express = createExpressServer(routingControllersOptions)
 // Parse class-validator classes into JSON Schema:
 const metadatas = (getFromContainer(MetadataStorage) as any).validationMetadatas
 const schemas = validationMetadatasToSchemas(metadatas, {
-  refPointerPrefix: '#/components/schemas'
+  refPointerPrefix: '#/components/schemas/'
 })
 
 // Parse routing-controllers classes into OpenAPI spec:
