@@ -252,7 +252,7 @@ handler() { ... }
   - Regex and optional path parameters (e.g. `/users/:id(\d+)/:type?`) are also supported
 - `@QueryParam` and `@QueryParams`
 - `@HeaderParam` and `@HeaderParams`
-- `@Body`
+- `@Body` and `@BodyParam`
 - Parse response keywords from `@HttpCode` and `@ContentType` values
 - Global `options.defaults.paramOptions.required` option and local override with `{required: true}` in decorator params
 - Parse `summary`, `operationId` and `tags` keywords from controller/method names
