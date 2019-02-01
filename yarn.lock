@@ -2458,6 +2458,10 @@ openapi3-ts@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/openapi3-ts/-/openapi3-ts-1.0.0.tgz#a2b5c87e5a1fe796ccd408c87d752de7c521bf14"
 
+openapi3-ts@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/openapi3-ts/-/openapi3-ts-1.2.0.tgz#b86b518b7d7b5589e5266024c96bdc723e255112"
+
 optimist@^0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/optimist/-/optimist-0.6.1.tgz#da3ea74686fa21a19a111c326e90eb15a0196686"

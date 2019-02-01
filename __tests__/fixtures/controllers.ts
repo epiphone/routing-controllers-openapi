@@ -2,6 +2,7 @@
 import { IsEmail, IsOptional, IsString } from 'class-validator'
 import {
   Body,
+  BodyParam,
   ContentType,
   Controller,
   Delete,
@@ -11,6 +12,7 @@ import {
   HttpCode,
   JsonController,
   Param,
+  Patch,
   Post,
   Put,
   QueryParam,
@@ -46,6 +48,11 @@ export class ListUsersHeaderParams {
   @IsOptional()
   @IsString()
   'X-Correlation-ID': string
+}
+
+export class UserQuery {
+  @IsString()
+  name: string
 }
 
 @JsonController('/users')
@@ -98,7 +105,10 @@ export class UsersController {
   }
 
   @Post('/:userId/posts')
-  createUserPost(@Body({ required: true }) _body: CreatePostBody) {
+  createUserPost(
+    @Body({ required: true }) _body: CreatePostBody,
+    @BodyParam('token') _token: string
+  ) {
     return
   }
 
@@ -113,7 +123,11 @@ export class UsersController {
     summary: ''
   })
   @Put()
-  putUserDefault() {
+  putUserDefault(
+    @BodyParam('limit') _limit: number,
+    @BodyParam('query') _query: UserQuery,
+    @BodyParam('token', { required: true }) _token: string
+  ) {
     return
   }
 }
@@ -125,6 +139,11 @@ export class UserPostsController {
     @Param('userId') _userId: number,
     @Param('postId') _postId: string
   ) {
+    return
+  }
+
+  @Patch('/:postId')
+  patchUserPost(@BodyParam('token') _token: string) {
     return
   }
 }

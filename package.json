@@ -30,7 +30,7 @@
   "dependencies": {
     "debug": "^3.1.0",
     "lodash": "^4.17.10",
-    "openapi3-ts": "^1.0.0",
+    "openapi3-ts": "^1.2.0",
     "path-to-regexp": "^2.2.1",
     "reflect-metadata": "^0.1.12",
     "routing-controllers": "^0.7.7",

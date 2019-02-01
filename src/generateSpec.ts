@@ -169,14 +169,45 @@ export function getQueryParams(route: IRoute): oa.ParameterObject[] {
  * Return OpenAPI requestBody of given route, if it has one.
  */
 export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
-  const meta = _.find(route.params, { type: 'body' })
-  if (meta) {
-    const schema = getParamSchema(meta)
-    const { $ref } = 'items' in schema && schema.items ? schema.items : schema
+  const bodyParamMetas = route.params.filter(d => d.type === 'body-param')
+  const bodyParamsSchema: oa.SchemaObject | null =
+    bodyParamMetas.length > 0
+      ? bodyParamMetas.reduce(
+          (acc: oa.SchemaObject, d) => ({
+            ...acc,
+            properties: {
+              ...acc.properties,
+              [d.name!]: getParamSchema(d)
+            },
+            required: isRequired(d, route)
+              ? [...(acc.required || []), d.name!]
+              : acc.required
+          }),
+          { properties: {}, required: [], type: 'object' }
+        )
+      : null
+
+  const bodyMeta = route.params.find(d => d.type === 'body')
+
+  if (bodyMeta) {
+    const bodySchema = getParamSchema(bodyMeta)
+    const { $ref } =
+      'items' in bodySchema && bodySchema.items ? bodySchema.items : bodySchema
+
     return {
-      content: { 'application/json': { schema } },
+      content: {
+        'application/json': {
+          schema: bodyParamsSchema
+            ? { allOf: [bodySchema, bodyParamsSchema] }
+            : bodySchema
+        }
+      },
       description: _.last(_.split($ref, '/')),
-      required: isRequired(meta, route)
+      required: isRequired(bodyMeta, route)
+    }
+  } else if (bodyParamsSchema) {
+    return {
+      content: { 'application/json': { schema: bodyParamsSchema } }
     }
   }
 }

@@ -11,6 +11,7 @@ import {
   parseRoutes,
   routingControllersToSpec
 } from '../src'
+import { getRequestBody } from '../src/generateSpec'
 import {
   RootController,
   UserPostsController,
@@ -99,6 +100,12 @@ describe('index', () => {
         type: 'get'
       },
       {
+        method: 'patchUserPost',
+        route: '/:postId',
+        target: UserPostsController,
+        type: 'patch'
+      },
+      {
         method: 'getDefaultPath',
         route: undefined,
         target: RootController,
@@ -154,5 +161,117 @@ describe('index', () => {
     route.action.target = class AnotherController {}
     route.action.method = 'anotherMethod'
     expect(getOperationId(route)).toEqual('AnotherController.anotherMethod')
+  })
+})
+
+describe('getRequestBody', () => {
+  it('parse a single `body` metadata item into a single `object` schema', () => {
+    const route = routes.find(d => d.action.method === 'createUser')!
+    expect(route).toBeDefined()
+    expect(getRequestBody(route)).toEqual({
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/CreateUserBody'
+          }
+        }
+      },
+      description: 'CreateUserBody',
+      required: false
+    })
+  })
+
+  it('parse a single `body` metadata item of array type into a single `object` schema', () => {
+    const route = routes.find(d => d.action.method === 'createManyUsers')!
+    expect(route).toBeDefined()
+    expect(getRequestBody(route)).toEqual({
+      content: {
+        'application/json': {
+          schema: {
+            items: {
+              $ref: '#/components/schemas/CreateUserBody'
+            },
+            type: 'array'
+          }
+        }
+      },
+      description: 'CreateUserBody',
+      required: true
+    })
+  })
+
+  it('parse a single `body-param` metadata item into a single `object` schema', () => {
+    const route = routes.find(d => d.action.method === 'patchUserPost')!
+    expect(route).toBeDefined()
+    expect(getRequestBody(route)).toEqual({
+      content: {
+        'application/json': {
+          schema: {
+            properties: {
+              token: {
+                type: 'string'
+              }
+            },
+            required: [],
+            type: 'object'
+          }
+        }
+      }
+    })
+  })
+
+  it('combine multiple `body-param` metadata items into a single `object` schema', () => {
+    const route = routes.find(d => d.action.method === 'putUserDefault')!
+    expect(route).toBeDefined()
+    expect(getRequestBody(route)).toEqual({
+      content: {
+        'application/json': {
+          schema: {
+            properties: {
+              limit: {
+                type: 'number'
+              },
+              query: {
+                $ref: '#/components/schemas/UserQuery'
+              },
+              token: {
+                type: 'string'
+              }
+            },
+            required: ['token'],
+            type: 'object'
+          }
+        }
+      }
+    })
+  })
+
+  it('wrap `body` and `body-param` metadata items under a single `allOf` schema', () => {
+    const route = routes.find(d => d.action.method === 'createUserPost')!
+    expect(route).toBeDefined()
+    expect(getRequestBody(route)).toEqual({
+      content: {
+        'application/json': {
+          schema: {
+            allOf: [
+              {
+                $ref: '#/components/schemas/CreatePostBody'
+              },
+              {
+                properties: {
+                  token: {
+                    type: 'string'
+                  }
+                },
+                required: [],
+                type: 'object'
+              }
+            ]
+          }
+        }
+      },
+      description: 'CreatePostBody',
+      required: true
+    })
   })
 })

@@ -66,6 +66,15 @@
         },
         "required": ["email", "username"],
         "type": "object"
+      },
+      "UserQuery": {
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["name"],
+        "type": "object"
       }
     }
   },
@@ -111,6 +120,27 @@
         "deprecated": true,
         "summary": "",
         "operationId": "UsersController.putUserDefault",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "limit": {
+                    "type": "number"
+                  },
+                  "query": {
+                    "$ref": "#/components/schemas/UserQuery"
+                  },
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": ["token"],
+                "type": "object"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "content": {
@@ -354,7 +384,20 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreatePostBody"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreatePostBody"
+                  },
+                  {
+                    "properties": {
+                      "token": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [],
+                    "type": "object"
+                  }
+                ]
               }
             }
           },
@@ -403,6 +446,52 @@
           }
         },
         "summary": "Get user post",
+        "tags": ["User Posts"]
+      },
+      "patch": {
+        "operationId": "UserPostsController.patchUserPost",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "postId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/html; charset=utf-8": {}
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Patch user post",
         "tags": ["User Posts"]
       }
     }
