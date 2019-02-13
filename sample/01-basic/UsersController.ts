@@ -18,6 +18,9 @@ class CreateUserBody {
   hobbies: string[]
 }
 
+@OpenAPI({
+  security: [{ basicAuth: [] }]
+})
 @JsonController('/users')
 export class UsersController {
   @Get('/')

@@ -76,6 +76,16 @@
         "required": ["name"],
         "type": "object"
       }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      },
+      "bearerAuth": {
+        "scheme": "bearer",
+        "type": "http"
+      }
     }
   },
   "info": {
@@ -86,6 +96,7 @@
   "paths": {
     "/api": {
       "get": {
+        "description": "Common description for all RootController operations",
         "operationId": "RootController.getDefaultPath",
         "responses": {
           "200": {
@@ -95,12 +106,14 @@
             "description": "Successful response"
           }
         },
+        "security": [{ "basicAuth": [] }],
         "summary": "Get default path",
         "tags": ["Root"]
       }
     },
     "/api/stringPath": {
       "get": {
+        "description": "Common description for all RootController operations",
         "operationId": "RootController.getStringPath",
         "responses": {
           "200": {
@@ -110,6 +123,7 @@
             "description": "Successful response"
           }
         },
+        "security": [],
         "summary": "Get string path",
         "tags": ["Root"]
       }

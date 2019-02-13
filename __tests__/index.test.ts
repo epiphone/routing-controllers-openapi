@@ -36,7 +36,19 @@ describe('index', () => {
     })
 
     const spec = routingControllersToSpec(storage, options, {
-      components: { schemas },
+      components: {
+        schemas,
+        securitySchemes: {
+          basicAuth: {
+            scheme: 'basic',
+            type: 'http'
+          },
+          bearerAuth: {
+            scheme: 'bearer',
+            type: 'http'
+          }
+        }
+      },
       info: { title: 'My app', version: '1.2.0' }
     })
     expect(spec).toEqual(require('./fixtures/spec.json'))

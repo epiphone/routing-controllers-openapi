@@ -25,7 +25,15 @@ const schemas = validationMetadatasToSchemas(metadatas, {
 // Parse routing-controllers classes into OpenAPI spec:
 const storage = getMetadataArgsStorage()
 const spec = routingControllersToSpec(storage, routingControllersOptions, {
-  components: { schemas },
+  components: {
+    schemas,
+    securitySchemes: {
+      basicAuth: {
+        scheme: 'basic',
+        type: 'http'
+      }
+    }
+  },
   info: {
     description: 'Generated with `routing-controllers-openapi`',
     title: 'A sample API',

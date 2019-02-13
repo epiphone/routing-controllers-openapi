@@ -25,9 +25,17 @@ export type OpenAPIParam =
  * returning an updated Operation.
  */
 export function OpenAPI(spec: OpenAPIParam) {
-  return (target: object, key: string) => {
-    const currentMeta = getOpenAPIMetadata(target, key)
-    setOpenAPIMetadata([spec, ...currentMeta], target, key)
+  // tslint:disable-next-line:ban-types
+  return (...args: [Function] | [object, string, PropertyDescriptor]) => {
+    if (args.length === 1) {
+      const [target] = args
+      const currentMeta = getOpenAPIMetadata(target)
+      setOpenAPIMetadata([spec, ...currentMeta], target)
+    } else {
+      const [target, key] = args
+      const currentMeta = getOpenAPIMetadata(target, key)
+      setOpenAPIMetadata([spec, ...currentMeta], target, key)
+    }
   }
 }
 
@@ -39,10 +47,11 @@ export function applyOpenAPIDecorator(
   route: IRoute
 ): OperationObject {
   const { action } = route
-  const openAPIParams = getOpenAPIMetadata(
-    action.target.prototype,
-    action.method
-  )
+  const openAPIParams = [
+    ...getOpenAPIMetadata(action.target),
+    ...getOpenAPIMetadata(action.target.prototype, action.method)
+  ]
+
   return openAPIParams.reduce((acc: OperationObject, oaParam: OpenAPIParam) => {
     return _.isFunction(oaParam)
       ? oaParam(acc, route)
@@ -53,8 +62,12 @@ export function applyOpenAPIDecorator(
 /**
  * Get the OpenAPI Operation object stored in given target property's metadata.
  */
-function getOpenAPIMetadata(target: object, key: string): OpenAPIParam[] {
-  return Reflect.getMetadata(OPEN_API_KEY, target.constructor, key) || []
+function getOpenAPIMetadata(target: object, key?: string): OpenAPIParam[] {
+  return (
+    (key
+      ? Reflect.getMetadata(OPEN_API_KEY, target.constructor, key)
+      : Reflect.getMetadata(OPEN_API_KEY, target)) || []
+  )
 }
 
 /**
@@ -63,9 +76,11 @@ function getOpenAPIMetadata(target: object, key: string): OpenAPIParam[] {
 function setOpenAPIMetadata(
   value: OpenAPIParam[],
   target: object,
-  key: string
+  key?: string
 ) {
-  return Reflect.defineMetadata(OPEN_API_KEY, value, target.constructor, key)
+  return key
+    ? Reflect.defineMetadata(OPEN_API_KEY, value, target.constructor, key)
+    : Reflect.defineMetadata(OPEN_API_KEY, value, target)
 }
 
 /**

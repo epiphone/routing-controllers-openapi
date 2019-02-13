@@ -437,3 +437,59 @@ describe('decorators', () => {
     })
   })
 })
+
+describe('@OpenAPI-decorated class', () => {
+  let routes: { [method: string]: IRoute }
+
+  beforeEach(() => {
+    getMetadataArgsStorage().reset()
+
+    @OpenAPI({
+      externalDocs: { url: 'http://docs.com' }
+    })
+    @Controller('/items')
+    @OpenAPI({
+      description: 'Common description',
+      security: [{ basicAuth: [] }]
+    })
+    // @ts-ignore: not referenced
+    class Item {
+      @Get('/')
+      @OpenAPI({
+        description: 'List all items',
+        summary: 'Method-specific summary'
+      })
+      listItems() {
+        return
+      }
+
+      @Get('/')
+      @OpenAPI(op => ({ ...op, security: [] }))
+      getItem() {
+        return
+      }
+    }
+
+    routes = _.keyBy(parseRoutes(getMetadataArgsStorage()), 'action.method')
+  })
+
+  it('applies controller OpenAPI props to each method with method-specific props taking precedence', () => {
+    expect(getOperation(routes.listItems)).toEqual(
+      expect.objectContaining({
+        description: 'List all items',
+        externalDocs: { url: 'http://docs.com' },
+        security: [{ basicAuth: [] }],
+        summary: 'Method-specific summary'
+      })
+    )
+
+    expect(getOperation(routes.getItem)).toEqual(
+      expect.objectContaining({
+        description: 'Common description',
+        externalDocs: { url: 'http://docs.com' },
+        security: [],
+        summary: 'Get item'
+      })
+    )
+  })
+})

@@ -21,6 +21,7 @@ import {
 
 import { OpenAPI, ResponseSchema } from '../../src'
 import { ModelDto } from './models'
+import { SpecificationExtension } from 'openapi3-ts'
 
 export class CreateUserBody {
   @IsEmail()
@@ -149,12 +150,17 @@ export class UserPostsController {
 }
 
 @Controller()
+@OpenAPI({
+  description: 'Common description for all RootController operations',
+  security: [{ basicAuth: [] }]
+})
 export class RootController {
   @Get()
   getDefaultPath() {
     return
   }
 
+  @OpenAPI(spec => ({ ...spec, security: [] }))
   @Get('/stringPath')
   getStringPath() {
     return

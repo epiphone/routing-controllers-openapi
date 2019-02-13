@@ -191,6 +191,22 @@ A single handler can be decorated with multiple `@OpenAPI`s. Note though that si
   }
 ```
 
+Multiple `@OpenAPI`s are merged together with [`lodash/merge`](https://lodash.com/docs/4.17.11#merge) which has [a few interesting properties](https://github.com/lodash/lodash/issues/1313) to keep in mind when it comes to arrays. Use the function parameter described above when strict control over merging logic is required.
+
+#### Class `@OpenAPI` decorator
+
+Using `@OpenAPI` on the controller class effectively applies given spec to each class method. Method-level `@OpenAPI`s are merged into class specs, with the former having precedence:
+
+```typescript
+@OpenAPI({
+  security: [{ basicAuth: [] }] // Applied to each method
+})
+@JsonController('/users')
+export class UsersController {
+  // ...
+}
+```
+
 ### Annotating response schemas
 
 Extracting response types automatically in runtime isn't currently allowed by Typescript's reflection system. Specifically the problem is that `routing-controllers-openapi` can't unwrap generic types like Promise<MyModel> or Array<MyModel>: see e.g. [here](https://github.com/Microsoft/TypeScript/issues/10576) for discussion. As a workaround you can use the `@ResponseSchema` decorator to supply the response body schema:
@@ -257,7 +273,8 @@ handler() { ... }
 - Global `options.defaults.paramOptions.required` option and local override with `{required: true}` in decorator params
 - Parse `summary`, `operationId` and `tags` keywords from controller/method names
 
-## TODO
+## Future work
+
 - Support for routing-controller's [authorization features](https://github.com/typestack/routing-controllers#using-authorization-features)
 
 Feel free to submit a PR!
