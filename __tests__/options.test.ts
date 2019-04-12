@@ -72,7 +72,7 @@ describe('options', () => {
     expect(getQueryParams(route)[1].required).toEqual(false)
   })
 
-  it('uses the explicit `type` parameter to override request body type', () => {
+  it('uses the explicit `type` parameter to override request query type', () => {
     const route = routes[1]
     expect(getQueryParams(route)[0]).toEqual({
       in: "query",
@@ -84,7 +84,7 @@ describe('options', () => {
     })
   })
 
-  it('uses the explicit `type` parameter to override array request body item type', () => {
+  it('uses the explicit `type` parameter to override request query array item type', () => {
     const route = routes[0]
     expect(getRequestBody(route)).toEqual({
       content: {
