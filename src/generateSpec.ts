@@ -173,18 +173,18 @@ export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
   const bodyParamsSchema: oa.SchemaObject | null =
     bodyParamMetas.length > 0
       ? bodyParamMetas.reduce(
-        (acc: oa.SchemaObject, d) => ({
-          ...acc,
-          properties: {
-            ...acc.properties,
-            [d.name!]: getParamSchema(d)
-          },
-          required: isRequired(d, route)
-            ? [...(acc.required || []), d.name!]
-            : acc.required
-        }),
-        { properties: {}, required: [], type: 'object' }
-      )
+          (acc: oa.SchemaObject, d) => ({
+            ...acc,
+            properties: {
+              ...acc.properties,
+              [d.name!]: getParamSchema(d)
+            },
+            required: isRequired(d, route)
+              ? [...(acc.required || []), d.name!]
+              : acc.required
+          }),
+          { properties: {}, required: [], type: 'object' }
+        )
       : null
 
   const bodyMeta = route.params.find(d => d.type === 'body')
