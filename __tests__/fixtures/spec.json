@@ -262,6 +262,35 @@
         "tags": ["Users"]
       }
     },
+    "/api/users/withType": {
+      "post": {
+        "operationId": "UsersController.createUserWithType",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "user",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/CreateUserBody"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelDto"
+                }
+              }
+            },
+            "description": "Created user object"
+          }
+        },
+        "summary": "Create user with type",
+        "tags": ["Users"]
+      }
+    },
     "/api/users/{from}-{to}": {
       "get": {
         "operationId": "UsersController.listUsersInRange",

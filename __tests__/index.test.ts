@@ -82,6 +82,12 @@ describe('index', () => {
         type: 'post'
       },
       {
+        method: 'createUserWithType',
+        route: '/withType',
+        target: UsersController,
+        type: 'post'
+      },
+      {
         method: 'createManyUsers',
         route: '/',
         target: UsersController,
