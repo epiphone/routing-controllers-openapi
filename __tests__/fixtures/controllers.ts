@@ -98,6 +98,16 @@ export class UsersController {
     return
   }
 
+  @HttpCode(201)
+  @Post('/withType')
+  @ResponseSchema(ModelDto, {
+    description: 'Created user object',
+    statusCode: 201
+  })
+  createUserWithType(@QueryParam('user', { type: CreateUserBody }) _user: string) {
+    return
+  }
+
   @Put('/')
   createManyUsers(
     @Body({ required: true, type: CreateUserBody }) _body: CreateUserBody[]

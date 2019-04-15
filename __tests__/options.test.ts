@@ -20,7 +20,8 @@ describe('options', () => {
   beforeEach(() => {
     getMetadataArgsStorage().reset()
 
-    class CreateUserBody {}
+    class CreateUserBody { }
+    class ParamType { }
 
     @JsonController('/users')
     // @ts-ignore: not referenced
@@ -35,7 +36,10 @@ describe('options', () => {
       }
 
       @Post('/:userId')
-      createManyUsers(@Body() _body: CreateUserBody[]) {
+      createManyUsers(
+        @QueryParam('param', { type: ParamType }) _param: string,
+        @Body() _body: CreateUserBody[],
+      ) {
         return
       }
     }
@@ -66,6 +70,18 @@ describe('options', () => {
     const route = routes[0]
     route.options.defaults = { paramOptions: { required: true } }
     expect(getQueryParams(route)[1].required).toEqual(false)
+  })
+
+  it('uses the explicit `type` parameter to override request query type', () => {
+    const route = routes[1]
+    expect(getQueryParams(route)[0]).toEqual({
+      in: "query",
+      name: "param",
+      required: false,
+      schema: {
+        $ref: '#/components/schemas/ParamType'
+      }
+    })
   })
 
   it('uses the explicit `type` parameter to override array request body item type', () => {

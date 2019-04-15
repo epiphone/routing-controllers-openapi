@@ -302,6 +302,15 @@ function getParamSchema(
   const { explicitType, index, object, method } = param
 
   const type = Reflect.getMetadata('design:paramtypes', object, method)[index]
+  if (_.isFunction(type) && type.name === 'Array') {
+    const items = explicitType
+      ? { $ref: '#/components/schemas/' + explicitType.name }
+      : { type: 'object' }
+    return { items, type: 'array' }
+  }
+  if (explicitType) {
+    return { $ref: '#/components/schemas/' + explicitType.name }
+  }
   if (_.isFunction(type)) {
     if (_.isString(type.prototype) || _.isSymbol(type.prototype)) {
       return { type: 'string' }
@@ -309,14 +318,10 @@ function getParamSchema(
       return { type: 'number' }
     } else if (_.isBoolean(type.prototype)) {
       return { type: 'boolean' }
-    } else if (type.name === 'Array') {
-      const items = explicitType
-        ? { $ref: '#/components/schemas/' + explicitType.name }
-        : { type: 'object' }
-      return { items, type: 'array' }
     } else if (type.name !== 'Object') {
       return { $ref: '#/components/schemas/' + type.name }
     }
   }
+
   return {}
 }
