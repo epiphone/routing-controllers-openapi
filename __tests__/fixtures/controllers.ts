@@ -1,5 +1,6 @@
 // tslint:disable:no-implicit-dependencies
-import { IsEmail, IsOptional, IsString } from 'class-validator'
+import { Type } from 'class-transformer'
+import { IsEmail, IsOptional, IsString, ValidateNested } from 'class-validator'
 import {
   Body,
   BodyParam,
@@ -21,11 +22,16 @@ import {
 
 import { OpenAPI, ResponseSchema } from '../../src'
 import { ModelDto } from './models'
-import { SpecificationExtension } from 'openapi3-ts'
 
 export class CreateUserBody {
   @IsEmail()
   email: string
+}
+
+export class CreateNestedBody {
+  @ValidateNested({ each: true })
+  @Type(() => CreateUserBody)
+  users: CreateUserBody[]
 }
 
 export class CreatePostBody {
@@ -104,7 +110,9 @@ export class UsersController {
     description: 'Created user object',
     statusCode: 201
   })
-  createUserWithType(@QueryParam('user', { type: CreateUserBody }) _user: string) {
+  createUserWithType(
+    @QueryParam('user', { type: CreateUserBody }) _user: string
+  ) {
     return
   }
 
@@ -112,6 +120,11 @@ export class UsersController {
   createManyUsers(
     @Body({ required: true, type: CreateUserBody }) _body: CreateUserBody[]
   ) {
+    return
+  }
+
+  @Post('/nested')
+  createNestedUsers(@Body({ required: true }) _body: CreateNestedBody) {
     return
   }
 

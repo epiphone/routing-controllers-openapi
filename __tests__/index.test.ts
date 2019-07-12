@@ -1,4 +1,5 @@
-// tslint:disable:no-implicit-dependencies
+// tslint:disable:no-implicit-dependencies no-submodule-imports
+import { defaultMetadataStorage } from 'class-transformer/storage'
 import { getFromContainer, MetadataStorage } from 'class-validator'
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
 import * as _ from 'lodash'
@@ -32,7 +33,8 @@ describe('index', () => {
     const metadatas = (getFromContainer(MetadataStorage) as any)
       .validationMetadatas
     const schemas = validationMetadatasToSchemas(metadatas, {
-      refPointerPrefix: '#/components/schemas'
+      classTransformerMetadataStorage: defaultMetadataStorage,
+      refPointerPrefix: '#/components/schemas/'
     })
 
     const spec = routingControllersToSpec(storage, options, {
@@ -92,6 +94,12 @@ describe('index', () => {
         route: '/',
         target: UsersController,
         type: 'put'
+      },
+      {
+        method: 'createNestedUsers',
+        route: '/nested',
+        target: UsersController,
+        type: 'post'
       },
       {
         method: 'createUserPost',
