@@ -136,7 +136,7 @@ import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
 // ...
 
 const schemas = validationMetadatasToSchemas(metadatas, {
-  refPointerPrefix: '#/components/schemas'
+  refPointerPrefix: '#/components/schemas/'
 })
 
 const spec = routingControllersToSpec(storage, routingControllerOptions, {
