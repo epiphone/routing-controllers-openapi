@@ -31,8 +31,7 @@
     "lodash": "^4.17.10",
     "openapi3-ts": "^1.2.0",
     "path-to-regexp": "^2.2.1",
-    "reflect-metadata": "^0.1.12",
-    "tslib": "^1.9.3"
+    "reflect-metadata": "^0.1.12"
   },
   "devDependencies": {
     "@team-griffin/install-self-peers": "^1.1.1",
@@ -53,7 +52,6 @@
     "tslint": "^5.18.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-config-standard": "^8.0.1",
-    "tsutils": "^3.14.0",
     "typescript": "^3.5.3"
   },
   "peerDependencies": {
