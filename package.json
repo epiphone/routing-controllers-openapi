@@ -28,7 +28,6 @@
     "singleQuote": true
   },
   "dependencies": {
-    "debug": "^3.1.0",
     "lodash": "^4.17.10",
     "openapi3-ts": "^1.2.0",
     "path-to-regexp": "^2.2.1",
@@ -37,7 +36,6 @@
     "tslib": "^1.9.3"
   },
   "devDependencies": {
-    "@types/debug": "^4.1.4",
     "@types/jest": "^24.0.15",
     "@types/lodash": "^4.14.136",
     "@types/node": "^12.6.2",
