@@ -18,7 +18,7 @@
     "build": "yarn clean && tsc -p tsconfig.release.json",
     "format": "prettier --write {src,test}/**/*.ts",
     "lint": "tslint --project . src/**/*.ts",
-    "prepare": "yarn build",
+    "prepare": "install-self-peers -- --ignore-scripts && yarn build",
     "send-coverage": "codecov -f coverage/*.json",
     "test": "jest --coverage",
     "test:watch": "jest --watch"
@@ -32,10 +32,10 @@
     "openapi3-ts": "^1.2.0",
     "path-to-regexp": "^2.2.1",
     "reflect-metadata": "^0.1.12",
-    "routing-controllers": "^0.7.7",
     "tslib": "^1.9.3"
   },
   "devDependencies": {
+    "@team-griffin/install-self-peers": "^1.1.1",
     "@types/jest": "^24.0.15",
     "@types/lodash": "^4.14.136",
     "@types/node": "^12.6.2",
@@ -55,5 +55,8 @@
     "tslint-config-standard": "^8.0.1",
     "tsutils": "^3.14.0",
     "typescript": "^3.5.3"
+  },
+  "peerDependencies": {
+    "routing-controllers": "^0.8.0"
   }
 }
