@@ -32,9 +32,9 @@ export function getOperation(route: IRoute): oa.OperationObject {
   const operation: oa.OperationObject = {
     operationId: getOperationId(route),
     parameters: [
-      ...getHeaderParams(route),
-      ...getPathParams(route),
-      ...getQueryParams(route)
+      ... getHeaderParams(route),
+      ... getPathParams(route),
+      ... getQueryParams(route)
     ],
     requestBody: getRequestBody(route) || undefined,
     responses: getResponses(route),
@@ -64,7 +64,7 @@ export function getPaths(routes: IRoute[]): oa.PathObject {
   }))
 
   // @ts-ignore: array spread
-  return _.merge(...routePaths)
+  return _.merge(... routePaths)
 }
 
 /**
@@ -127,7 +127,7 @@ export function getPathParams(route: IRoute): oa.ParameterObject[] {
       if (meta) {
         const metaSchema = getParamSchema(meta)
         param.schema =
-          'type' in metaSchema ? { ...param.schema, ...metaSchema } : metaSchema
+          'type' in metaSchema ? { ... param.schema, ... metaSchema }: metaSchema
       }
 
       return param
@@ -173,18 +173,18 @@ export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
   const bodyParamsSchema: oa.SchemaObject | null =
     bodyParamMetas.length > 0
       ? bodyParamMetas.reduce(
-          (acc: oa.SchemaObject, d) => ({
-            ...acc,
-            properties: {
-              ...acc.properties,
-              [d.name!]: getParamSchema(d)
-            },
-            required: isRequired(d, route)
-              ? [...(acc.required || []), d.name!]
-              : acc.required
-          }),
-          { properties: {}, required: [], type: 'object' }
-        )
+      (acc: oa.SchemaObject, d) => ({
+        ... acc,
+        properties: {
+          ... acc.properties,
+          [d.name!]: getParamSchema(d)
+        },
+        required: isRequired(d, route)
+          ? [... (acc.required || []), d.name!]
+          : acc.required
+      }),
+      { properties: {}, required: [], type: 'object' }
+      )
       : null
 
   const bodyMeta = route.params.find(d => d.type === 'body')
@@ -192,7 +192,7 @@ export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
   if (bodyMeta) {
     const bodySchema = getParamSchema(bodyMeta)
     const { $ref } =
-      'items' in bodySchema && bodySchema.items ? bodySchema.items : bodySchema
+      'items' in bodySchema && bodySchema.items ? bodySchema.items: bodySchema
 
     return {
       content: {
@@ -221,7 +221,7 @@ export function getContentType(route: IRoute): string {
       ? 'application/json'
       : 'text/html; charset=utf-8'
   const contentMeta = _.find(route.responseHandlers, { type: 'content-type' })
-  return contentMeta ? contentMeta.value : defaultContentType
+  return contentMeta ? contentMeta.value: defaultContentType
 }
 
 /**
@@ -229,7 +229,7 @@ export function getContentType(route: IRoute): string {
  */
 export function getStatusCode(route: IRoute): string {
   const successMeta = _.find(route.responseHandlers, { type: 'success-code' })
-  return successMeta ? successMeta.value + '' : '200'
+  return successMeta ? successMeta.value + '': '200'
 }
 
 /**
@@ -279,7 +279,7 @@ export function getTags(route: IRoute): string[] {
 export function expressToOpenAPIPath(expressPath: string) {
   const tokens = pathToRegexp.parse(expressPath)
   return tokens
-    .map(d => (_.isString(d) ? d : `${d.prefix}{${d.name}}`))
+    .map(d => (_.isString(d) ? d: `${d.prefix}{${d.name}}`))
     .join('')
 }
 
@@ -289,7 +289,7 @@ export function expressToOpenAPIPath(expressPath: string) {
  */
 function isRequired(meta: { required?: boolean }, route: IRoute) {
   const globalRequired = _.get(route.options, 'defaults.paramOptions.required')
-  return globalRequired ? meta.required !== false : !!meta.required
+  return globalRequired ? meta.required !== false: !!meta.required
 }
 
 /**
@@ -300,8 +300,9 @@ function getParamSchema(
   param: ParamMetadataArgs
 ): oa.SchemaObject | oa.ReferenceObject {
   const { explicitType, index, object, method } = param
-
-  const type = Reflect.getMetadata('design:paramtypes', object, method)[index]
+  const reflectedTypes = Reflect.getMetadata('design:paramtypes', object, method);
+  if (reflectedTypes.length <= index) return {};
+  const type = reflectedTypes[index]
   if (_.isFunction(type) && type.name === 'Array') {
     const items = explicitType
       ? { $ref: '#/components/schemas/' + explicitType.name }
