@@ -135,7 +135,7 @@ import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
 
 // ...
 
-const schemas = validationMetadatasToSchemas(metadatas, {
+const schemas = validationMetadatasToSchemas({
   refPointerPrefix: '#/components/schemas/'
 })
 

@@ -1,5 +1,4 @@
 import 'reflect-metadata'
-import { getFromContainer, MetadataStorage } from 'class-validator' // tslint:disable-line
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
 import { Express } from 'express'
 import {
@@ -17,8 +16,7 @@ const routingControllersOptions = {
 const app: Express = createExpressServer(routingControllersOptions)
 
 // Parse class-validator classes into JSON Schema:
-const metadatas = (getFromContainer(MetadataStorage) as any).validationMetadatas
-const schemas = validationMetadatasToSchemas(metadatas, {
+const schemas = validationMetadatasToSchemas({
   refPointerPrefix: '#/components/schemas/'
 })
 
