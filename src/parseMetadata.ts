@@ -2,7 +2,7 @@
 import * as _ from 'lodash'
 import {
   MetadataArgsStorage,
-  RoutingControllersOptions
+  RoutingControllersOptions,
 } from 'routing-controllers'
 import { ActionMetadataArgs } from 'routing-controllers/metadata/args/ActionMetadataArgs'
 import { ControllerMetadataArgs } from 'routing-controllers/metadata/args/ControllerMetadataArgs'
@@ -27,10 +27,10 @@ export function parseRoutes(
   storage: MetadataArgsStorage,
   options: RoutingControllersOptions = {}
 ): IRoute[] {
-  return storage.actions.map(action => ({
+  return storage.actions.map((action) => ({
     action,
     controller: _.find(storage.controllers, {
-      target: action.target
+      target: action.target,
     }) as ControllerMetadataArgs,
     options,
     params: _.sortBy(
@@ -40,6 +40,6 @@ export function parseRoutes(
     responseHandlers: storage.filterResponseHandlersWithTargetAndMethod(
       action.target,
       action.method
-    )
+    ),
   }))
 }
