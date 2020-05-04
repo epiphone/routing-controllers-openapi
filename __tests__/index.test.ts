@@ -1,6 +1,5 @@
 // tslint:disable:no-implicit-dependencies no-submodule-imports
 import { defaultMetadataStorage } from 'class-transformer/storage'
-import { getFromContainer, MetadataStorage } from 'class-validator'
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
 import * as _ from 'lodash'
 import { getMetadataArgsStorage } from 'routing-controllers'
@@ -30,9 +29,7 @@ const routes = parseRoutes(storage, options)
 describe('index', () => {
   it('generates an OpenAPI spec from routing-controllers metadata', () => {
     // Include component schemas parsed with class-validator-jsonschema:
-    const metadatas = (getFromContainer(MetadataStorage) as any)
-      .validationMetadatas
-    const schemas = validationMetadatasToSchemas(metadatas, {
+    const schemas = validationMetadatasToSchemas({
       classTransformerMetadataStorage: defaultMetadataStorage,
       refPointerPrefix: '#/components/schemas/'
     })

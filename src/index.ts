@@ -2,7 +2,7 @@ import * as _ from 'lodash'
 import * as oa from 'openapi3-ts'
 import {
   MetadataArgsStorage,
-  RoutingControllersOptions
+  RoutingControllersOptions,
 } from 'routing-controllers'
 
 import { getSpec } from './generateSpec'

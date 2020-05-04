@@ -1,7 +1,11 @@
 sudo: false
 language: node_js
 node_js:
-  - 8
+  - 12
+script:
+  - yarn test:format
+  - yarn lint
+  - yarn test
 cache: yarn
 notifications:
   email: false

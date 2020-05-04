@@ -34,12 +34,12 @@ export function getOperation(route: IRoute): oa.OperationObject {
     parameters: [
       ...getHeaderParams(route),
       ...getPathParams(route),
-      ...getQueryParams(route)
+      ...getQueryParams(route),
     ],
     requestBody: getRequestBody(route) || undefined,
     responses: getResponses(route),
     summary: getSummary(route),
-    tags: getTags(route)
+    tags: getTags(route),
   }
 
   const cleanedOperation = _.omitBy(operation, _.isEmpty) as oa.OperationObject
@@ -57,10 +57,10 @@ export function getOperationId(route: IRoute): string {
  * Return OpenAPI Paths Object for given routes
  */
 export function getPaths(routes: IRoute[]): oa.PathObject {
-  const routePaths = routes.map(route => ({
+  const routePaths = routes.map((route) => ({
     [getFullPath(route)]: {
-      [route.action.type]: getOperation(route)
-    }
+      [route.action.type]: getOperation(route),
+    },
   }))
 
   // @ts-ignore: array spread
@@ -73,13 +73,13 @@ export function getPaths(routes: IRoute[]): oa.PathObject {
 export function getHeaderParams(route: IRoute): oa.ParameterObject[] {
   const headers: oa.ParameterObject[] = _(route.params)
     .filter({ type: 'header' })
-    .map(headerMeta => {
+    .map((headerMeta) => {
       const schema = getParamSchema(headerMeta) as oa.SchemaObject
       return {
         in: 'header' as oa.ParameterLocation,
         name: headerMeta.name || '',
         required: isRequired(headerMeta, route),
-        schema
+        schema,
       }
     })
     .value()
@@ -91,7 +91,7 @@ export function getHeaderParams(route: IRoute): oa.ParameterObject[] {
       in: 'header',
       name: _.last(_.split(schema.$ref, '/')) || '',
       required: isRequired(headersMeta, route),
-      schema
+      schema,
     })
   }
 
@@ -116,7 +116,7 @@ export function getPathParams(route: IRoute): oa.ParameterObject[] {
         in: 'path',
         name,
         required: !token.optional,
-        schema: { type: 'string' }
+        schema: { type: 'string' },
       }
 
       if (token.pattern && token.pattern !== '[^\\/]+?') {
@@ -140,13 +140,13 @@ export function getPathParams(route: IRoute): oa.ParameterObject[] {
 export function getQueryParams(route: IRoute): oa.ParameterObject[] {
   const queries: oa.ParameterObject[] = _(route.params)
     .filter({ type: 'query' })
-    .map(queryMeta => {
+    .map((queryMeta) => {
       const schema = getParamSchema(queryMeta) as oa.SchemaObject
       return {
         in: 'query' as oa.ParameterLocation,
         name: queryMeta.name || '',
         required: isRequired(queryMeta, route),
-        schema
+        schema,
       }
     })
     .value()
@@ -158,7 +158,7 @@ export function getQueryParams(route: IRoute): oa.ParameterObject[] {
       in: 'query',
       name: _.last(_.split(schema.$ref, '/')) || '',
       required: isRequired(queriesMeta, route),
-      schema
+      schema,
     })
   }
 
@@ -169,7 +169,7 @@ export function getQueryParams(route: IRoute): oa.ParameterObject[] {
  * Return OpenAPI requestBody of given route, if it has one.
  */
 export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
-  const bodyParamMetas = route.params.filter(d => d.type === 'body-param')
+  const bodyParamMetas = route.params.filter((d) => d.type === 'body-param')
   const bodyParamsSchema: oa.SchemaObject | null =
     bodyParamMetas.length > 0
       ? bodyParamMetas.reduce(
@@ -177,17 +177,17 @@ export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
             ...acc,
             properties: {
               ...acc.properties,
-              [d.name!]: getParamSchema(d)
+              [d.name!]: getParamSchema(d),
             },
             required: isRequired(d, route)
               ? [...(acc.required || []), d.name!]
-              : acc.required
+              : acc.required,
           }),
           { properties: {}, required: [], type: 'object' }
         )
       : null
 
-  const bodyMeta = route.params.find(d => d.type === 'body')
+  const bodyMeta = route.params.find((d) => d.type === 'body')
 
   if (bodyMeta) {
     const bodySchema = getParamSchema(bodyMeta)
@@ -199,15 +199,15 @@ export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
         'application/json': {
           schema: bodyParamsSchema
             ? { allOf: [bodySchema, bodyParamsSchema] }
-            : bodySchema
-        }
+            : bodySchema,
+        },
       },
       description: _.last(_.split($ref, '/')),
-      required: isRequired(bodyMeta, route)
+      required: isRequired(bodyMeta, route),
     }
   } else if (bodyParamsSchema) {
     return {
-      content: { 'application/json': { schema: bodyParamsSchema } }
+      content: { 'application/json': { schema: bodyParamsSchema } },
     }
   }
 }
@@ -242,8 +242,8 @@ export function getResponses(route: IRoute): oa.ResponsesObject {
   return {
     [successStatus]: {
       content: { [contentType]: {} },
-      description: 'Successful response'
-    }
+      description: 'Successful response',
+    },
   }
 }
 
@@ -255,7 +255,7 @@ export function getSpec(routes: IRoute[]): oa.OpenAPIObject {
     components: { schemas: {} },
     info: { title: '', version: '1.0.0' },
     openapi: '3.0.0',
-    paths: getPaths(routes)
+    paths: getPaths(routes),
   }
 }
 
@@ -279,7 +279,7 @@ export function getTags(route: IRoute): string[] {
 export function expressToOpenAPIPath(expressPath: string) {
   const tokens = pathToRegexp.parse(expressPath)
   return tokens
-    .map(d => (_.isString(d) ? d : `${d.prefix}{${d.name}}`))
+    .map((d) => (_.isString(d) ? d : `${d.prefix}{${d.name}}`))
     .join('')
 }
 
