@@ -4,6 +4,7 @@ import * as oa from 'openapi3-ts'
 import * as pathToRegexp from 'path-to-regexp'
 import 'reflect-metadata'
 import { ParamMetadataArgs } from 'routing-controllers/metadata/args/ParamMetadataArgs'
+import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
 
 import { applyOpenAPIDecorator } from './decorators'
 import { IRoute } from './index'
@@ -153,15 +154,24 @@ export function getQueryParams(route: IRoute): oa.ParameterObject[] {
 
   const queriesMeta = _.find(route.params, { type: 'queries' })
   if (queriesMeta) {
-    const schema = getParamSchema(queriesMeta) as oa.ReferenceObject
-    queries.push({
-      in: 'query',
-      name: _.last(_.split(schema.$ref, '/')) || '',
-      required: isRequired(queriesMeta, route),
-      schema,
+    const paramSchema = getParamSchema(queriesMeta) as oa.ReferenceObject
+    const paramSchemaName = _.last(_.split(paramSchema.$ref, '/')) || ''
+    const schemas = validationMetadatasToSchemas({
+      refPointerPrefix: '#/components/schemas/',
     })
-  }
+    const currentSchema = schemas[paramSchemaName]
 
+    for (const [name, schema] of Object.entries(
+      currentSchema?.properties || {}
+    )) {
+      queries.push({
+        in: 'query',
+        name,
+        required: currentSchema.required?.includes(name),
+        schema,
+      })
+    }
+  }
   return queries
 }
 

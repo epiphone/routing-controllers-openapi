@@ -29,6 +29,7 @@
     "singleQuote": true
   },
   "dependencies": {
+    "class-validator-jsonschema": "^2.0.0-rc1",
     "lodash": "^4.17.15",
     "openapi3-ts": "^1.3.0",
     "path-to-regexp": "^2.2.1",
@@ -45,7 +46,6 @@
     "@types/rimraf": "^3.0.0",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.12.2",
-    "class-validator-jsonschema": "^2.0.0-rc1",
     "codecov": "^3.6.1",
     "jest": "^25.5.3",
     "prettier": "^2.0.5",
