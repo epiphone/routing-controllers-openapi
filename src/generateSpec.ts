@@ -4,7 +4,6 @@ import * as oa from 'openapi3-ts'
 import * as pathToRegexp from 'path-to-regexp'
 import 'reflect-metadata'
 import { ParamMetadataArgs } from 'routing-controllers/metadata/args/ParamMetadataArgs'
-import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
 
 import { applyOpenAPIDecorator } from './decorators'
 import { IRoute } from './index'
@@ -29,13 +28,16 @@ export function getFullPath(route: IRoute): string {
 /**
  * Return OpenAPI Operation object for given route.
  */
-export function getOperation(route: IRoute): oa.OperationObject {
+export function getOperation(
+  route: IRoute,
+  schemas: { [p: string]: oa.SchemaObject }
+): oa.OperationObject {
   const operation: oa.OperationObject = {
     operationId: getOperationId(route),
     parameters: [
       ...getHeaderParams(route),
       ...getPathParams(route),
-      ...getQueryParams(route),
+      ...getQueryParams(route, schemas),
     ],
     requestBody: getRequestBody(route) || undefined,
     responses: getResponses(route),
@@ -57,10 +59,13 @@ export function getOperationId(route: IRoute): string {
 /**
  * Return OpenAPI Paths Object for given routes
  */
-export function getPaths(routes: IRoute[]): oa.PathObject {
+export function getPaths(
+  routes: IRoute[],
+  schemas: { [p: string]: oa.SchemaObject }
+): oa.PathObject {
   const routePaths = routes.map((route) => ({
     [getFullPath(route)]: {
-      [route.action.type]: getOperation(route),
+      [route.action.type]: getOperation(route, schemas),
     },
   }))
 
@@ -138,7 +143,10 @@ export function getPathParams(route: IRoute): oa.ParameterObject[] {
 /**
  * Return query parameters of given route.
  */
-export function getQueryParams(route: IRoute): oa.ParameterObject[] {
+export function getQueryParams(
+  route: IRoute,
+  schemas: { [p: string]: oa.SchemaObject }
+): oa.ParameterObject[] {
   const queries: oa.ParameterObject[] = _(route.params)
     .filter({ type: 'query' })
     .map((queryMeta) => {
@@ -156,9 +164,6 @@ export function getQueryParams(route: IRoute): oa.ParameterObject[] {
   if (queriesMeta) {
     const paramSchema = getParamSchema(queriesMeta) as oa.ReferenceObject
     const paramSchemaName = _.last(_.split(paramSchema.$ref, '/')) || ''
-    const schemas = validationMetadatasToSchemas({
-      refPointerPrefix: '#/components/schemas/',
-    })
     const currentSchema = schemas[paramSchemaName]
 
     for (const [name, schema] of Object.entries(
@@ -260,12 +265,15 @@ export function getResponses(route: IRoute): oa.ResponsesObject {
 /**
  * Return OpenAPI specification for given routes.
  */
-export function getSpec(routes: IRoute[]): oa.OpenAPIObject {
+export function getSpec(
+  routes: IRoute[],
+  schemas: { [p: string]: oa.SchemaObject }
+): oa.OpenAPIObject {
   return {
     components: { schemas: {} },
     info: { title: '', version: '1.0.0' },
     openapi: '3.0.0',
-    paths: getPaths(routes),
+    paths: getPaths(routes, schemas),
   }
 }
 
