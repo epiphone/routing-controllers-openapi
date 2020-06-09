@@ -192,38 +192,38 @@ describe('decorators', () => {
   })
 
   it('merges keywords defined in @OpenAPI decorator into operation', () => {
-    const operation = getOperation(routes.listUsers)
+    const operation = getOperation(routes.listUsers, {})
     expect(operation.description).toEqual('List all users')
   })
 
   it('applies @OpenAPI decorator function parameter to operation', () => {
-    const operation = getOperation(routes.getUser)
+    const operation = getOperation(routes.getUser, {})
     expect(operation.tags).toEqual(['Users', 'custom-tag'])
   })
 
   it('merges consecutive @OpenAPI object parameters top-down', () => {
-    const operation = getOperation(routes.multipleOpenAPIsWithObjectParam)
+    const operation = getOperation(routes.multipleOpenAPIsWithObjectParam, {})
     expect(operation.summary).toEqual('Some summary')
     expect(operation.description).toEqual('Some description')
     expect(operation['x-custom-key']).toEqual('Custom value')
   })
 
   it('applies consecutive @OpenAPI function parameters top-down', () => {
-    const operation = getOperation(routes.multipleOpenAPIsWithFunctionParam)
+    const operation = getOperation(routes.multipleOpenAPIsWithFunctionParam, {})
     expect(operation.summary).toEqual('Some summary')
     expect(operation.description).toEqual('Some description')
     expect(operation['x-custom-key']).toEqual(20)
   })
 
   it('merges and applies consecutive @OpenAPI object and function parameters top-down', () => {
-    const operation = getOperation(routes.multipleOpenAPIsWithMixedParam)
+    const operation = getOperation(routes.multipleOpenAPIsWithMixedParam, {})
     expect(operation.summary).toEqual('Some summary')
     expect(operation.description).toEqual('Some description')
     expect(operation['x-custom-key']).toEqual(20)
   })
 
   it('applies @ResponseSchema merging in response schema into source metadata', () => {
-    const operation = getOperation(routes.responseSchemaDefaults)
+    const operation = getOperation(routes.responseSchemaDefaults, {})
     // ensure other metadata doesnt get overwritten by decorator
     expect(operation.operationId).toEqual(
       'UsersController.responseSchemaDefaults'
@@ -231,7 +231,7 @@ describe('decorators', () => {
   })
 
   it('applies @ResponseSchema using default contentType and statusCode', () => {
-    const operation = getOperation(routes.responseSchemaDefaults)
+    const operation = getOperation(routes.responseSchemaDefaults, {})
     expect(operation.responses).toEqual({
       '200': {
         content: {
@@ -247,7 +247,7 @@ describe('decorators', () => {
   })
 
   it('applies @ResponseSchema using contentType and statusCode from options object', () => {
-    const operation = getOperation(routes.responseSchemaOptions)
+    const operation = getOperation(routes.responseSchemaOptions, {})
     expect(operation.responses).toEqual({
       '200': {
         content: {
@@ -269,14 +269,14 @@ describe('decorators', () => {
   })
 
   it('applies @ResponseSchema using contentType and statusCode from decorators', () => {
-    const operation = getOperation(routes.responseSchemaDecorators)
+    const operation = getOperation(routes.responseSchemaDecorators, {})
     expect(operation.responses['201'].content['application/pdf']).toEqual({
       schema: { $ref: '#/components/schemas/ModelDto' }
     })
   })
 
   it('applies @ResponseSchema using isArray flag set to true', () => {
-    const operation = getOperation(routes.responseSchemaArray)
+    const operation = getOperation(routes.responseSchemaArray, {})
     expect(operation.responses['200'].content['application/json']).toEqual({
       schema: {
         items: {
@@ -288,7 +288,7 @@ describe('decorators', () => {
   })
 
   it('applies @ResponseSchema using contentType and statusCode from options object, overruling options from RC decorators', () => {
-    const operation = getOperation(routes.responseSchemaDecoratorAndSchema)
+    const operation = getOperation(routes.responseSchemaDecoratorAndSchema, {})
     expect(operation.responses).toEqual({
       '201': {
         content: {
@@ -308,7 +308,7 @@ describe('decorators', () => {
   })
 
   it('applies @ResponseSchema using a string as ModelName', () => {
-    const operation = getOperation(routes.responseSchemaModelAsString)
+    const operation = getOperation(routes.responseSchemaModelAsString, {})
     expect(operation.responses).toEqual({
       '200': {
         content: {
@@ -329,7 +329,7 @@ describe('decorators', () => {
 
   it('applies @ResponseSchema while retaining inner OpenAPI decorator', () => {
     const operation = getOperation(
-      routes.responseSchemaNotOverwritingInnerOpenApiDecorator
+      routes.responseSchemaNotOverwritingInnerOpenApiDecorator, {}
     )
     expect(operation.description).toEqual('somedescription')
     expect(operation.responses).toEqual({
@@ -352,7 +352,7 @@ describe('decorators', () => {
 
   it('applies @ResponseSchema while retaining outer OpenAPI decorator', () => {
     const operation = getOperation(
-      routes.responseSchemaNotOverwritingOuterOpenApiDecorator
+      routes.responseSchemaNotOverwritingOuterOpenApiDecorator, {}
     )
     expect(operation.description).toEqual('somedescription')
     expect(operation.responses).toEqual({
@@ -374,7 +374,7 @@ describe('decorators', () => {
   })
 
   it('does not apply @ResponseSchema if empty ModelName is passed', () => {
-    const operation = getOperation(routes.responseSchemaNoNoModel)
+    const operation = getOperation(routes.responseSchemaNoNoModel, {})
     expect(operation.responses).toEqual({
       '200': {
         content: {
@@ -386,7 +386,7 @@ describe('decorators', () => {
   })
 
   it('applies @ResponseSchema using default contentType and statusCode from @Controller (non-json)', () => {
-    const operation = getOperation(routes.responseSchemaDefaultsHtml)
+    const operation = getOperation(routes.responseSchemaDefaultsHtml, {})
     expect(operation.responses).toEqual({
       '200': {
         content: {
@@ -402,7 +402,7 @@ describe('decorators', () => {
   })
 
   it('applies multiple @ResponseSchema on a single handler', () => {
-    const operation = getOperation(routes.multipleResponseSchemas)
+    const operation = getOperation(routes.multipleResponseSchemas, {})
     expect(operation.responses).toEqual({
       '200': {
         content: {
@@ -474,7 +474,7 @@ describe('@OpenAPI-decorated class', () => {
   })
 
   it('applies controller OpenAPI props to each method with method-specific props taking precedence', () => {
-    expect(getOperation(routes.listItems)).toEqual(
+    expect(getOperation(routes.listItems, {})).toEqual(
       expect.objectContaining({
         description: 'List all items',
         externalDocs: { url: 'http://docs.com' },
@@ -483,7 +483,7 @@ describe('@OpenAPI-decorated class', () => {
       })
     )
 
-    expect(getOperation(routes.getItem)).toEqual(
+    expect(getOperation(routes.getItem, {})).toEqual(
       expect.objectContaining({
         description: 'Common description',
         externalDocs: { url: 'http://docs.com' },

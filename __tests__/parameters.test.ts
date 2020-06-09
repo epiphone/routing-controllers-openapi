@@ -17,16 +17,33 @@ import {
   IRoute,
   parseRoutes
 } from '../src'
+import { SchemaObject } from 'openapi3-ts'
+import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator'
+import { defaultMetadataStorage } from 'class-transformer/storage'
 
 describe('parameters', () => {
   let route: IRoute
+  let schemas: { [p: string]: SchemaObject }
 
   beforeAll(() => {
-    class ListUsersHeaderParams {}
-    class ListUsersQueryParams {}
+    class ListUsersHeaderParams {
+    }
+
+    class ListUsersQueryParams {
+      @IsNumber()
+      genderId: number
+
+      @IsBoolean()
+      @IsOptional()
+      isPretty: boolean
+
+      @IsString({ each: true })
+      types: string[]
+    }
 
     @JsonController('/users')
-    // @ts-ignore: not referenced
+      // @ts-ignore: not referenced
     class UsersController {
       @Get('/:string/:regex(\\d{6})/:optional?/:number/:boolean/:any')
       getPost(
@@ -36,7 +53,7 @@ describe('parameters', () => {
         @Param('any') _anyParam: any,
         @QueryParam('limit') _limit: number,
         @HeaderParam('Authorization', { required: true })
-        _authorization: string,
+          _authorization: string,
         @QueryParams() _queryRef?: ListUsersQueryParams,
         @HeaderParams() _headerParams?: ListUsersHeaderParams
       ) {
@@ -45,6 +62,10 @@ describe('parameters', () => {
     }
 
     route = parseRoutes(getMetadataArgsStorage())[0]
+    schemas = validationMetadatasToSchemas({
+      classTransformerMetadataStorage: defaultMetadataStorage,
+      refPointerPrefix: '#/components/schemas/'
+    })
   })
 
   it('parses path parameter from path strings', () => {
@@ -134,7 +155,7 @@ describe('parameters', () => {
   })
 
   it('parses query param from @QueryParam decorator', () => {
-    expect(getQueryParams(route)[0]).toEqual({
+    expect(getQueryParams(route, schemas)[0]).toEqual({
       in: 'query',
       name: 'limit',
       required: false,
@@ -143,12 +164,40 @@ describe('parameters', () => {
   })
 
   it('parses query param ref from @QueryParams decorator', () => {
-    expect(getQueryParams(route)[1]).toEqual({
-      in: 'query',
-      name: 'ListUsersQueryParams',
-      required: false,
-      schema: { $ref: '#/components/schemas/ListUsersQueryParams' }
-    })
+    expect(getQueryParams(route, schemas)).toEqual([
+      // limit comes from @QueryParam
+      {
+        in: 'query',
+        name: 'limit',
+        required: false,
+        schema: { type: 'number' }
+      },
+      {
+        in: 'query',
+        name: 'genderId',
+        required: true,
+        schema: { type: 'number' }
+      },
+      {
+        in: 'query',
+        name: 'isPretty',
+        required: false,
+        schema: {
+          type: 'boolean'
+        }
+      },
+      {
+        in: 'query',
+        name: 'types',
+        required: true,
+        schema: {
+          items: {
+            type: 'string'
+          },
+          type: 'array'
+        }
+      }
+    ])
   })
 
   it('parses header param from @HeaderParam decorator', () => {

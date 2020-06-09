@@ -220,10 +220,22 @@
           },
           {
             "in": "query",
-            "name": "ListUsersQueryParams",
+            "name": "email",
             "required": false,
             "schema": {
-              "$ref": "#/components/schemas/ListUsersQueryParams"
+              "format": "email",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "types",
+            "required": true,
+            "schema": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
             }
           }
         ],
