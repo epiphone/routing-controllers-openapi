@@ -25,7 +25,7 @@ export function routingControllersToSpec(
   additionalProperties: Partial<oa.OpenAPIObject> = {}
 ): oa.OpenAPIObject {
   const routes = parseRoutes(storage, routingControllerOptions)
-  const spec = getSpec(routes)
+  const spec = getSpec(routes, additionalProperties.components?.schemas || {})
 
   return _.merge(spec, additionalProperties)
 }

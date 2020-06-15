@@ -57,24 +57,24 @@ describe('options', () => {
 
   it('sets query parameter optional by default', () => {
     const route = routes[0]
-    expect(getQueryParams(route)[0].required).toEqual(false)
+    expect(getQueryParams(route, {})[0].required).toEqual(false)
   })
 
   it('sets query parameter required as per global options', () => {
     const route = routes[0]
     route.options.defaults = { paramOptions: { required: true } }
-    expect(getQueryParams(route)[0].required).toEqual(true)
+    expect(getQueryParams(route, {})[0].required).toEqual(true)
   })
 
   it('uses local required option over the global one', () => {
     const route = routes[0]
     route.options.defaults = { paramOptions: { required: true } }
-    expect(getQueryParams(route)[1].required).toEqual(false)
+    expect(getQueryParams(route, {})[1].required).toEqual(false)
   })
 
   it('uses the explicit `type` parameter to override request query type', () => {
     const route = routes[1]
-    expect(getQueryParams(route)[0]).toEqual({
+    expect(getQueryParams(route, {})[0]).toEqual({
       in: "query",
       name: "param",
       required: false,

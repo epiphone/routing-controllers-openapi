@@ -6,6 +6,7 @@ import {
   getMetadataArgsStorage
 } from 'routing-controllers'
 import { routingControllersToSpec } from 'routing-controllers-openapi'
+import * as swaggerUiExpress from 'swagger-ui-express';
 
 import { UsersController } from './UsersController'
 
@@ -38,6 +39,8 @@ const spec = routingControllersToSpec(storage, routingControllersOptions, {
     version: '1.0.0'
   }
 })
+
+app.use('/docs', swaggerUiExpress.serve, swaggerUiExpress.setup(spec));
 
 // Render spec on root:
 app.get('/', (_req, res) => {
