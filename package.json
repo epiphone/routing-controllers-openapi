@@ -43,7 +43,7 @@
     "@types/prettier": "^2.0.0",
     "@types/reflect-metadata": "^0.1.0",
     "@types/rimraf": "^3.0.0",
-    "class-transformer": "^0.2.3",
+    "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
     "class-validator-jsonschema": "^2.0.0-rc1",
     "codecov": "^3.6.1",
