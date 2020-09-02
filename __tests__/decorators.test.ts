@@ -191,6 +191,22 @@ describe('decorators', () => {
       threeResponseSchemasSameStatusCode() {
         return
       }
+
+      @Get('/twoResponseSchemaSameStatusCodeWithOneArraySchema')
+      @ResponseSchema('SuccessObjects1', { isArray: true })
+      @ResponseSchema('SuccessObject2')
+      twoResponseSchemaSameStatusCodeWithOneArraySchema() {
+        return
+      }
+
+      @Get('/fourResponseSchemasMixedStatusCodeWithTwoArraySchemas')
+      @ResponseSchema('SuccessObjects1', { isArray: true })
+      @ResponseSchema('CreatedObject2', { statusCode: 201 })
+      @ResponseSchema('CreatedObjects3', { statusCode: 201, isArray: true})
+      @ResponseSchema('BadRequestObject4', { statusCode: 400 })
+      fourResponseSchemasMixedStatusCodeWithTwoArraySchemas() {
+        return
+      }
     }
 
     @Controller('/usershtml')
@@ -486,6 +502,77 @@ describe('decorators', () => {
             }
           }
         },
+        description: ''
+      }
+    })
+  })
+
+  it('applies two @ResponseSchema with same status code, where one of them is an array', () => {
+    const operation = getOperation(routes.twoResponseSchemaSameStatusCodeWithOneArraySchema, {})
+    expect(operation.responses).toEqual({
+      '200': {
+        content: {
+          'application/json': {
+            schema: {
+              oneOf: [
+                {
+                  items: {
+                    $ref: '#/components/schemas/SuccessObjects1'
+                  },
+                  type: 'array'
+                },
+                {$ref: '#/components/schemas/SuccessObject2'},
+              ]
+            }
+          }
+        },
+        description: ''
+      }
+    })
+  })
+
+  it('applies four @ResponseSchema with mixed status code, where two of them are arrays', () => {
+    const operation = getOperation(routes.fourResponseSchemasMixedStatusCodeWithTwoArraySchemas, {})
+    expect(operation.responses).toEqual({
+      '200': {
+        content: {
+          'application/json': {
+            schema: {
+              items: {
+                $ref: '#/components/schemas/SuccessObjects1'
+              },
+              type: 'array'
+            }
+          }
+        },
+        description: ''
+      },
+      '201': {
+        content: {
+          'application/json': {
+            schema: {
+              oneOf: [
+                {$ref: '#/components/schemas/CreatedObject2'}, 
+                {
+                  items: {
+                    $ref: '#/components/schemas/CreatedObjects3'
+                  },
+                  type: 'array'
+                }
+              ]
+            }
+          }
+        },
+        description: ''
+      },
+      '400': {
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/BadRequestObject4'
+            }
+          }
+        },        
         description: ''
       }
     })
