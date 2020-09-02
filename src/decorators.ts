@@ -126,19 +126,20 @@ export function ResponseSchema(
         },
       }
 
-      const oldSchema = source.responses[statusCode]?.content[contentType].schema
+      const oldSchema =
+        source.responses[statusCode]?.content[contentType].schema
       if (oldSchema?.$ref) {
         // case where we're adding multiple schemas under single statuscode/contentType
         // with single $ref
 
         // delete old schema and integrate into current schema under oneOf
-        const schemaObj = { oneOf: [Object.assign({}, oldSchema), schema] }
+        const schemaObj = { oneOf: [{ ...oldSchema }, schema] }
         responses[statusCode].content[contentType].schema = schemaObj
         delete oldSchema.$ref
       } else if (oldSchema?.oneOf) {
         // case where there's already multiple existing schemas
-        const oneOf = _.concat(oldSchema.oneOf, schema)
-        responses[statusCode].content[contentType].schema = {oneOf}
+        const oneOf = _.concat([...oldSchema.oneOf], schema)
+        responses[statusCode].content[contentType].schema = { oneOf }
         delete oldSchema.oneOf
       }
 
