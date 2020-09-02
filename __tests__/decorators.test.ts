@@ -176,6 +176,21 @@ describe('decorators', () => {
       multipleResponseSchemas() {
         return
       }
+
+      @Get('/twoResponseSchemaSameStatusCode')
+      @ResponseSchema('SuccessObject1')
+      @ResponseSchema('SuccessObject2')
+      twoResponseSchemasSameStatusCode() {
+        return
+      }
+
+      @Get('/threeResponseSchemaSameStatusCode')
+      @ResponseSchema('SuccessObject1')
+      @ResponseSchema('SuccessObject2')
+      @ResponseSchema('SuccessObject3')
+      threeResponseSchemasSameStatusCode() {
+        return
+      }
     }
 
     @Controller('/usershtml')
@@ -436,7 +451,47 @@ describe('decorators', () => {
       }
     })
   })
+
+  it('applies two @ResponseSchema with same status code', () => {
+    const operation = getOperation(routes.twoResponseSchemasSameStatusCode, {})
+    expect(operation.responses).toEqual({
+      '200': {
+        content: {
+          'application/json': {
+            schema: {
+              oneOf: [
+                {$ref: '#/components/schemas/SuccessObject1'},
+                {$ref: '#/components/schemas/SuccessObject2'},
+              ]
+            }
+          }
+        },
+        description: ''
+      }
+    })
+  })
+
+  it('applies three @ResponseSchema with same status code', () => {
+    const operation = getOperation(routes.threeResponseSchemasSameStatusCode, {})
+    expect(operation.responses).toEqual({
+      '200': {
+        content: {
+          'application/json': {
+            schema: {
+              oneOf: [
+                {$ref: '#/components/schemas/SuccessObject1'},
+                {$ref: '#/components/schemas/SuccessObject2'},
+                {$ref: '#/components/schemas/SuccessObject3'},
+              ]
+            }
+          }
+        },
+        description: ''
+      }
+    })
+  })
 })
+
 
 describe('@OpenAPI-decorated class', () => {
   let routes: { [method: string]: IRoute }
