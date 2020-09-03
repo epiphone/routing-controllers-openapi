@@ -1,4 +1,5 @@
 # routing-controllers-openapi
+
 [![Build Status](https://travis-ci.org/epiphone/routing-controllers-openapi.svg?branch=master)](https://travis-ci.org/epiphone/routing-controllers-openapi) [![codecov](https://codecov.io/gh/epiphone/routing-controllers-openapi/branch/master/graph/badge.svg)](https://codecov.io/gh/epiphone/routing-controllers-openapi) [![npm version](https://badge.fury.io/js/routing-controllers-openapi.svg)](https://badge.fury.io/js/routing-controllers-openapi)
 
 Runtime OpenAPI v3 schema generation for [routing-controllers](https://github.com/typestack/routing-controllers).
@@ -71,9 +72,7 @@ prints out the following specification:
           }
         },
         "summary": "List users",
-        "tags": [
-          "Users"
-        ]
+        "tags": ["Users"]
       }
     },
     "/users/": {
@@ -99,9 +98,7 @@ prints out the following specification:
           }
         },
         "summary": "Create user",
-        "tags": [
-          "Users"
-        ]
+        "tags": ["Users"]
       }
     }
   }
@@ -136,12 +133,12 @@ import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
 // ...
 
 const schemas = validationMetadatasToSchemas({
-  refPointerPrefix: '#/components/schemas/'
+  refPointerPrefix: '#/components/schemas/',
 })
 
 const spec = routingControllersToSpec(storage, routingControllerOptions, {
   components: { schemas },
-  info: { title: 'My app', version: '1.2.0' }
+  info: { title: 'My app', version: '1.2.0' },
 })
 ```
 
@@ -154,15 +151,14 @@ import { OpenAPI } from 'routing-controllers-openapi'
 
 @JsonController('/users')
 export class UsersController {
-
   @Get('/')
   @OpenAPI({
     description: 'List all available users',
     responses: {
       '400': {
-        description: 'Bad request'
-      }
-    }
+        description: 'Bad request',
+      },
+    },
   })
   listUsers() {
     // ...
@@ -199,7 +195,7 @@ Using `@OpenAPI` on the controller class effectively applies given spec to each 
 
 ```typescript
 @OpenAPI({
-  security: [{ basicAuth: [] }] // Applied to each method
+  security: [{ basicAuth: [] }], // Applied to each method
 })
 @JsonController('/users')
 export class UsersController {
@@ -216,7 +212,6 @@ import { ResponseSchema } from 'routing-controllers-openapi'
 
 @JsonController('/users')
 export class UsersController {
-
   @Get('/:id')
   @ResponseSchema(User)
   getUser() {
@@ -257,6 +252,40 @@ Note that when using `@ResponseSchema` together with `@JSONSchema`, the outer de
 }})
 @ResponseSchema(SomeResponseObject)
 handler() { ... }
+```
+
+#### Multiple ResponseSchemas
+
+Multiple ResponseSchemas with different status codes are supported as follows.
+
+```typescript
+@ResponseSchema(Response1)
+@ResponseSchema(Response2, {statusCode: '400'})
+```
+
+In case of multiple ResponseSchemas being registered with the same status code, we resolve them
+using the [oneOf](https://swagger.io/docs/specification/data-models/oneof-anyof-allof-not/#oneof) operator.
+
+```typescript
+@ResponseSchema(Response1)
+@ResponseSchema(Response2)
+```
+
+will generate
+
+```json
+"200": {
+  "content": {
+    "application/json":{
+      "schema": {
+        "oneOf": [
+          {$ref: "#/components/schemas/Response1"},
+          {$ref: "#/components/schemas/Response2"}
+        ]
+      }
+    }
+  }
+}
 ```
 
 ## Supported features
