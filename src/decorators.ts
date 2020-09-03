@@ -129,16 +129,6 @@ export function ResponseSchema(
       const oldSchema =
         source.responses[statusCode]?.content[contentType].schema
 
-      const makeNewSchema = () => {
-        if (oldSchema.oneOf) {
-          return {
-            oneOf: _.concat([...oldSchema.oneOf], schema),
-          }
-        }
-
-        return { oneOf: [{ ...oldSchema }, schema] }
-      }
-
       if (oldSchema?.$ref || oldSchema?.items || oldSchema?.oneOf) {
         // case where we're adding multiple schemas under single statuscode/contentType
         const newStatusCodeResponse = _.merge(
@@ -146,7 +136,12 @@ export function ResponseSchema(
           source.responses[statusCode],
           responses[statusCode]
         )
-        const newSchema = makeNewSchema()
+        const newSchema = oldSchema.oneOf
+          ? {
+              oneOf: [...oldSchema.oneOf, schema],
+            }
+          : { oneOf: [oldSchema, schema] }
+
         newStatusCodeResponse.content[contentType].schema = newSchema
         source.responses[statusCode] = newStatusCodeResponse
         return source
