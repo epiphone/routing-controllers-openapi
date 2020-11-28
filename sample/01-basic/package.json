@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "npm run build && node ./build/app.js",
-    "start:watch": "build:watch && nodemon ./build/app.js",
+    "start:watch": "npm run build:watch && nodemon ./build/app.js",
     "build": "node_modules/.bin/tsc",
     "build:watch": "npm run build -- -w"
   },
@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.3",
+    "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
     "class-validator-jsonschema": "^2.0.0-rc1",
     "express": "^4.17.1",

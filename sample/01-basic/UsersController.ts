@@ -1,4 +1,12 @@
-import { IsOptional, IsString, MaxLength, IsNumber, IsPositive } from 'class-validator'
+import { Type } from 'class-transformer'
+import {
+  IsOptional,
+  IsString,
+  MaxLength,
+  IsNumber,
+  IsPositive,
+  ValidateNested,
+} from 'class-validator'
 import {
   Body,
   Get,
@@ -6,9 +14,14 @@ import {
   Param,
   Post,
   Put,
-  QueryParams
+  QueryParams,
 } from 'routing-controllers'
 import { OpenAPI } from 'routing-controllers-openapi'
+
+class Child {
+  @IsString()
+  name: string
+}
 
 class CreateUserBody {
   @IsString()
@@ -17,20 +30,27 @@ class CreateUserBody {
   @IsOptional()
   @MaxLength(20, { each: true })
   hobbies: string[]
+
+  @ValidateNested()
+  child: Child
+
+  @ValidateNested({ each: true })
+  @Type(() => Child)
+  children: Child[]
 }
 
 class PaginationQuery {
   @IsNumber()
   @IsPositive()
-  public limit: number;
+  public limit: number
 
   @IsNumber()
   @IsOptional()
-  public offset?: number;
+  public offset?: number
 }
 
 @OpenAPI({
-  security: [{ basicAuth: [] }]
+  security: [{ basicAuth: [] }],
 })
 @JsonController('/users')
 export class UsersController {
@@ -39,7 +59,7 @@ export class UsersController {
   getAll(@QueryParams() query: PaginationQuery) {
     return [
       { id: 1, name: 'First user!', hobbies: [] },
-      { id: 2, name: 'Second user!', hobbies: ['fishing', 'cycling'] }
+      { id: 2, name: 'Second user!', hobbies: ['fishing', 'cycling'] },
     ]
   }
 
