@@ -62,7 +62,7 @@ export function applyOpenAPIDecorator(
 /**
  * Get the OpenAPI Operation object stored in given target property's metadata.
  */
-function getOpenAPIMetadata(target: object, key?: string): OpenAPIParam[] {
+export function getOpenAPIMetadata(target: object, key?: string): OpenAPIParam[] {
   return (
     (key
       ? Reflect.getMetadata(OPEN_API_KEY, target.constructor, key)
@@ -73,7 +73,7 @@ function getOpenAPIMetadata(target: object, key?: string): OpenAPIParam[] {
 /**
  * Store given OpenAPI Operation object into target property's metadata.
  */
-function setOpenAPIMetadata(
+export function setOpenAPIMetadata(
   value: OpenAPIParam[],
   target: object,
   key?: string
