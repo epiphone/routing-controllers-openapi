@@ -16,8 +16,8 @@
   "scripts": {
     "clean": "rimraf coverage build",
     "build": "yarn clean && tsc -p tsconfig.release.json",
-    "format": "prettier --write {src,test}/**/*.ts",
-    "test:format": "prettier --check {src,test}/**/*.ts",
+    "format": "prettier --write {src,__tests__}/**/*.ts",
+    "test:format": "prettier --check {src,__tests__}/**/*.ts",
     "lint": "tslint --project . src/**/*.ts",
     "prepare": "install-self-peers -- --frozen-lockfile --ignore-scripts && yarn build",
     "send-coverage": "codecov -f coverage/*.json",

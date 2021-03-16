@@ -20,6 +20,7 @@ import {
 import { SchemaObject } from 'openapi3-ts'
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator'
+// tslint:disable:no-implicit-dependencies no-submodule-imports
 import { defaultMetadataStorage } from 'class-transformer/cjs/storage'
 
 describe('parameters', () => {
