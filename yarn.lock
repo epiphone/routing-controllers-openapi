@@ -1083,7 +1083,7 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-class-validator-jsonschema@2.1.1:
+"class-validator-jsonschema@^2.0.0-rc1 - 2.1.1":
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/class-validator-jsonschema/-/class-validator-jsonschema-2.1.1.tgz#2ab18c03d0af78f805e7c2e9771ab61c48f79c00"
   integrity sha512-h9ZjaFgrtk7shrSbYGii08ow+mcrKVjzdBWZ/iHfrro6APOiTxYLTIASBneOfy+8uShocCsvBB2VtBFj8P/+Lg==
