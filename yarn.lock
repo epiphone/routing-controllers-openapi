@@ -1069,10 +1069,10 @@ ci-info@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-2.0.0.tgz#67a9e964be31a51e15e5010d58e6f12834002f46"
 
-class-transformer@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/class-transformer/-/class-transformer-0.4.0.tgz#b52144117b423c516afb44cc1c76dbad31c2165b"
-  integrity sha512-ETWD/H2TbWbKEi7m9N4Km5+cw1hNcqJSxlSYhsLsNjQzWWiZIYA1zafxpK9PwVfaZ6AqR5rrjPVUBGESm5tQUA==
+class-transformer@0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/class-transformer/-/class-transformer-0.3.1.tgz#ee681a5439ff2230fc57f5056412d3befa70d597"
+  integrity sha512-cKFwohpJbuMovS8xVLmn8N2AUbAuc8pVo4zEfsUVo8qgECOogns1WVk/FkOZoxhOPTyTYFckuoH+13FO+MQ8GA==
 
 class-utils@^0.3.5:
   version "0.3.6"
@@ -1083,10 +1083,10 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-class-validator-jsonschema@^2.0.0-rc1:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/class-validator-jsonschema/-/class-validator-jsonschema-2.2.0.tgz#d33f8e6e579c627582729b10f387d870f5282bf7"
-  integrity sha512-tyyU5IjO7+rEwuXrXImsXz6DppYKDyT2+fG2Pz5oaHccz9Z5iMWPQFRuR9JykCX+Y9HgwC15U2h/v/2jYvCBkw==
+class-validator-jsonschema@2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/class-validator-jsonschema/-/class-validator-jsonschema-2.1.1.tgz#2ab18c03d0af78f805e7c2e9771ab61c48f79c00"
+  integrity sha512-h9ZjaFgrtk7shrSbYGii08ow+mcrKVjzdBWZ/iHfrro6APOiTxYLTIASBneOfy+8uShocCsvBB2VtBFj8P/+Lg==
   dependencies:
     lodash "^4.17.20"
     openapi3-ts "^2.0.0"

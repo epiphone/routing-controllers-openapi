@@ -17,7 +17,7 @@ import {
   Post,
   Put,
   QueryParam,
-  QueryParams,
+  QueryParams
 } from 'routing-controllers'
 
 import { OpenAPI, ResponseSchema } from '../../src'
@@ -98,7 +98,7 @@ export class UsersController {
   @Post('/')
   @ResponseSchema(ModelDto, {
     description: 'Created user object',
-    statusCode: 201,
+    statusCode: 201
   })
   createUser(@Body() _body: CreateUserBody) {
     return
@@ -108,7 +108,7 @@ export class UsersController {
   @Post('/withType')
   @ResponseSchema(ModelDto, {
     description: 'Created user object',
-    statusCode: 201,
+    statusCode: 201
   })
   createUserWithType(
     @QueryParam('user', { type: CreateUserBody }) _user: string
@@ -144,7 +144,7 @@ export class UsersController {
   @OpenAPI({
     deprecated: true,
     description: 'Insert or update a user object - DEPRECATED in v1.0.1',
-    summary: '',
+    summary: ''
   })
   @Put()
   putUserDefault(
@@ -175,7 +175,7 @@ export class UserPostsController {
 @Controller()
 @OpenAPI({
   description: 'Common description for all RootController operations',
-  security: [{ basicAuth: [] }],
+  security: [{ basicAuth: [] }]
 })
 export class RootController {
   @Get()
@@ -183,7 +183,7 @@ export class RootController {
     return
   }
 
-  @OpenAPI((spec) => ({ ...spec, security: [] }))
+  @OpenAPI(spec => ({ ...spec, security: [] }))
   @Get('/stringPath')
   getStringPath() {
     return
