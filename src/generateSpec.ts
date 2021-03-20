@@ -323,7 +323,7 @@ function getParamSchema(
   if (_.isFunction(type) && type.name === 'Array') {
     const items = explicitType
       ? { $ref: '#/components/schemas/' + explicitType.name }
-      : { type: 'object' }
+      : { type: 'object' as const }
     return { items, type: 'array' }
   }
   if (explicitType) {
