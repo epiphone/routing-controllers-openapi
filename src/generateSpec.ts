@@ -3,7 +3,7 @@ import * as _ from 'lodash'
 import * as oa from 'openapi3-ts'
 import * as pathToRegexp from 'path-to-regexp'
 import 'reflect-metadata'
-import { ParamMetadataArgs } from 'routing-controllers/metadata/args/ParamMetadataArgs'
+import { ParamMetadataArgs } from 'routing-controllers/types/metadata/args/ParamMetadataArgs'
 
 import { applyOpenAPIDecorator } from './decorators'
 import { IRoute } from './index'
