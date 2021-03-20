@@ -3,7 +3,7 @@ import {
   getMetadataArgsStorage,
   JsonController,
   Post,
-  QueryParam
+  QueryParam,
 } from 'routing-controllers'
 
 import {
@@ -11,7 +11,7 @@ import {
   getQueryParams,
   getRequestBody,
   IRoute,
-  parseRoutes
+  parseRoutes,
 } from '../src'
 
 describe('options', () => {
@@ -20,8 +20,8 @@ describe('options', () => {
   beforeEach(() => {
     getMetadataArgsStorage().reset()
 
-    class CreateUserBody { }
-    class ParamType { }
+    class CreateUserBody {}
+    class ParamType {}
 
     @JsonController('/users')
     // @ts-ignore: not referenced
@@ -38,7 +38,7 @@ describe('options', () => {
       @Post('/:userId')
       createManyUsers(
         @QueryParam('param', { type: ParamType }) _param: string,
-        @Body() _body: CreateUserBody[],
+        @Body() _body: CreateUserBody[]
       ) {
         return
       }
@@ -75,12 +75,12 @@ describe('options', () => {
   it('uses the explicit `type` parameter to override request query type', () => {
     const route = routes[1]
     expect(getQueryParams(route, {})[0]).toEqual({
-      in: "query",
-      name: "param",
+      in: 'query',
+      name: 'param',
       required: false,
       schema: {
-        $ref: '#/components/schemas/ParamType'
-      }
+        $ref: '#/components/schemas/ParamType',
+      },
     })
   })
 
@@ -91,14 +91,14 @@ describe('options', () => {
         'application/json': {
           schema: {
             items: {
-              $ref: '#/components/schemas/CreateUserBody'
+              $ref: '#/components/schemas/CreateUserBody',
             },
-            type: 'array'
-          }
-        }
+            type: 'array',
+          },
+        },
       },
       description: 'CreateUserBody',
-      required: false
+      required: false,
     })
   })
 
@@ -109,14 +109,14 @@ describe('options', () => {
         'application/json': {
           schema: {
             items: {
-              type: 'object'
+              type: 'object',
             },
-            type: 'array'
-          }
-        }
+            type: 'array',
+          },
+        },
       },
       description: '',
-      required: false
+      required: false,
     })
   })
 })

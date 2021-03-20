@@ -7,7 +7,7 @@ import {
   JsonController,
   Param,
   QueryParam,
-  QueryParams
+  QueryParams,
 } from 'routing-controllers'
 
 import {
@@ -15,7 +15,7 @@ import {
   getPathParams,
   getQueryParams,
   IRoute,
-  parseRoutes
+  parseRoutes,
 } from '../src'
 import { SchemaObject } from 'openapi3-ts'
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
@@ -27,8 +27,7 @@ describe('parameters', () => {
   let schemas: { [p: string]: SchemaObject }
 
   beforeAll(() => {
-    class ListUsersHeaderParams {
-    }
+    class ListUsersHeaderParams {}
 
     class ListUsersQueryParams {
       @IsNumber()
@@ -43,7 +42,7 @@ describe('parameters', () => {
     }
 
     @JsonController('/users')
-      // @ts-ignore: not referenced
+    // @ts-ignore: not referenced
     class UsersController {
       @Get('/:string/:regex(\\d{6})/:optional?/:number/:boolean/:any')
       getPost(
@@ -53,7 +52,7 @@ describe('parameters', () => {
         @Param('any') _anyParam: any,
         @QueryParam('limit') _limit: number,
         @HeaderParam('Authorization', { required: true })
-          _authorization: string,
+        _authorization: string,
         @QueryParams() _queryRef?: ListUsersQueryParams,
         @HeaderParams() _headerParams?: ListUsersHeaderParams
       ) {
@@ -64,7 +63,7 @@ describe('parameters', () => {
     route = parseRoutes(getMetadataArgsStorage())[0]
     schemas = validationMetadatasToSchemas({
       classTransformerMetadataStorage: defaultMetadataStorage,
-      refPointerPrefix: '#/components/schemas/'
+      refPointerPrefix: '#/components/schemas/',
     })
   })
 
@@ -74,38 +73,38 @@ describe('parameters', () => {
         in: 'path',
         name: 'string',
         required: true,
-        schema: { type: 'string' }
+        schema: { type: 'string' },
       },
       {
         in: 'path',
         name: 'regex',
         required: true,
-        schema: { pattern: '\\d{6}', type: 'string' }
+        schema: { pattern: '\\d{6}', type: 'string' },
       },
       {
         in: 'path',
         name: 'optional',
         required: false,
-        schema: { type: 'string' }
+        schema: { type: 'string' },
       },
       {
         in: 'path',
         name: 'number',
         required: true,
-        schema: { type: 'string' }
+        schema: { type: 'string' },
       },
       {
         in: 'path',
         name: 'boolean',
         required: true,
-        schema: { type: 'string' }
+        schema: { type: 'string' },
       },
       {
         in: 'path',
         name: 'any',
         required: true,
-        schema: { type: 'string' }
-      }
+        schema: { type: 'string' },
+      },
     ])
   })
 
@@ -115,38 +114,38 @@ describe('parameters', () => {
         in: 'path',
         name: 'string',
         required: true,
-        schema: { type: 'string' }
+        schema: { type: 'string' },
       },
       {
         in: 'path',
         name: 'regex',
         required: true,
-        schema: { pattern: '\\d{6}', type: 'string' }
+        schema: { pattern: '\\d{6}', type: 'string' },
       },
       {
         in: 'path',
         name: 'optional',
         required: false,
-        schema: { type: 'string' }
+        schema: { type: 'string' },
       },
       {
         in: 'path',
         name: 'number',
         required: true,
-        schema: { type: 'number' }
+        schema: { type: 'number' },
       },
       {
         in: 'path',
         name: 'boolean',
         required: true,
-        schema: { type: 'boolean' }
+        schema: { type: 'boolean' },
       },
       {
         in: 'path',
         name: 'any',
         required: true,
-        schema: {}
-      }
+        schema: {},
+      },
     ])
   })
 
@@ -159,7 +158,7 @@ describe('parameters', () => {
       in: 'query',
       name: 'limit',
       required: false,
-      schema: { type: 'number' }
+      schema: { type: 'number' },
     })
   })
 
@@ -170,21 +169,21 @@ describe('parameters', () => {
         in: 'query',
         name: 'limit',
         required: false,
-        schema: { type: 'number' }
+        schema: { type: 'number' },
       },
       {
         in: 'query',
         name: 'genderId',
         required: true,
-        schema: { type: 'number' }
+        schema: { type: 'number' },
       },
       {
         in: 'query',
         name: 'isPretty',
         required: false,
         schema: {
-          type: 'boolean'
-        }
+          type: 'boolean',
+        },
       },
       {
         in: 'query',
@@ -192,11 +191,11 @@ describe('parameters', () => {
         required: true,
         schema: {
           items: {
-            type: 'string'
+            type: 'string',
           },
-          type: 'array'
-        }
-      }
+          type: 'array',
+        },
+      },
     ])
   })
 
@@ -205,7 +204,7 @@ describe('parameters', () => {
       in: 'header',
       name: 'Authorization',
       required: true,
-      schema: { type: 'string' }
+      schema: { type: 'string' },
     })
   })
 
@@ -214,7 +213,7 @@ describe('parameters', () => {
       in: 'header',
       name: 'ListUsersHeaderParams',
       required: false,
-      schema: { $ref: '#/components/schemas/ListUsersHeaderParams' }
+      schema: { $ref: '#/components/schemas/ListUsersHeaderParams' },
     })
   })
 })
