@@ -1,15 +1,15 @@
-import 'reflect-metadata'
-import { defaultMetadataStorage } from 'class-transformer/storage' // tslint:disable-line:no-submodule-imports
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
 import { Express } from 'express'
+import 'reflect-metadata'
 import {
   createExpressServer,
   getMetadataArgsStorage,
 } from 'routing-controllers'
 import { routingControllersToSpec } from 'routing-controllers-openapi'
 import * as swaggerUiExpress from 'swagger-ui-express'
-
 import { UsersController } from './UsersController'
+
+const { defaultMetadataStorage } = require('class-transformer/cjs/storage')
 
 const routingControllersOptions = {
   controllers: [UsersController],

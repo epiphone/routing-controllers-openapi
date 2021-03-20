@@ -16,7 +16,7 @@ import {
   Put,
   QueryParams,
 } from 'routing-controllers'
-import { OpenAPI } from 'routing-controllers-openapi'
+import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi'
 
 class Child {
   @IsString()
@@ -39,6 +39,14 @@ class CreateUserBody {
   children: Child[]
 }
 
+class UserResponse {
+  @IsString()
+  name: string
+
+  @IsString({ each: true })
+  hobbies: string[]
+}
+
 class PaginationQuery {
   @IsNumber()
   @IsPositive()
@@ -56,6 +64,7 @@ class PaginationQuery {
 export class UsersController {
   @Get('/')
   @OpenAPI({ summary: 'Return a list of users' })
+  @ResponseSchema(UserResponse, { isArray: true })
   getAll(@QueryParams() query: PaginationQuery) {
     return [
       { id: 1, name: 'First user!', hobbies: [] },
@@ -65,8 +74,9 @@ export class UsersController {
 
   @Get('/:id')
   @OpenAPI({ summary: 'Return a single user' })
+  @ResponseSchema(UserResponse)
   getOne(@Param('id') id: number) {
-    return { name: 'User #' + id }
+    return { name: 'User #' + id, hobbies: ['something'] }
   }
 
   @Post('/')
