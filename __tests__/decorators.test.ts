@@ -6,7 +6,7 @@ import {
   getMetadataArgsStorage,
   HttpCode,
   JsonController,
-  Param
+  Param,
 } from 'routing-controllers'
 
 import {
@@ -15,7 +15,7 @@ import {
   IRoute,
   OpenAPI,
   parseRoutes,
-  ResponseSchema
+  ResponseSchema,
 } from '../src'
 import { ModelDto } from './fixtures/models'
 
@@ -30,7 +30,7 @@ describe('decorators', () => {
     class UsersController {
       @Get('/')
       @OpenAPI({
-        description: 'List all users'
+        description: 'List all users',
       })
       listUsers() {
         return
@@ -39,7 +39,7 @@ describe('decorators', () => {
       @Get('/:userId')
       @OpenAPI((source, route) => ({
         ...source,
-        tags: [...getTags(route), 'custom-tag']
+        tags: [...getTags(route), 'custom-tag'],
       }))
       getUser(@Param('userId') _userId: number) {
         return
@@ -48,11 +48,11 @@ describe('decorators', () => {
       @Get('/multipleOpenAPIsWithObjectParam')
       @OpenAPI({
         summary: 'Some summary',
-        ['x-custom-key']: 'This will be overwritten'
+        ['x-custom-key']: 'This will be overwritten',
       })
       @OpenAPI({
         description: 'Some description',
-        ['x-custom-key']: 'Custom value'
+        ['x-custom-key']: 'Custom value',
       })
       multipleOpenAPIsWithObjectParam() {
         return
@@ -62,12 +62,12 @@ describe('decorators', () => {
       @OpenAPI((source, _route) => ({
         ...source,
         summary: 'Some summary',
-        'x-custom-key': 10
+        'x-custom-key': 10,
       }))
       @OpenAPI((source, _route) => ({
         ...source,
         description: 'Some description',
-        'x-custom-key': source['x-custom-key'] * 2
+        'x-custom-key': source['x-custom-key'] * 2,
       }))
       multipleOpenAPIsWithFunctionParam() {
         return
@@ -76,12 +76,12 @@ describe('decorators', () => {
       @Get('/multipleOpenAPIsWithMixedParam')
       @OpenAPI({
         summary: 'Some summary',
-        'x-custom-key': 10
+        'x-custom-key': 10,
       })
       @OpenAPI((source, _route) => ({
         ...source,
         description: 'Some description',
-        'x-custom-key': source['x-custom-key'] * 2
+        'x-custom-key': source['x-custom-key'] * 2,
       }))
       multipleOpenAPIsWithMixedParam() {
         return
@@ -97,7 +97,7 @@ describe('decorators', () => {
       @ResponseSchema(ModelDto, {
         contentType: 'text/csv',
         description: 'Bad request',
-        statusCode: 400
+        statusCode: 400,
       })
       responseSchemaOptions() {
         return
@@ -128,7 +128,7 @@ describe('decorators', () => {
       @Get('/responseSchemaModelAsString')
       @ResponseSchema('MyModelName', {
         contentType: 'text/csv',
-        statusCode: 400
+        statusCode: 400,
       })
       responseSchemaModelAsString() {
         return
@@ -137,7 +137,7 @@ describe('decorators', () => {
       @Get('/responseSchemaNotOverwritingInnerOpenApiDecorator')
       @ResponseSchema('MyModelName', {
         contentType: 'text/csv',
-        statusCode: 400
+        statusCode: 400,
       })
       @OpenAPI({ description: 'somedescription' })
       responseSchemaNotOverwritingInnerOpenApiDecorator() {
@@ -148,7 +148,7 @@ describe('decorators', () => {
       @OpenAPI({ description: 'somedescription' })
       @ResponseSchema('MyModelName', {
         contentType: 'text/csv',
-        statusCode: 400
+        statusCode: 400,
       })
       responseSchemaNotOverwritingOuterOpenApiDecorator() {
         return
@@ -163,15 +163,15 @@ describe('decorators', () => {
       @Get('/multipleResponseSchemas')
       @ResponseSchema('MySuccessObject', {
         description: 'Some successful response object',
-        statusCode: 200
+        statusCode: 200,
       })
       @ResponseSchema('BadRequestErrorObject', {
         contentType: 'text/html',
-        statusCode: 400
+        statusCode: 400,
       })
       @ResponseSchema('NotFoundErrorObject', {
         contentType: 'text/csv',
-        statusCode: 404
+        statusCode: 404,
       })
       multipleResponseSchemas() {
         return
@@ -202,7 +202,7 @@ describe('decorators', () => {
       @Get('/fourResponseSchemasMixedStatusCodeWithTwoArraySchemas')
       @ResponseSchema('SuccessObjects1', { isArray: true })
       @ResponseSchema('CreatedObject2', { statusCode: 201 })
-      @ResponseSchema('CreatedObjects3', { statusCode: 201, isArray: true})
+      @ResponseSchema('CreatedObjects3', { statusCode: 201, isArray: true })
       @ResponseSchema('BadRequestObject4', { statusCode: 400 })
       fourResponseSchemasMixedStatusCodeWithTwoArraySchemas() {
         return
@@ -268,12 +268,12 @@ describe('decorators', () => {
         content: {
           'application/json': {
             schema: {
-              $ref: '#/components/schemas/ModelDto'
-            }
-          }
+              $ref: '#/components/schemas/ModelDto',
+            },
+          },
         },
-        description: ''
-      }
+        description: '',
+      },
     })
   })
 
@@ -282,27 +282,27 @@ describe('decorators', () => {
     expect(operation.responses).toEqual({
       '200': {
         content: {
-          'application/json': {}
+          'application/json': {},
         },
-        description: 'Successful response'
+        description: 'Successful response',
       },
       '400': {
         content: {
           'text/csv': {
             schema: {
-              $ref: '#/components/schemas/ModelDto'
-            }
-          }
+              $ref: '#/components/schemas/ModelDto',
+            },
+          },
         },
-        description: 'Bad request'
-      }
+        description: 'Bad request',
+      },
     })
   })
 
   it('applies @ResponseSchema using contentType and statusCode from decorators', () => {
     const operation = getOperation(routes.responseSchemaDecorators, {})
     expect(operation.responses['201'].content['application/pdf']).toEqual({
-      schema: { $ref: '#/components/schemas/ModelDto' }
+      schema: { $ref: '#/components/schemas/ModelDto' },
     })
   })
 
@@ -311,10 +311,10 @@ describe('decorators', () => {
     expect(operation.responses['200'].content['application/json']).toEqual({
       schema: {
         items: {
-          $ref: '#/components/schemas/ModelDto'
+          $ref: '#/components/schemas/ModelDto',
         },
-        type: 'array'
-      }
+        type: 'array',
+      },
     })
   })
 
@@ -323,18 +323,18 @@ describe('decorators', () => {
     expect(operation.responses).toEqual({
       '201': {
         content: {
-          'application/pdf': {}
+          'application/pdf': {},
         },
-        description: 'Successful response'
+        description: 'Successful response',
       },
       '400': {
         content: {
           'text/csv': {
-            schema: { $ref: '#/components/schemas/ModelDto' }
-          }
+            schema: { $ref: '#/components/schemas/ModelDto' },
+          },
         },
-        description: ''
-      }
+        description: '',
+      },
     })
   })
 
@@ -343,64 +343,66 @@ describe('decorators', () => {
     expect(operation.responses).toEqual({
       '200': {
         content: {
-          'application/json': {}
+          'application/json': {},
         },
-        description: 'Successful response'
+        description: 'Successful response',
       },
       '400': {
         content: {
           'text/csv': {
-            schema: { $ref: '#/components/schemas/MyModelName' }
-          }
+            schema: { $ref: '#/components/schemas/MyModelName' },
+          },
         },
-        description: ''
-      }
+        description: '',
+      },
     })
   })
 
   it('applies @ResponseSchema while retaining inner OpenAPI decorator', () => {
     const operation = getOperation(
-      routes.responseSchemaNotOverwritingInnerOpenApiDecorator, {}
+      routes.responseSchemaNotOverwritingInnerOpenApiDecorator,
+      {}
     )
     expect(operation.description).toEqual('somedescription')
     expect(operation.responses).toEqual({
       '200': {
         content: {
-          'application/json': {}
+          'application/json': {},
         },
-        description: 'Successful response'
+        description: 'Successful response',
       },
       '400': {
         content: {
           'text/csv': {
-            schema: { $ref: '#/components/schemas/MyModelName' }
-          }
+            schema: { $ref: '#/components/schemas/MyModelName' },
+          },
         },
-        description: ''
-      }
+        description: '',
+      },
     })
   })
 
   it('applies @ResponseSchema while retaining outer OpenAPI decorator', () => {
     const operation = getOperation(
-      routes.responseSchemaNotOverwritingOuterOpenApiDecorator, {}
+      routes.responseSchemaNotOverwritingOuterOpenApiDecorator,
+      {}
     )
     expect(operation.description).toEqual('somedescription')
     expect(operation.responses).toEqual({
       '200': {
         content: {
-          'application/json': {}
+          'application/json': {},
         },
-        description: 'Successful response'
+        description: 'Successful response',
       },
       '400': {
         content: {
           'text/csv': {
-            schema: { $ref: '#/components/schemas/MyModelName' }
-          }
+            schema: { $ref: '#/components/schemas/MyModelName' },
+          },
         },
-        description: ''
-      }
+        description: '',
+      },
     })
   })
 
@@ -409,10 +411,10 @@ describe('decorators', () => {
     expect(operation.responses).toEqual({
       '200': {
         content: {
-          'application/json': {}
+          'application/json': {},
         },
-        description: 'Successful response'
-      }
+        description: 'Successful response',
+      },
     })
   })
 
@@ -423,12 +425,12 @@ describe('decorators', () => {
         content: {
           'text/html; charset=utf-8': {
             schema: {
-              $ref: '#/components/schemas/ModelDto'
-            }
-          }
+              $ref: '#/components/schemas/ModelDto',
+            },
+          },
         },
-        description: ''
-      }
+        description: '',
+      },
     })
   })
 
@@ -439,32 +441,32 @@ describe('decorators', () => {
         content: {
           'application/json': {
             schema: {
-              $ref: '#/components/schemas/MySuccessObject'
-            }
-          }
+              $ref: '#/components/schemas/MySuccessObject',
+            },
+          },
         },
-        description: 'Some successful response object'
+        description: 'Some successful response object',
       },
       '400': {
         content: {
           'text/html': {
             schema: {
-              $ref: '#/components/schemas/BadRequestErrorObject'
-            }
-          }
+              $ref: '#/components/schemas/BadRequestErrorObject',
+            },
+          },
         },
-        description: ''
+        description: '',
       },
       '404': {
         content: {
           'text/csv': {
             schema: {
-              $ref: '#/components/schemas/NotFoundErrorObject'
-            }
-          }
+              $ref: '#/components/schemas/NotFoundErrorObject',
+            },
+          },
         },
-        description: ''
-      }
+        description: '',
+      },
     })
   })
 
@@ -476,39 +478,45 @@ describe('decorators', () => {
           'application/json': {
             schema: {
               oneOf: [
-                {$ref: '#/components/schemas/SuccessObject1'},
-                {$ref: '#/components/schemas/SuccessObject2'},
-              ]
-            }
-          }
+                { $ref: '#/components/schemas/SuccessObject1' },
+                { $ref: '#/components/schemas/SuccessObject2' },
+              ],
+            },
+          },
         },
-        description: ''
-      }
+        description: '',
+      },
     })
   })
 
   it('applies three @ResponseSchema with same status code', () => {
-    const operation = getOperation(routes.threeResponseSchemasSameStatusCode, {})
+    const operation = getOperation(
+      routes.threeResponseSchemasSameStatusCode,
+      {}
+    )
     expect(operation.responses).toEqual({
       '200': {
         content: {
           'application/json': {
             schema: {
               oneOf: [
-                {$ref: '#/components/schemas/SuccessObject1'},
-                {$ref: '#/components/schemas/SuccessObject2'},
-                {$ref: '#/components/schemas/SuccessObject3'},
-              ]
-            }
-          }
+                { $ref: '#/components/schemas/SuccessObject1' },
+                { $ref: '#/components/schemas/SuccessObject2' },
+                { $ref: '#/components/schemas/SuccessObject3' },
+              ],
+            },
+          },
         },
-        description: ''
-      }
+        description: '',
+      },
     })
   })
 
   it('applies two @ResponseSchema with same status code, where one of them is an array', () => {
-    const operation = getOperation(routes.twoResponseSchemaSameStatusCodeWithOneArraySchema, {})
+    const operation = getOperation(
+      routes.twoResponseSchemaSameStatusCodeWithOneArraySchema,
+      {}
+    )
     expect(operation.responses).toEqual({
       '200': {
         content: {
@@ -517,68 +525,70 @@ describe('decorators', () => {
               oneOf: [
                 {
                   items: {
-                    $ref: '#/components/schemas/SuccessObjects1'
+                    $ref: '#/components/schemas/SuccessObjects1',
                   },
-                  type: 'array'
+                  type: 'array',
                 },
-                {$ref: '#/components/schemas/SuccessObject2'},
-              ]
-            }
-          }
+                { $ref: '#/components/schemas/SuccessObject2' },
+              ],
+            },
+          },
         },
-        description: ''
-      }
+        description: '',
+      },
     })
   })
 
   it('applies four @ResponseSchema with mixed status code, where two of them are arrays', () => {
-    const operation = getOperation(routes.fourResponseSchemasMixedStatusCodeWithTwoArraySchemas, {})
+    const operation = getOperation(
+      routes.fourResponseSchemasMixedStatusCodeWithTwoArraySchemas,
+      {}
+    )
     expect(operation.responses).toEqual({
       '200': {
         content: {
           'application/json': {
             schema: {
               items: {
-                $ref: '#/components/schemas/SuccessObjects1'
+                $ref: '#/components/schemas/SuccessObjects1',
               },
-              type: 'array'
-            }
-          }
+              type: 'array',
+            },
+          },
         },
-        description: ''
+        description: '',
       },
       '201': {
         content: {
           'application/json': {
             schema: {
               oneOf: [
-                {$ref: '#/components/schemas/CreatedObject2'}, 
+                { $ref: '#/components/schemas/CreatedObject2' },
                 {
                   items: {
-                    $ref: '#/components/schemas/CreatedObjects3'
+                    $ref: '#/components/schemas/CreatedObjects3',
                   },
-                  type: 'array'
-                }
-              ]
-            }
-          }
+                  type: 'array',
+                },
+              ],
+            },
+          },
         },
-        description: ''
+        description: '',
       },
       '400': {
         content: {
           'application/json': {
             schema: {
-              $ref: '#/components/schemas/BadRequestObject4'
-            }
-          }
-        },        
-        description: ''
-      }
+              $ref: '#/components/schemas/BadRequestObject4',
+            },
+          },
+        },
+        description: '',
+      },
     })
   })
 })
-
 
 describe('@OpenAPI-decorated class', () => {
   let routes: { [method: string]: IRoute }
@@ -587,26 +597,26 @@ describe('@OpenAPI-decorated class', () => {
     getMetadataArgsStorage().reset()
 
     @OpenAPI({
-      externalDocs: { url: 'http://docs.com' }
+      externalDocs: { url: 'http://docs.com' },
     })
     @Controller('/items')
     @OpenAPI({
       description: 'Common description',
-      security: [{ basicAuth: [] }]
+      security: [{ basicAuth: [] }],
     })
     // @ts-ignore: not referenced
     class Item {
       @Get('/')
       @OpenAPI({
         description: 'List all items',
-        summary: 'Method-specific summary'
+        summary: 'Method-specific summary',
       })
       listItems() {
         return
       }
 
       @Get('/')
-      @OpenAPI(op => ({ ...op, security: [] }))
+      @OpenAPI((op) => ({ ...op, security: [] }))
       getItem() {
         return
       }
@@ -621,7 +631,7 @@ describe('@OpenAPI-decorated class', () => {
         description: 'List all items',
         externalDocs: { url: 'http://docs.com' },
         security: [{ basicAuth: [] }],
-        summary: 'Method-specific summary'
+        summary: 'Method-specific summary',
       })
     )
 
@@ -630,7 +640,7 @@ describe('@OpenAPI-decorated class', () => {
         description: 'Common description',
         externalDocs: { url: 'http://docs.com' },
         security: [],
-        summary: 'Get item'
+        summary: 'Get item',
       })
     )
   })

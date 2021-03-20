@@ -5,7 +5,7 @@ import {
   Get,
   getMetadataArgsStorage,
   HttpCode,
-  JsonController
+  JsonController,
 } from 'routing-controllers'
 
 import { getResponses, parseRoutes } from '../src'
@@ -64,26 +64,26 @@ describe('responses', () => {
   it('sets default content type as per controller class type', () => {
     expect(responses[0]).toMatchObject({
       '200': {
-        content: { 'text/html; charset=utf-8': {} }
-      }
+        content: { 'text/html; charset=utf-8': {} },
+      },
     })
     expect(responses[2]).toMatchObject({
       '200': {
-        content: { 'application/json': {} }
-      }
+        content: { 'application/json': {} },
+      },
     })
   })
 
   it('overrides content type as per @ContentType decorator', () => {
     expect(responses[1]).toMatchObject({
       '201': {
-        content: { 'text/cvs': {} }
-      }
+        content: { 'text/cvs': {} },
+      },
     })
     expect(responses[3]).toMatchObject({
       '204': {
-        content: { 'text/plain': {} }
-      }
+        content: { 'text/plain': {} },
+      },
     })
   })
 })

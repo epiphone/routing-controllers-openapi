@@ -16,8 +16,8 @@
   "scripts": {
     "clean": "rimraf coverage build",
     "build": "npm run clean && tsc -p tsconfig.release.json",
-    "format": "prettier --write {src,test}/**/*.ts",
-    "test:format": "prettier --check {src,test}/**/*.ts",
+    "format": "prettier --write {src,__tests__}/**/*.ts",
+    "test:format": "prettier --check {src,__tests__}/**/*.ts",
     "test:lint": "tslint --project . src/**/*.ts",
     "prepare": "install-self-peers --npm -- --no-save --ignore-scripts && npm run build",
     "send-coverage": "codecov -f coverage/*.json",

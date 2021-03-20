@@ -9,20 +9,20 @@ import {
   getFullPath,
   getOperationId,
   parseRoutes,
-  routingControllersToSpec
+  routingControllersToSpec,
 } from '../src'
 import { getRequestBody } from '../src/generateSpec'
 import {
   RootController,
   UserPostsController,
-  UsersController
+  UsersController,
 } from './fixtures/controllers'
 
 // Construct OpenAPI spec:
 const storage = getMetadataArgsStorage()
 const options = {
   controllers: [UsersController, UserPostsController],
-  routePrefix: '/api'
+  routePrefix: '/api',
 }
 const routes = parseRoutes(storage, options)
 
@@ -31,7 +31,7 @@ describe('index', () => {
     // Include component schemas parsed with class-validator-jsonschema:
     const schemas = validationMetadatasToSchemas({
       classTransformerMetadataStorage: defaultMetadataStorage,
-      refPointerPrefix: '#/components/schemas/'
+      refPointerPrefix: '#/components/schemas/',
     })
 
     const spec = routingControllersToSpec(storage, options, {
@@ -40,106 +40,106 @@ describe('index', () => {
         securitySchemes: {
           basicAuth: {
             scheme: 'basic',
-            type: 'http'
+            type: 'http',
           },
           bearerAuth: {
             scheme: 'bearer',
-            type: 'http'
-          }
-        }
+            type: 'http',
+          },
+        },
       },
-      info: { title: 'My app', version: '1.2.0' }
+      info: { title: 'My app', version: '1.2.0' },
     })
     expect(spec).toEqual(require('./fixtures/spec.json'))
   })
 
   it('parses actions in declared order from controller metadata', () => {
-    const actions = routes.map(d => d.action)
+    const actions = routes.map((d) => d.action)
     expect(actions).toEqual([
       {
         method: 'listUsers',
         route: '/',
         target: UsersController,
-        type: 'get'
+        type: 'get',
       },
       {
         method: 'listUsersInRange',
         route: '/:from-:to',
         target: UsersController,
-        type: 'get'
+        type: 'get',
       },
       {
         method: 'getUser',
         route: '/:userId?',
         target: UsersController,
-        type: 'get'
+        type: 'get',
       },
       {
         method: 'createUser',
         route: '/',
         target: UsersController,
-        type: 'post'
+        type: 'post',
       },
       {
         method: 'createUserWithType',
         route: '/withType',
         target: UsersController,
-        type: 'post'
+        type: 'post',
       },
       {
         method: 'createManyUsers',
         route: '/',
         target: UsersController,
-        type: 'put'
+        type: 'put',
       },
       {
         method: 'createNestedUsers',
         route: '/nested',
         target: UsersController,
-        type: 'post'
+        type: 'post',
       },
       {
         method: 'createUserPost',
         route: '/:userId/posts',
         target: UsersController,
-        type: 'post'
+        type: 'post',
       },
       {
         method: 'deleteUsersByVersion',
         route: '/:version(v?\\d{1}|all)',
         target: UsersController,
-        type: 'delete'
+        type: 'delete',
       },
       {
         method: 'putUserDefault',
         route: undefined,
         target: UsersController,
-        type: 'put'
+        type: 'put',
       },
       {
         method: 'getUserPost',
         route: '/:postId',
         target: UserPostsController,
-        type: 'get'
+        type: 'get',
       },
       {
         method: 'patchUserPost',
         route: '/:postId',
         target: UserPostsController,
-        type: 'patch'
+        type: 'patch',
       },
       {
         method: 'getDefaultPath',
         route: undefined,
         target: RootController,
-        type: 'get'
+        type: 'get',
       },
       {
         method: 'getStringPath',
         route: '/stringPath',
         target: RootController,
-        type: 'get'
-      }
+        type: 'get',
+      },
     ])
   })
 
@@ -189,42 +189,42 @@ describe('index', () => {
 
 describe('getRequestBody', () => {
   it('parse a single `body` metadata item into a single `object` schema', () => {
-    const route = routes.find(d => d.action.method === 'createUser')!
+    const route = routes.find((d) => d.action.method === 'createUser')!
     expect(route).toBeDefined()
     expect(getRequestBody(route)).toEqual({
       content: {
         'application/json': {
           schema: {
-            $ref: '#/components/schemas/CreateUserBody'
-          }
-        }
+            $ref: '#/components/schemas/CreateUserBody',
+          },
+        },
       },
       description: 'CreateUserBody',
-      required: false
+      required: false,
     })
   })
 
   it('parse a single `body` metadata item of array type into a single `object` schema', () => {
-    const route = routes.find(d => d.action.method === 'createManyUsers')!
+    const route = routes.find((d) => d.action.method === 'createManyUsers')!
     expect(route).toBeDefined()
     expect(getRequestBody(route)).toEqual({
       content: {
         'application/json': {
           schema: {
             items: {
-              $ref: '#/components/schemas/CreateUserBody'
+              $ref: '#/components/schemas/CreateUserBody',
             },
-            type: 'array'
-          }
-        }
+            type: 'array',
+          },
+        },
       },
       description: 'CreateUserBody',
-      required: true
+      required: true,
     })
   })
 
   it('parse a single `body-param` metadata item into a single `object` schema', () => {
-    const route = routes.find(d => d.action.method === 'patchUserPost')!
+    const route = routes.find((d) => d.action.method === 'patchUserPost')!
     expect(route).toBeDefined()
     expect(getRequestBody(route)).toEqual({
       content: {
@@ -232,19 +232,19 @@ describe('getRequestBody', () => {
           schema: {
             properties: {
               token: {
-                type: 'string'
-              }
+                type: 'string',
+              },
             },
             required: [],
-            type: 'object'
-          }
-        }
-      }
+            type: 'object',
+          },
+        },
+      },
     })
   })
 
   it('combine multiple `body-param` metadata items into a single `object` schema', () => {
-    const route = routes.find(d => d.action.method === 'putUserDefault')!
+    const route = routes.find((d) => d.action.method === 'putUserDefault')!
     expect(route).toBeDefined()
     expect(getRequestBody(route)).toEqual({
       content: {
@@ -252,25 +252,25 @@ describe('getRequestBody', () => {
           schema: {
             properties: {
               limit: {
-                type: 'number'
+                type: 'number',
               },
               query: {
-                $ref: '#/components/schemas/UserQuery'
+                $ref: '#/components/schemas/UserQuery',
               },
               token: {
-                type: 'string'
-              }
+                type: 'string',
+              },
             },
             required: ['token'],
-            type: 'object'
-          }
-        }
-      }
+            type: 'object',
+          },
+        },
+      },
     })
   })
 
   it('wrap `body` and `body-param` metadata items under a single `allOf` schema', () => {
-    const route = routes.find(d => d.action.method === 'createUserPost')!
+    const route = routes.find((d) => d.action.method === 'createUserPost')!
     expect(route).toBeDefined()
     expect(getRequestBody(route)).toEqual({
       content: {
@@ -278,23 +278,23 @@ describe('getRequestBody', () => {
           schema: {
             allOf: [
               {
-                $ref: '#/components/schemas/CreatePostBody'
+                $ref: '#/components/schemas/CreatePostBody',
               },
               {
                 properties: {
                   token: {
-                    type: 'string'
-                  }
+                    type: 'string',
+                  },
                 },
                 required: [],
-                type: 'object'
-              }
-            ]
-          }
-        }
+                type: 'object',
+              },
+            ],
+          },
+        },
       },
       description: 'CreatePostBody',
-      required: true
+      required: true,
     })
   })
 })
