@@ -19,7 +19,7 @@
     "express": "^4.17.1",
     "reflect-metadata": "^0.1.13",
     "routing-controllers": "0.9.0",
-    "routing-controllers-openapi": "github:epiphone/routing-controllers-openapi#34ccc11",
+    "routing-controllers-openapi": "3.0.0",
     "swagger-ui-express": "^4.1.4"
   },
   "devDependencies": {
