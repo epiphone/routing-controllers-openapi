@@ -318,8 +318,13 @@ function getParamSchema(
   param: ParamMetadataArgs
 ): oa.SchemaObject | oa.ReferenceObject {
   const { explicitType, index, object, method } = param
-
-  const type = Reflect.getMetadata('design:paramtypes', object, method)[index]
+  const reflectedTypes = Reflect.getMetadata(
+    'design:paramtypes',
+    object,
+    method
+  )
+  if (reflectedTypes.length <= index) return {}
+  const type = reflectedTypes[index]
   if (_.isFunction(type) && type.name === 'Array') {
     const items = explicitType
       ? { $ref: '#/components/schemas/' + explicitType.name }
