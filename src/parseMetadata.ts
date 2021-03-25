@@ -29,14 +29,10 @@ export function parseRoutes(
 ): IRoute[] {
   return storage.actions.map((action) => ({
     action,
-    controller: _.find(storage.controllers, {
-      target: action.target,
-    }) as ControllerMetadataArgs,
+    controller: storage.controllers.find(c => c.target === action.target) as ControllerMetadataArgs,
     options,
-    params: _.sortBy(
-      storage.filterParamsWithTargetAndMethod(action.target, action.method),
-      'index'
-    ),
+    params: storage.filterParamsWithTargetAndMethod(action.target, action.method)
+    .sort((a,b)=>a.index - b.index),
     responseHandlers: storage.filterResponseHandlersWithTargetAndMethod(
       action.target,
       action.method

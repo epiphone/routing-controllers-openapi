@@ -1,4 +1,5 @@
 import * as _ from 'lodash'
+import _merge from 'lodash.merge'
 import * as oa from 'openapi3-ts'
 import {
   MetadataArgsStorage,
@@ -27,5 +28,5 @@ export function routingControllersToSpec(
   const routes = parseRoutes(storage, routingControllerOptions)
   const spec = getSpec(routes, additionalProperties.components?.schemas || {})
 
-  return _.merge(spec, additionalProperties)
+  return _merge(spec, additionalProperties)
 }

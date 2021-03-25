@@ -2,6 +2,7 @@
 const { defaultMetadataStorage } = require('class-transformer/cjs/storage')
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
 import * as _ from 'lodash'
+import _merge from 'lodash.merge'
 import { getMetadataArgsStorage } from 'routing-controllers'
 
 import {
@@ -144,7 +145,7 @@ describe('index', () => {
   })
 
   it('gets full OpenAPI-formatted paths', () => {
-    const route = _.cloneDeep(routes[0])
+    const route = _merge({}, routes[0])
     expect(getFullPath(route)).toEqual('/api/users/')
 
     route.options.routePrefix = undefined
@@ -178,7 +179,7 @@ describe('index', () => {
   })
 
   it('gets OpenAPI Operation IDs', () => {
-    const route = _.cloneDeep(routes[0])
+    const route = _merge({}, routes[0])
     expect(getOperationId(route)).toEqual('UsersController.listUsers')
 
     route.action.target = class AnotherController {}

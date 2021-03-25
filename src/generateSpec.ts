@@ -1,5 +1,8 @@
 // tslint:disable:no-submodule-imports
 import * as _ from 'lodash'
+import _merge from 'lodash.merge'
+import _capitalize from 'lodash.capitalize'
+import _startCase from 'lodash.startcase'
 import * as oa from 'openapi3-ts'
 import * as pathToRegexp from 'path-to-regexp'
 import 'reflect-metadata'
@@ -45,7 +48,14 @@ export function getOperation(
     tags: getTags(route),
   }
 
-  const cleanedOperation = _.omitBy(operation, _.isEmpty) as oa.OperationObject
+  const cleanedOperation = {} as oa.OperationObject
+
+  Object.entries(operation)
+    .filter(
+      ([_, value]) => value && (value.length || Object.keys(value).length)
+    )
+    .forEach(([key, value]) => (cleanedOperation[key] = value))
+
   return applyOpenAPIDecorator(cleanedOperation, route)
 }
 
@@ -70,15 +80,15 @@ export function getPaths(
   }))
 
   // @ts-ignore: array spread
-  return _.merge(...routePaths)
+  return _merge(...routePaths)
 }
 
 /**
  * Return header parameters of given route.
  */
 export function getHeaderParams(route: IRoute): oa.ParameterObject[] {
-  const headers: oa.ParameterObject[] = _(route.params)
-    .filter({ type: 'header' })
+  const headers: oa.ParameterObject[] = route.params
+    .filter((p) => p.type === 'header')
     .map((headerMeta) => {
       const schema = getParamSchema(headerMeta) as oa.SchemaObject
       return {
@@ -88,14 +98,13 @@ export function getHeaderParams(route: IRoute): oa.ParameterObject[] {
         schema,
       }
     })
-    .value()
 
-  const headersMeta = _.find(route.params, { type: 'headers' })
+  const headersMeta = route.params.find((p) => p.type === 'headers')
   if (headersMeta) {
     const schema = getParamSchema(headersMeta) as oa.ReferenceObject
     headers.push({
       in: 'header',
-      name: _.last(_.split(schema.$ref, '/')) || '',
+      name: schema.$ref.split('/').slice(-1)[0] || '',
       required: isRequired(headersMeta, route),
       schema,
     })
@@ -115,7 +124,7 @@ export function getPathParams(route: IRoute): oa.ParameterObject[] {
   const tokens = pathToRegexp.parse(path)
 
   return tokens
-    .filter(_.isObject) // Omit non-parameter plain string tokens
+    .filter((token) => token && typeof token === 'object') // Omit non-parameter plain string tokens
     .map((token: pathToRegexp.Key) => {
       const name = token.name + ''
       const param: oa.ParameterObject = {
@@ -129,7 +138,9 @@ export function getPathParams(route: IRoute): oa.ParameterObject[] {
         param.schema = { pattern: token.pattern, type: 'string' }
       }
 
-      const meta = _.find(route.params, { name, type: 'param' })
+      const meta = route.params.find(
+        (p) => p.name === name && p.type === 'param'
+      )
       if (meta) {
         const metaSchema = getParamSchema(meta)
         param.schema =
@@ -147,8 +158,8 @@ export function getQueryParams(
   route: IRoute,
   schemas: { [p: string]: oa.SchemaObject }
 ): oa.ParameterObject[] {
-  const queries: oa.ParameterObject[] = _(route.params)
-    .filter({ type: 'query' })
+  const queries: oa.ParameterObject[] = route.params
+    .filter((p) => p.type === 'query')
     .map((queryMeta) => {
       const schema = getParamSchema(queryMeta) as oa.SchemaObject
       return {
@@ -158,12 +169,12 @@ export function getQueryParams(
         schema,
       }
     })
-    .value()
 
-  const queriesMeta = _.find(route.params, { type: 'queries' })
+  const queriesMeta = route.params.find((p) => p.type === 'queries')
   if (queriesMeta) {
     const paramSchema = getParamSchema(queriesMeta) as oa.ReferenceObject
-    const paramSchemaName = _.last(_.split(paramSchema.$ref, '/')) || ''
+    // the last segment after '/'
+    const paramSchemaName = paramSchema.$ref.split('/').slice(-1)[0] || ''
     const currentSchema = schemas[paramSchemaName]
 
     for (const [name, schema] of Object.entries(
@@ -217,7 +228,7 @@ export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
             : bodySchema,
         },
       },
-      description: _.last(_.split($ref, '/')),
+      description: ($ref || '').split('/').slice(-1)[0],
       required: isRequired(bodyMeta, route),
     }
   } else if (bodyParamsSchema) {
@@ -235,7 +246,7 @@ export function getContentType(route: IRoute): string {
     route.controller.type === 'json'
       ? 'application/json'
       : 'text/html; charset=utf-8'
-  const contentMeta = _.find(route.responseHandlers, { type: 'content-type' })
+  const contentMeta = route.responseHandlers.find(h => h.type === 'content-type')
   return contentMeta ? contentMeta.value : defaultContentType
 }
 
@@ -243,7 +254,7 @@ export function getContentType(route: IRoute): string {
  * Return the status code of given route.
  */
 export function getStatusCode(route: IRoute): string {
-  const successMeta = _.find(route.responseHandlers, { type: 'success-code' })
+  const successMeta = route.responseHandlers.find(h => h.type === 'success-code')
   return successMeta ? successMeta.value + '' : '200'
 }
 
@@ -281,14 +292,14 @@ export function getSpec(
  * Return OpenAPI Operation summary string for given route.
  */
 export function getSummary(route: IRoute): string {
-  return _.capitalize(_.startCase(route.action.method))
+  return _capitalize(_startCase(route.action.method))
 }
 
 /**
  * Return OpenAPI tags for given route.
  */
 export function getTags(route: IRoute): string[] {
-  return [_.startCase(route.controller.target.name.replace(/Controller$/, ''))]
+  return [_startCase(route.controller.target.name.replace(/Controller$/, ''))]
 }
 
 /**
@@ -297,7 +308,7 @@ export function getTags(route: IRoute): string[] {
 export function expressToOpenAPIPath(expressPath: string) {
   const tokens = pathToRegexp.parse(expressPath)
   return tokens
-    .map((d) => (_.isString(d) ? d : `${d.prefix}{${d.name}}`))
+    .map((d) => (typeof d === "string" ? d : `${d.prefix}{${d.name}}`))
     .join('')
 }
 
@@ -306,7 +317,7 @@ export function expressToOpenAPIPath(expressPath: string) {
  * setting if local setting is not defined.
  */
 function isRequired(meta: { required?: boolean }, route: IRoute) {
-  const globalRequired = _.get(route.options, 'defaults.paramOptions.required')
+  const globalRequired = route.options?.defaults?.paramOptions?.required
   return globalRequired ? meta.required !== false : !!meta.required
 }
 
@@ -319,8 +330,12 @@ function getParamSchema(
 ): oa.SchemaObject | oa.ReferenceObject {
   const { explicitType, index, object, method } = param
 
-  const type = Reflect.getMetadata('design:paramtypes', object, method)[index]
-  if (_.isFunction(type) && type.name === 'Array') {
+  const type: Function | unknown = Reflect.getMetadata(
+    'design:paramtypes',
+    object,
+    method
+  )[index]
+  if (typeof type === 'function' && type.name === 'Array') {
     const items = explicitType
       ? { $ref: '#/components/schemas/' + explicitType.name }
       : { type: 'object' as const }
@@ -329,12 +344,15 @@ function getParamSchema(
   if (explicitType) {
     return { $ref: '#/components/schemas/' + explicitType.name }
   }
-  if (_.isFunction(type)) {
-    if (_.isString(type.prototype) || _.isSymbol(type.prototype)) {
+  if (typeof type === 'function') {
+    if (
+      type.prototype === String.prototype ||
+      type.prototype === Symbol.prototype
+    ) {
       return { type: 'string' }
-    } else if (_.isNumber(type.prototype)) {
+    } else if (type.prototype === Number.prototype) {
       return { type: 'number' }
-    } else if (_.isBoolean(type.prototype)) {
+    } else if (type.prototype === Boolean.prototype) {
       return { type: 'boolean' }
     } else if (type.name !== 'Object') {
       return { $ref: '#/components/schemas/' + type.name }

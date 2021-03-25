@@ -1,4 +1,5 @@
 import * as _ from 'lodash'
+import _merge from 'lodash.merge'
 import {
   OperationObject,
   ReferenceObject,
@@ -53,9 +54,9 @@ export function applyOpenAPIDecorator(
   ]
 
   return openAPIParams.reduce((acc: OperationObject, oaParam: OpenAPIParam) => {
-    return _.isFunction(oaParam)
+    return typeof oaParam === 'function'
       ? oaParam(acc, route)
-      : _.merge({}, acc, oaParam)
+      : _merge({}, acc, oaParam)
   }, originalOperation) as OperationObject
 }
 
@@ -134,7 +135,7 @@ export function ResponseSchema(
 
       if (oldSchema?.$ref || oldSchema?.items || oldSchema?.oneOf) {
         // case where we're adding multiple schemas under single statuscode/contentType
-        const newStatusCodeResponse = _.merge(
+        const newStatusCodeResponse = _merge(
           {},
           source.responses[statusCode],
           responses[statusCode]
@@ -150,7 +151,7 @@ export function ResponseSchema(
         return source
       }
 
-      return _.merge({}, source, { responses })
+      return _merge({}, source, { responses })
     }
 
     return source
