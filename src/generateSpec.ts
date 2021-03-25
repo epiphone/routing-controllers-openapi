@@ -1,5 +1,4 @@
 // tslint:disable:no-submodule-imports
-import * as _ from 'lodash'
 import _merge from 'lodash.merge'
 import _capitalize from 'lodash.capitalize'
 import _startCase from 'lodash.startcase'

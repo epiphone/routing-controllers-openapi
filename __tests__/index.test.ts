@@ -1,7 +1,6 @@
 // tslint:disable:no-implicit-dependencies no-submodule-imports
 const { defaultMetadataStorage } = require('class-transformer/cjs/storage')
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
-import * as _ from 'lodash'
 import _merge from 'lodash.merge'
 import { getMetadataArgsStorage } from 'routing-controllers'
 

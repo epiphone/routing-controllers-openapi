@@ -29,7 +29,6 @@
     "singleQuote": true
   },
   "dependencies": {
-    "lodash": "^4.17.15",
     "lodash.merge": "^4.6.2",
     "lodash.capitalize": "^4.2.1",
     "lodash.startcase": "^4.4.0",
@@ -41,7 +40,6 @@
   "devDependencies": {
     "@team-griffin/install-self-peers": "^1.1.1",
     "@types/jest": "^26.0.20",
-    "@types/lodash": "^4.14.168",
     "@types/lodash.merge": "^4.6.6",
     "@types/lodash.capitalize": "^4.2.6",
     "@types/lodash.startcase": "^4.4.6",

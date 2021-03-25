@@ -1,5 +1,4 @@
 // tslint:disable:no-submodule-imports
-import * as _ from 'lodash'
 import {
   MetadataArgsStorage,
   RoutingControllersOptions,

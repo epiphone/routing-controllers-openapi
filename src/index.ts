@@ -1,4 +1,3 @@
-import * as _ from 'lodash'
 import _merge from 'lodash.merge'
 import * as oa from 'openapi3-ts'
 import {
