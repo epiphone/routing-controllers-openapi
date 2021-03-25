@@ -246,7 +246,9 @@ export function getContentType(route: IRoute): string {
     route.controller.type === 'json'
       ? 'application/json'
       : 'text/html; charset=utf-8'
-  const contentMeta = route.responseHandlers.find(h => h.type === 'content-type')
+  const contentMeta = route.responseHandlers.find(
+    (h) => h.type === 'content-type'
+  )
   return contentMeta ? contentMeta.value : defaultContentType
 }
 
@@ -254,7 +256,9 @@ export function getContentType(route: IRoute): string {
  * Return the status code of given route.
  */
 export function getStatusCode(route: IRoute): string {
-  const successMeta = route.responseHandlers.find(h => h.type === 'success-code')
+  const successMeta = route.responseHandlers.find(
+    (h) => h.type === 'success-code'
+  )
   return successMeta ? successMeta.value + '' : '200'
 }
 
@@ -308,7 +312,7 @@ export function getTags(route: IRoute): string[] {
 export function expressToOpenAPIPath(expressPath: string) {
   const tokens = pathToRegexp.parse(expressPath)
   return tokens
-    .map((d) => (typeof d === "string" ? d : `${d.prefix}{${d.name}}`))
+    .map((d) => (typeof d === 'string' ? d : `${d.prefix}{${d.name}}`))
     .join('')
 }
 

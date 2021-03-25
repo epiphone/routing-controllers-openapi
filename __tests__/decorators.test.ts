@@ -20,7 +20,7 @@ import {
 import { ModelDto } from './fixtures/models'
 
 describe('decorators', () => {
-  const routes: { [method: string]: IRoute } = {};
+  const routes: { [method: string]: IRoute } = {}
 
   beforeEach(() => {
     getMetadataArgsStorage().reset()
@@ -219,9 +219,9 @@ describe('decorators', () => {
       }
     }
 
-    parseRoutes(getMetadataArgsStorage())
-    .forEach((route)=> (routes[route.action.method] = route));
-
+    parseRoutes(getMetadataArgsStorage()).forEach(
+      (route) => (routes[route.action.method] = route)
+    )
   })
 
   it('merges keywords defined in @OpenAPI decorator into operation', () => {
@@ -624,9 +624,9 @@ describe('@OpenAPI-decorated class', () => {
       }
     }
 
-    
-    parseRoutes(getMetadataArgsStorage())
-    .forEach((route)=> (routes[route.action.method] = route));
+    parseRoutes(getMetadataArgsStorage()).forEach(
+      (route) => (routes[route.action.method] = route)
+    )
   })
 
   it('applies controller OpenAPI props to each method with method-specific props taking precedence', () => {

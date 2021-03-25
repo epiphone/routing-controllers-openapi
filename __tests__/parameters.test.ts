@@ -150,7 +150,7 @@ describe('parameters', () => {
   })
 
   it('ignores @Param if corresponding name is not found in path string', () => {
-    expect(getPathParams(route).filter(r => r.name === 'invalid')).toEqual([])
+    expect(getPathParams(route).filter((r) => r.name === 'invalid')).toEqual([])
   })
 
   it('parses query param from @QueryParam decorator', () => {
