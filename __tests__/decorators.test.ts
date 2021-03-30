@@ -18,8 +18,12 @@ import {
 } from '../src'
 import { ModelDto } from './fixtures/models'
 
+type IndexedRoutes = {
+  [method: string]: IRoute
+}
+
 describe('decorators', () => {
-  const routes: { [method: string]: IRoute } = {}
+  let routes: IndexedRoutes
 
   beforeEach(() => {
     getMetadataArgsStorage().reset()
@@ -218,9 +222,10 @@ describe('decorators', () => {
       }
     }
 
-    parseRoutes(getMetadataArgsStorage()).forEach(
-      (route) => (routes[route.action.method] = route)
-    )
+    routes = parseRoutes(getMetadataArgsStorage()).reduce((acc, route) => {
+      acc[route.action.method] = route
+      return acc
+    }, {} as IndexedRoutes)
   })
 
   it('merges keywords defined in @OpenAPI decorator into operation', () => {
@@ -592,7 +597,7 @@ describe('decorators', () => {
 })
 
 describe('@OpenAPI-decorated class', () => {
-  const routes: { [method: string]: IRoute } = {}
+  let routes: IndexedRoutes
 
   beforeEach(() => {
     getMetadataArgsStorage().reset()
@@ -623,9 +628,10 @@ describe('@OpenAPI-decorated class', () => {
       }
     }
 
-    parseRoutes(getMetadataArgsStorage()).forEach(
-      (route) => (routes[route.action.method] = route)
-    )
+    routes = parseRoutes(getMetadataArgsStorage()).reduce((acc, route) => {
+      acc[route.action.method] = route
+      return acc
+    }, {} as IndexedRoutes)
   })
 
   it('applies controller OpenAPI props to each method with method-specific props taking precedence', () => {
