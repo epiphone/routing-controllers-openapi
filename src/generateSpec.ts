@@ -47,13 +47,14 @@ export function getOperation(
     tags: getTags(route),
   }
 
-  const cleanedOperation = {} as oa.OperationObject
-
-  Object.entries(operation)
+  const cleanedOperation = Object.entries(operation)
     .filter(
       ([_, value]) => value && (value.length || Object.keys(value).length)
     )
-    .forEach(([key, value]) => (cleanedOperation[key] = value))
+    .reduce((acc, [key, value]) => {
+      acc[key] = value
+      return acc
+    }, ({} as unknown) as oa.OperationObject)
 
   return applyOpenAPIDecorator(cleanedOperation, route)
 }
@@ -333,7 +334,7 @@ function getParamSchema(
 ): oa.SchemaObject | oa.ReferenceObject {
   const { explicitType, index, object, method } = param
 
-  const type: Function | unknown = Reflect.getMetadata(
+  const type: (() => unknown) | unknown = Reflect.getMetadata(
     'design:paramtypes',
     object,
     method
