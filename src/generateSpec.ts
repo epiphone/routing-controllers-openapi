@@ -103,7 +103,7 @@ export function getHeaderParams(route: IRoute): oa.ParameterObject[] {
     const schema = getParamSchema(headersMeta) as oa.ReferenceObject
     headers.push({
       in: 'header',
-      name: schema.$ref.split('/').slice(-1)[0] || '',
+      name: schema.$ref.split('/').pop() || '',
       required: isRequired(headersMeta, route),
       schema,
     })
@@ -173,7 +173,7 @@ export function getQueryParams(
   if (queriesMeta) {
     const paramSchema = getParamSchema(queriesMeta) as oa.ReferenceObject
     // the last segment after '/'
-    const paramSchemaName = paramSchema.$ref.split('/').slice(-1)[0] || ''
+    const paramSchemaName = paramSchema.$ref.split('/').pop() || ''
     const currentSchema = schemas[paramSchemaName]
 
     for (const [name, schema] of Object.entries(
@@ -227,7 +227,7 @@ export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
             : bodySchema,
         },
       },
-      description: ($ref || '').split('/').slice(-1)[0],
+      description: ($ref || '').split('/').pop(),
       required: isRequired(bodyMeta, route),
     }
   } else if (bodyParamsSchema) {
