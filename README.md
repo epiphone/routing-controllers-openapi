@@ -247,7 +247,7 @@ Note that when using `@ResponseSchema` together with `@JSONSchema`, the outer de
           '$ref': '#/components/schemas/Pet'
         }
       }
-    ]
+    }
   }
 }})
 @ResponseSchema(SomeResponseObject)
