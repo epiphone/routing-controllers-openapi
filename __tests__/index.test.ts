@@ -117,6 +117,12 @@ describe('index', () => {
         type: 'put',
       },
       {
+        method: 'putUserAvatar',
+        route: '/:userId/avatar',
+        target: UsersController,
+        type: 'put',
+      },
+      {
         method: 'getUserPost',
         route: '/:postId',
         target: UserPostsController,
@@ -127,6 +133,12 @@ describe('index', () => {
         route: '/:postId',
         target: UserPostsController,
         type: 'patch',
+      },
+      {
+        method: 'createUserPostImages',
+        route: '/:postId/images',
+        target: UserPostsController,
+        type: 'post',
       },
       {
         method: 'getDefaultPath',
@@ -294,6 +306,64 @@ describe('getRequestBody', () => {
         },
       },
       description: 'CreatePostBody',
+      required: true,
+    })
+  })
+
+  it('parse a single `UploadedFile` metadata into a single `object` schema under content-type `multipart/form-data`', () => {
+    const route = routes.find((d) => d.action.method === 'putUserAvatar')!
+    expect(route).toBeDefined()
+    expect(getRequestBody(route)).toEqual({
+      content: {
+        'multipart/form-data': {
+          schema: {
+            properties: {
+              image: {
+                format: 'binary',
+                type: 'string',
+              },
+            },
+            required: [],
+            type: 'object',
+          },
+        },
+      },
+    })
+  })
+  it('wrap `body` and others metadata containing `UploadedFiles` items under a single `allOf` schema under content-type `multipart/form-data`', () => {
+    const route = routes.find(
+      (d) => d.action.method === 'createUserPostImages'
+    )!
+    expect(route).toBeDefined()
+    expect(getRequestBody(route)).toEqual({
+      content: {
+        'multipart/form-data': {
+          schema: {
+            allOf: [
+              {
+                $ref: '#/components/schemas/CreateUserPostImagesBody',
+              },
+              {
+                properties: {
+                  images: {
+                    items: {
+                      format: 'binary',
+                      type: 'string',
+                    },
+                    type: 'array',
+                  },
+                  token: {
+                    type: 'string',
+                  },
+                },
+                required: [],
+                type: 'object',
+              },
+            ],
+          },
+        },
+      },
+      description: 'CreateUserPostImagesBody',
       required: true,
     })
   })
