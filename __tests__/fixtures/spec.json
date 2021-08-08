@@ -10,7 +10,9 @@
             "type": "array"
           }
         },
-        "required": ["users"],
+        "required": [
+          "users"
+        ],
         "type": "object"
       },
       "CreatePostBody": {
@@ -22,7 +24,9 @@
             "type": "array"
           }
         },
-        "required": ["content"],
+        "required": [
+          "content"
+        ],
         "type": "object"
       },
       "CreateUserBody": {
@@ -32,7 +36,9 @@
             "type": "string"
           }
         },
-        "required": ["email"],
+        "required": [
+          "email"
+        ],
         "type": "object"
       },
       "ListUsersQueryParams": {
@@ -48,7 +54,9 @@
             "type": "array"
           }
         },
-        "required": ["types"],
+        "required": [
+          "types"
+        ],
         "type": "object"
       },
       "CreateUserPostImagesBody": {
@@ -57,7 +65,9 @@
             "type": "string"
           }
         },
-        "required": ["description"],
+        "required": [
+          "description"
+        ],
         "type": "object"
       },
       "ListUsersHeaderParams": {
@@ -69,7 +79,9 @@
             "type": "string"
           }
         },
-        "required": ["Authorization"],
+        "required": [
+          "Authorization"
+        ],
         "type": "object"
       },
       "ModelDto": {
@@ -85,7 +97,10 @@
             "type": "string"
           }
         },
-        "required": ["email", "username"],
+        "required": [
+          "email",
+          "username"
+        ],
         "type": "object"
       },
       "UserQuery": {
@@ -94,7 +109,9 @@
             "type": "string"
           }
         },
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object"
       }
     },
@@ -133,7 +150,9 @@
           }
         ],
         "summary": "Get default path",
-        "tags": ["Root"]
+        "tags": [
+          "Root"
+        ]
       }
     },
     "/api/stringPath": {
@@ -150,7 +169,9 @@
         },
         "security": [],
         "summary": "Get string path",
-        "tags": ["Root"]
+        "tags": [
+          "Root"
+        ]
       }
     },
     "/api/users": {
@@ -174,7 +195,9 @@
                     "type": "string"
                   }
                 },
-                "required": ["token"],
+                "required": [
+                  "token"
+                ],
                 "type": "object"
               }
             }
@@ -188,7 +211,9 @@
             "description": "Successful response"
           }
         },
-        "tags": ["Users"]
+        "tags": [
+          "Users"
+        ]
       }
     },
     "/api/users/": {
@@ -241,7 +266,9 @@
           }
         },
         "summary": "List users",
-        "tags": ["Users"]
+        "tags": [
+          "Users"
+        ]
       },
       "post": {
         "operationId": "UsersController.createUser",
@@ -269,7 +296,9 @@
           }
         },
         "summary": "Create user",
-        "tags": ["Users"]
+        "tags": [
+          "Users"
+        ]
       },
       "put": {
         "operationId": "UsersController.createManyUsers",
@@ -296,10 +325,11 @@
           }
         },
         "summary": "Create many users",
-        "tags": ["Users"]
+        "tags": [
+          "Users"
+        ]
       }
     },
-
     "/api/users/nested": {
       "post": {
         "operationId": "UsersController.createNestedUsers",
@@ -323,7 +353,9 @@
           }
         },
         "summary": "Create nested users",
-        "tags": ["Users"]
+        "tags": [
+          "Users"
+        ]
       }
     },
     "/api/users/withType": {
@@ -352,7 +384,9 @@
           }
         },
         "summary": "Create user with type",
-        "tags": ["Users"]
+        "tags": [
+          "Users"
+        ]
       }
     },
     "/api/users/{from}-{to}": {
@@ -404,10 +438,11 @@
           }
         },
         "summary": "List users in range",
-        "tags": ["Users"]
+        "tags": [
+          "Users"
+        ]
       }
     },
-
     "/api/users/{userId}/posts/{postId}/images": {
       "post": {
         "operationId": "UserPostsController.createUserPostImages",
@@ -460,7 +495,6 @@
           "description": "CreateUserPostImagesBody",
           "required": true
         },
-
         "responses": {
           "200": {
             "content": {
@@ -470,10 +504,11 @@
           }
         },
         "summary": "Create user post images",
-        "tags": ["User Posts"]
+        "tags": [
+          "User Posts"
+        ]
       }
     },
-
     "/api/users/{version}": {
       "delete": {
         "operationId": "UsersController.deleteUsersByVersion",
@@ -497,7 +532,9 @@
           }
         },
         "summary": "Delete users by version",
-        "tags": ["Users"]
+        "tags": [
+          "Users"
+        ]
       }
     },
     "/api/users/{userId}": {
@@ -538,7 +575,9 @@
           }
         },
         "summary": "Get user",
-        "tags": ["Users"]
+        "tags": [
+          "Users"
+        ]
       }
     },
     "/api/users/{userId}/avatar": {
@@ -579,7 +618,9 @@
           }
         },
         "summary": "Put user avatar",
-        "tags": ["Users"]
+        "tags": [
+          "Users"
+        ]
       }
     },
     "/api/users/{userId}/posts": {
@@ -628,7 +669,9 @@
           }
         },
         "summary": "Create user post",
-        "tags": ["Users"]
+        "tags": [
+          "Users"
+        ]
       }
     },
     "/api/users/{userId}/posts/{postId}": {
@@ -661,7 +704,9 @@
           }
         },
         "summary": "Get user post",
-        "tags": ["User Posts"]
+        "tags": [
+          "User Posts"
+        ]
       },
       "patch": {
         "operationId": "UserPostsController.patchUserPost",
@@ -707,7 +752,9 @@
           }
         },
         "summary": "Patch user post",
-        "tags": ["User Posts"]
+        "tags": [
+          "User Posts"
+        ]
       }
     }
   }
