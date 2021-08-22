@@ -215,16 +215,14 @@ function getNamedParamSchema(
  */
 export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
   const bodyParamMetas = route.params.filter((d) => d.type === 'body-param')
-
   const uploadFileMetas = route.params.filter((d) =>
     ['file', 'files'].includes(d.type)
   )
-
-  const namedParams = [...bodyParamMetas, ...uploadFileMetas]
+  const namedParamMetas = [...bodyParamMetas, ...uploadFileMetas]
 
   const namedParamsSchema: oa.SchemaObject | null =
-    namedParams.length > 0
-      ? namedParams.reduce(
+    namedParamMetas.length > 0
+      ? namedParamMetas.reduce(
           (acc: oa.SchemaObject, d) => ({
             ...acc,
             properties: {
