@@ -19,7 +19,7 @@
     "format": "prettier --write {src,__tests__}/**/*.ts",
     "test:format": "prettier --check {src,__tests__}/**/*.ts",
     "test:lint": "tslint --project . src/**/*.ts",
-    "prepare": "install-self-peers --npm -- --no-save --ignore-scripts && npm run build",
+    "prepare": "npm run build",
     "send-coverage": "codecov -f coverage/*.json",
     "test": "jest --coverage",
     "test:watch": "jest --watch"
@@ -29,8 +29,8 @@
     "singleQuote": true
   },
   "dependencies": {
-    "lodash.merge": "^4.6.2",
     "lodash.capitalize": "^4.2.1",
+    "lodash.merge": "^4.6.2",
     "lodash.startcase": "^4.4.0",
     "openapi3-ts": "^2.0.1",
     "path-to-regexp": "^2.2.1",
@@ -38,10 +38,9 @@
     "tslib": "^2.1.0"
   },
   "devDependencies": {
-    "@team-griffin/install-self-peers": "^1.1.1",
     "@types/jest": "^26.0.20",
-    "@types/lodash.merge": "^4.6.6",
     "@types/lodash.capitalize": "^4.2.6",
+    "@types/lodash.merge": "^4.6.6",
     "@types/lodash.startcase": "^4.4.6",
     "@types/node": "^13.13.46",
     "@types/prettier": "^2.2.2",
@@ -49,7 +48,7 @@
     "@types/rimraf": "^3.0.0",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
-    "class-validator-jsonschema": "^3.0.0",
+    "class-validator-jsonschema": "^3.1.1",
     "codecov": "^3.8.1",
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
