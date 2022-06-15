@@ -1,6 +1,6 @@
 {
-  "name": "routing-controllers-openapi",
-  "version": "3.1.0",
+  "name": "@streamelements/routing-controllers-openapi",
+  "version": "3.2.0",
   "description": "Runtime OpenAPI v3 spec generation for routing-controllers",
   "keywords": [
     "routing-controllers",
