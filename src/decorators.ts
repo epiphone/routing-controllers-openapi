@@ -158,3 +158,12 @@ export function ResponseSchema(
 
   return OpenAPI(setResponseSchema)
 }
+
+// Set the field as nullable
+export function OpenAPINullable(target: any, methodKey: string, parameterIndex: number) {
+  let md = Reflect.getMetadata('nullable', target,'method');
+  md = md || {};
+  md[methodKey] = md[methodKey] || {};
+  md[methodKey][parameterIndex] = { nullable: true };
+  Reflect.defineMetadata('nullable', md, target, 'method');
+}
