@@ -339,27 +339,39 @@ function getParamSchema(
     object,
     method
   )[index]
+
+  const nullableMetadata = Reflect.getMetadata(
+    'nullable',
+    object,
+    'method'
+  )
+
+  let nullable;
+  if (nullableMetadata && nullableMetadata[method] && nullableMetadata[method][index.toString()]) {
+    nullable = true;
+  }
+
   if (typeof type === 'function' && type.name === 'Array') {
     const items = explicitType
       ? { $ref: '#/components/schemas/' + explicitType.name }
       : { type: 'object' as const }
-    return { items, type: 'array' }
+    return { items, type: 'array', nullable }
   }
   if (explicitType) {
-    return { $ref: '#/components/schemas/' + explicitType.name }
+    return { $ref: '#/components/schemas/' + explicitType.name, nullable: object?.nullable }
   }
   if (typeof type === 'function') {
     if (
       type.prototype === String.prototype ||
       type.prototype === Symbol.prototype
     ) {
-      return { type: 'string' }
+      return { type: 'string', nullable }
     } else if (type.prototype === Number.prototype) {
-      return { type: 'number' }
+      return { type: 'number', nullable }
     } else if (type.prototype === Boolean.prototype) {
-      return { type: 'boolean' }
+      return { type: 'boolean', nullable }
     } else if (type.name !== 'Object') {
-      return { $ref: '#/components/schemas/' + type.name }
+      return { $ref: '#/components/schemas/' + type.name, nullable }
     }
   }
 
