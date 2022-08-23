@@ -38,7 +38,7 @@ export function getOperation(
     operationId: getOperationId(route),
     parameters: [
       ...getHeaderParams(route),
-      ...getPathParams(route),
+      ...getPathParams(route, schemas),
       ...getQueryParams(route, schemas),
     ],
     requestBody: getRequestBody(route) || undefined,
@@ -119,9 +119,22 @@ export function getHeaderParams(route: IRoute): oa.ParameterObject[] {
  * Path parameters are first parsed from the path string itself, and then
  * supplemented with possible @Param() decorator values.
  */
-export function getPathParams(route: IRoute): oa.ParameterObject[] {
+export function getPathParams(
+  route: IRoute,
+  schemas: { [p: string]: oa.SchemaObject },
+): oa.ParameterObject[] {
   const path = getFullExpressPath(route)
   const tokens = pathToRegexp.parse(path)
+
+  const paramsMeta = route.params.find((p) => p.type === 'params')
+  let paramsSchema: oa.SchemaObject
+
+  if (paramsMeta) {
+    const paramSchema = getParamSchema(paramsMeta) as oa.ReferenceObject
+    const paramSchemaName = paramSchema.$ref.split('/').pop() || ''
+
+    paramsSchema = schemas[paramSchemaName]
+  }
 
   return tokens
     .filter((token) => token && typeof token === 'object') // Omit non-parameter plain string tokens
@@ -131,7 +144,7 @@ export function getPathParams(route: IRoute): oa.ParameterObject[] {
         in: 'path',
         name,
         required: !token.optional,
-        schema: { type: 'string' },
+        schema: paramsSchema?.properties?.[name] ?? { type: 'string' },
       }
 
       if (token.pattern && token.pattern !== '[^\\/]+?') {

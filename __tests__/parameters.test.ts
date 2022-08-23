@@ -5,6 +5,7 @@ import {
   HeaderParams,
   JsonController,
   Param,
+  Params,
   QueryParam,
   QueryParams,
 } from 'routing-controllers'
@@ -22,7 +23,7 @@ import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator'
 const { defaultMetadataStorage } = require('class-transformer/cjs/storage')
 
 describe('parameters', () => {
-  let route: IRoute
+  let routes: IRoute[]
   let schemas: { [p: string]: SchemaObject }
 
   beforeAll(() => {
@@ -38,6 +39,17 @@ describe('parameters', () => {
 
       @IsString({ each: true })
       types: string[]
+    }
+
+    class ListPostsPathParams {
+      @IsString()
+      string: string
+
+      @IsNumber()
+      number: number
+
+      @IsBoolean()
+      boolean: boolean
     }
 
     @JsonController('/users')
@@ -57,9 +69,16 @@ describe('parameters', () => {
       ) {
         return
       }
+
+      @Get('/:string/:number/:boolean')
+      getPosts(
+        @Params() _params: ListPostsPathParams,
+      ) {
+        return
+      }
     }
 
-    route = parseRoutes(getMetadataArgsStorage())[0]
+    routes = parseRoutes(getMetadataArgsStorage())
     schemas = validationMetadatasToSchemas({
       classTransformerMetadataStorage: defaultMetadataStorage,
       refPointerPrefix: '#/components/schemas/',
@@ -67,7 +86,7 @@ describe('parameters', () => {
   })
 
   it('parses path parameter from path strings', () => {
-    expect(getPathParams({ ...route, params: [] })).toEqual([
+    expect(getPathParams({ ...routes[0], params: [] }, schemas)).toEqual([
       {
         in: 'path',
         name: 'string',
@@ -108,7 +127,7 @@ describe('parameters', () => {
   })
 
   it('supplements path parameter with @Param decorator', () => {
-    expect(getPathParams(route)).toEqual([
+    expect(getPathParams(routes[0], schemas)).toEqual([
       {
         in: 'path',
         name: 'string',
@@ -148,12 +167,35 @@ describe('parameters', () => {
     ])
   })
 
+  it('supplements path parameters with schemas from the @Params decorator', () => {
+    expect(getPathParams(routes[1], schemas)).toEqual([
+      {
+        in: 'path',
+        name: 'string',
+        required: true,
+        schema: { type: 'string' },
+      },
+      {
+        in: 'path',
+        name: 'number',
+        required: true,
+        schema: { type: 'number' },
+      },
+      {
+        in: 'path',
+        name: 'boolean',
+        required: true,
+        schema: { type: 'boolean' },
+      },
+    ])
+  })
+
   it('ignores @Param if corresponding name is not found in path string', () => {
-    expect(getPathParams(route).filter((r) => r.name === 'invalid')).toEqual([])
+    expect(getPathParams(routes[0], schemas).filter((r) => r.name === 'invalid')).toEqual([])
   })
 
   it('parses query param from @QueryParam decorator', () => {
-    expect(getQueryParams(route, schemas)[0]).toEqual({
+    expect(getQueryParams(routes[0], schemas)[0]).toEqual({
       in: 'query',
       name: 'limit',
       required: false,
@@ -162,7 +204,7 @@ describe('parameters', () => {
   })
 
   it('parses query param ref from @QueryParams decorator', () => {
-    expect(getQueryParams(route, schemas)).toEqual([
+    expect(getQueryParams(routes[0], schemas)).toEqual([
       // limit comes from @QueryParam
       {
         in: 'query',
@@ -199,7 +241,7 @@ describe('parameters', () => {
   })
 
   it('parses header param from @HeaderParam decorator', () => {
-    expect(getHeaderParams(route)[0]).toEqual({
+    expect(getHeaderParams(routes[0])[0]).toEqual({
       in: 'header',
       name: 'Authorization',
       required: true,
@@ -208,7 +250,7 @@ describe('parameters', () => {
   })
 
   it('parses header param ref from @HeaderParams decorator', () => {
-    expect(getHeaderParams(route)[1]).toEqual({
+    expect(getHeaderParams(routes[0])[1]).toEqual({
       in: 'header',
       name: 'ListUsersHeaderParams',
       required: false,
