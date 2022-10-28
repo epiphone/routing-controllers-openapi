@@ -73,11 +73,13 @@ export function getPaths(
   routes: IRoute[],
   schemas: { [p: string]: oa.SchemaObject }
 ): oa.PathObject {
-  const routePaths = routes.map((route) => ({
-    [getFullPath(route)]: {
-      [route.action.type]: getOperation(route, schemas),
-    },
-  }))
+  const routePaths = routes
+    .filter(route => !!route.controller)
+    .map((route) => ({
+      [getFullPath(route)]: {
+        [route.action.type]: getOperation(route, schemas),
+      },
+    }))
 
   // @ts-ignore: array spread
   return _merge(...routePaths)
@@ -172,9 +174,10 @@ export function getQueryParams(
 
   const queriesMeta = route.params.find((p) => p.type === 'queries')
   if (queriesMeta) {
-    const paramSchema = getParamSchema(queriesMeta) as oa.ReferenceObject
+    const { $ref: paramSchemaRef = '' } = getParamSchema(queriesMeta) as oa.ReferenceObject
+
     // the last segment after '/'
-    const paramSchemaName = paramSchema.$ref.split('/').pop() || ''
+    const paramSchemaName = paramSchemaRef.split('/').pop() || ''
     const currentSchema = schemas[paramSchemaName]
 
     for (const [name, schema] of Object.entries(
