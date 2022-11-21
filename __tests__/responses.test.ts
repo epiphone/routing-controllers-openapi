@@ -6,7 +6,7 @@ import {
   getMetadataArgsStorage,
   HttpCode,
   JsonController,
-} from 'routing-controllers'
+} from 'routing-controllers-extended'
 
 import { getResponses, parseRoutes } from '../src'
 

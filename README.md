@@ -1,18 +1,16 @@
-# routing-controllers-openapi
+# routing-controllers-extended-openapi
 
-[![codecov](https://codecov.io/gh/epiphone/routing-controllers-openapi/branch/master/graph/badge.svg)](https://codecov.io/gh/epiphone/routing-controllers-openapi) [![npm version](https://badge.fury.io/js/routing-controllers-openapi.svg)](https://badge.fury.io/js/routing-controllers-openapi)
-
-Runtime OpenAPI v3 schema generation for [routing-controllers](https://github.com/typestack/routing-controllers).
+Runtime OpenAPI v3 schema generation for [routing-controllers-extended](https://github.com/spicemc/routing-controllers-extended-openapi).
 
 ## Installation
 
-`npm install --save routing-controllers-openapi`
+`npm install --save routing-controllers-extended-openapi`
 
 ## Usage
 
 ```typescript
-import { getMetadataArgsStorage } from 'routing-controllers'
-import { routingControllersToSpec } from 'routing-controllers-openapi'
+import { getMetadataArgsStorage } from 'routing-controllers-extended-extended'
+import { routingControllersToSpec } from 'routing-controllers-extended-openapi'
 
 // Define your controllers as usual:
 
@@ -147,7 +145,7 @@ const spec = routingControllersToSpec(storage, routingControllerOptions, {
 Use the `@OpenAPI` decorator to supply your actions with additional keywords:
 
 ```typescript
-import { OpenAPI } from 'routing-controllers-openapi'
+import { OpenAPI } from 'routing-controllers-extended-openapi'
 
 @JsonController('/users')
 export class UsersController {
@@ -208,7 +206,7 @@ export class UsersController {
 Extracting response types automatically in runtime isn't currently allowed by Typescript's reflection system. Specifically the problem is that `routing-controllers-openapi` can't unwrap generic types like Promise<MyModel> or Array<MyModel>: see e.g. [here](https://github.com/Microsoft/TypeScript/issues/10576) for discussion. As a workaround you can use the `@ResponseSchema` decorator to supply the response body schema:
 
 ```typescript
-import { ResponseSchema } from 'routing-controllers-openapi'
+import { ResponseSchema } from 'routing-controllers-extended-openapi'
 
 @JsonController('/users')
 export class UsersController {

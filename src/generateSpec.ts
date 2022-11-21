@@ -5,7 +5,7 @@ import _startCase from 'lodash.startcase'
 import * as oa from 'openapi3-ts'
 import * as pathToRegexp from 'path-to-regexp'
 import 'reflect-metadata'
-import { ParamMetadataArgs } from 'routing-controllers/types/metadata/args/ParamMetadataArgs'
+import { ParamMetadataArgs } from 'routing-controllers-extended/types/metadata/args/ParamMetadataArgs'
 
 import { applyOpenAPIDecorator } from './decorators'
 import { IRoute } from './index'
@@ -130,7 +130,7 @@ export function getPathParams(route: IRoute): oa.ParameterObject[] {
       const param: oa.ParameterObject = {
         in: 'path',
         name,
-        required: !token.optional,
+        required: !(token.modifier == '?'),
         schema: { type: 'string' },
       }
 

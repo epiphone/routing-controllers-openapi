@@ -18,7 +18,7 @@ import {
   Put,
   QueryParam,
   QueryParams,
-} from 'routing-controllers'
+} from 'routing-controllers-extended'
 
 import { OpenAPI, ResponseSchema } from '../../src'
 import { ModelDto } from './models'

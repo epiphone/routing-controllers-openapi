@@ -4,7 +4,7 @@ import {
   JsonController,
   Post,
   QueryParam,
-} from 'routing-controllers'
+} from 'routing-controllers-extended'
 
 import {
   getPathParams,

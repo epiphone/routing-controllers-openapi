@@ -9,7 +9,7 @@ import 'reflect-metadata'
 
 import { getContentType, getStatusCode, IRoute } from './index'
 
-const OPEN_API_KEY = Symbol('routing-controllers-openapi:OpenAPI')
+const OPEN_API_KEY = Symbol('routing-controllers-extended-openapi:OpenAPI')
 
 export type OpenAPIParam =
   | Partial<OperationObject>

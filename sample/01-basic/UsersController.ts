@@ -15,8 +15,8 @@ import {
   Post,
   Put,
   QueryParams,
-} from 'routing-controllers'
-import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi'
+} from 'routing-controllers-extended'
+import { OpenAPI, ResponseSchema } from 'routing-controllers-extended-openapi'
 
 class Child {
   @IsString()
