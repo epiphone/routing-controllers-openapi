@@ -4,8 +4,8 @@ import 'reflect-metadata'
 import {
   createExpressServer,
   getMetadataArgsStorage,
-} from 'routing-controllers'
-import { routingControllersToSpec } from 'routing-controllers-openapi'
+} from 'routing-controllers-extended'
+import { routingControllersToSpec } from 'routing-controllers-extended-openapi'
 import * as swaggerUiExpress from 'swagger-ui-express'
 import { UsersController } from './UsersController'
 

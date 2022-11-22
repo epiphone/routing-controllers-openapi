@@ -6,7 +6,7 @@ import {
   HttpCode,
   JsonController,
   Param,
-} from 'routing-controllers'
+} from 'routing-controllers-extended'
 
 import {
   getOperation,

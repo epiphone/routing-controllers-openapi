@@ -2,7 +2,7 @@
 const { defaultMetadataStorage } = require('class-transformer/cjs/storage')
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema'
 import _merge from 'lodash.merge'
-import { getMetadataArgsStorage } from 'routing-controllers'
+import { getMetadataArgsStorage } from 'routing-controllers-extended'
 
 import {
   expressToOpenAPIPath,
@@ -27,7 +27,7 @@ const options = {
 const routes = parseRoutes(storage, options)
 
 describe('index', () => {
-  it('generates an OpenAPI spec from routing-controllers metadata', () => {
+  it('generates an OpenAPI spec from routing-controllers-extended metadata', () => {
     // Include component schemas parsed with class-validator-jsonschema:
     const schemas = validationMetadatasToSchemas({
       classTransformerMetadataStorage: defaultMetadataStorage,

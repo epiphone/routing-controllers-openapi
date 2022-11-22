@@ -12,14 +12,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.18.3",
-    "class-transformer": "0.4.0",
-    "class-validator": "0.13.1",
-    "class-validator-jsonschema": "^3.0.0",
+    "body-parser": "^1.20.1",
+    "class-transformer": "0.5.1",
+    "class-validator": "0.13.2",
+    "class-validator-jsonschema": "^3.1.1",
     "express": "^4.17.1",
     "reflect-metadata": "^0.1.13",
-    "routing-controllers": "0.9.0",
-    "routing-controllers-openapi": "3.0.0",
+    "routing-controllers-extended": "^1.0.4",
+    "routing-controllers-extended-openapi": "^1.0.0",
     "swagger-ui-express": "^4.1.4"
   },
   "devDependencies": {
@@ -27,6 +27,6 @@
     "@types/express-serve-static-core": "~4.17.7",
     "@types/swagger-ui-express": "^4.1.2",
     "nodemon": "^1.18.3",
-    "typescript": "^4.2.3"
+    "typescript": "^4.9.3"
   }
 }

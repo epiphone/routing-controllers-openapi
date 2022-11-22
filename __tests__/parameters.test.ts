@@ -7,7 +7,7 @@ import {
   Param,
   QueryParam,
   QueryParams,
-} from 'routing-controllers'
+} from 'routing-controllers-extended'
 
 import {
   getHeaderParams,
@@ -72,7 +72,7 @@ describe('parameters', () => {
         in: 'path',
         name: 'string',
         required: true,
-        schema: { type: 'string' },
+        schema: { pattern: '[^\\/#\\?]+?', type: 'string' },
       },
       {
         in: 'path',
@@ -84,25 +84,25 @@ describe('parameters', () => {
         in: 'path',
         name: 'optional',
         required: false,
-        schema: { type: 'string' },
+        schema: { pattern: '[^\\/#\\?]+?', type: 'string' },
       },
       {
         in: 'path',
         name: 'number',
         required: true,
-        schema: { type: 'string' },
+        schema: { pattern: '[^\\/#\\?]+?', type: 'string' },
       },
       {
         in: 'path',
         name: 'boolean',
         required: true,
-        schema: { type: 'string' },
+        schema: { pattern: '[^\\/#\\?]+?', type: 'string' },
       },
       {
         in: 'path',
         name: 'any',
         required: true,
-        schema: { type: 'string' },
+        schema: { pattern: '[^\\/#\\?]+?', type: 'string' },
       },
     ])
   })
@@ -113,7 +113,7 @@ describe('parameters', () => {
         in: 'path',
         name: 'string',
         required: true,
-        schema: { type: 'string' },
+        schema: { pattern: '[^\\/#\\?]+?', type: 'string' },
       },
       {
         in: 'path',
@@ -125,19 +125,19 @@ describe('parameters', () => {
         in: 'path',
         name: 'optional',
         required: false,
-        schema: { type: 'string' },
+        schema: { pattern: '[^\\/#\\?]+?', type: 'string' },
       },
       {
         in: 'path',
         name: 'number',
         required: true,
-        schema: { type: 'number' },
+        schema: { pattern: '[^\\/#\\?]+?', type: 'number' },
       },
       {
         in: 'path',
         name: 'boolean',
         required: true,
-        schema: { type: 'boolean' },
+        schema: { pattern: '[^\\/#\\?]+?', type: 'boolean' },
       },
       {
         in: 'path',

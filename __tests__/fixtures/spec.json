@@ -387,6 +387,7 @@
             "name": "from",
             "required": true,
             "schema": {
+              "pattern": "[^\\/#\\?]+?",
               "type": "string"
             }
           },
@@ -395,6 +396,7 @@
             "name": "to",
             "required": true,
             "schema": {
+              "pattern": "[^\\/#\\?]+?",
               "type": "number"
             }
           },
@@ -485,6 +487,7 @@
             "name": "userId",
             "required": false,
             "schema": {
+              "pattern": "[^\\/#\\?]+?",
               "type": "number"
             }
           }
@@ -512,6 +515,7 @@
             "name": "userId",
             "required": true,
             "schema": {
+              "pattern": "[^\\/#\\?]+?",
               "type": "string"
             }
           }
@@ -563,6 +567,7 @@
             "name": "userId",
             "required": true,
             "schema": {
+              "pattern": "[^\\/#\\?]+?",
               "type": "number"
             }
           },
@@ -571,6 +576,7 @@
             "name": "postId",
             "required": true,
             "schema": {
+              "pattern": "[^\\/#\\?]+?",
               "type": "string"
             }
           }
@@ -596,6 +602,7 @@
             "name": "userId",
             "required": true,
             "schema": {
+              "pattern": "[^\\/#\\?]+?",
               "type": "string"
             }
           },
@@ -604,6 +611,7 @@
             "name": "postId",
             "required": true,
             "schema": {
+              "pattern": "[^\\/#\\?]+?",
               "type": "string"
             }
           }
