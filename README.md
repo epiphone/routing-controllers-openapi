@@ -302,12 +302,11 @@ will generate
 
 ## Future work
 
-- Support for routing-controller's [authorization features](https://github.com/typestack/routing-controllers#using-authorization-features)
-
 Feel free to submit a PR!
 
 ## Related projects
 
+- Based on [routing-controllers-openapi](https://github.com/epiphone/routing-controllers-openapi)
 - Inspired by [tsoa](https://github.com/lukeautry/tsoa) and [trafficlight](https://github.com/swimlane/trafficlight)
 - Include your Mongoose models in the spec with [mongoose-schema-jsonschema](https://github.com/DScheglov/mongoose-schema-jsonschema)
 - Generate JSON schema from your Typescript sources with [typescript-json-schema](https://github.com/YousefED/typescript-json-schema)
