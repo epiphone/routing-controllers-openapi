@@ -1,0 +1,35 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  checks:
+    name: Linters
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - run: npm ci --ignore-scripts
+      - run: npm run test:format
+      - run: npm run test:lint
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['16.x', '18.x']
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setting up Node.js (v${{ matrix.node-version }}.x)
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci --ignore-scripts
+      - run: npm run test:ci
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - run: npm ci --ignore-scripts
+      - run: npm run build

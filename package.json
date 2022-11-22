@@ -21,7 +21,8 @@
     "prepare": "npm run build",
     "send-coverage": "codecov -f coverage/*.json",
     "test": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:ci": "jest --runInBand --no-cache --coverage --verbose"
   },
   "prettier": {
     "semi": false,
