@@ -1,5 +1,8 @@
 # routing-controllers-extended-openapi
 
+!! This will not be updated anymore since the original routing-controllers are maintained again.
+See also: https://github.com/epiphone/routing-controllers-openapi/pull/127
+
 Runtime OpenAPI v3 schema generation for [routing-controllers-extended](https://github.com/spicemc/routing-controllers-extended-openapi).
 
 ## Installation
