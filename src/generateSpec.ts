@@ -130,7 +130,7 @@ export function getPathParams(route: IRoute): oa.ParameterObject[] {
       const param: oa.ParameterObject = {
         in: 'path',
         name,
-        required: !token.optional,
+        required: !(token.modifier == '?'),
         schema: { type: 'string' },
       }
 
