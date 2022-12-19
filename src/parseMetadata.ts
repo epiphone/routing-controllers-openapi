@@ -29,7 +29,7 @@ export function parseRoutes(
   return storage.actions.map((action) => ({
     action,
     controller: storage.controllers.find(
-      (c) => c.target === action.target
+      (c) => c.target === action.target || c.target.prototype instanceof action.target
     ) as ControllerMetadataArgs,
     options,
     params: storage
