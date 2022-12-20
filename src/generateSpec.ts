@@ -170,24 +170,25 @@ export function getQueryParams(
       }
     })
 
-  const queriesMeta = route.params.find((p) => p.type === 'queries')
-  if (queriesMeta) {
-    const paramSchema = getParamSchema(queriesMeta) as oa.ReferenceObject
-    // the last segment after '/'
-    const paramSchemaName = paramSchema.$ref.split('/').pop() || ''
-    const currentSchema = schemas[paramSchemaName]
+  route.params
+    .filter((p) => p.type === 'queries')
+    .forEach((queriesMeta) => {
+      const paramSchema = getParamSchema(queriesMeta) as oa.ReferenceObject
+      // the last segment after '/'
+      const paramSchemaName = paramSchema.$ref.split('/').pop() || ''
+      const currentSchema = schemas[paramSchemaName]
 
-    for (const [name, schema] of Object.entries(
-      currentSchema?.properties || {}
-    )) {
-      queries.push({
-        in: 'query',
-        name,
-        required: currentSchema.required?.includes(name),
-        schema,
-      })
-    }
-  }
+      for (const [name, schema] of Object.entries(
+        currentSchema?.properties || {}
+      )) {
+        queries.push({
+          in: 'query',
+          name,
+          required: currentSchema.required?.includes(name) || false,
+          schema,
+        })
+      }
+    })
   return queries
 }
 
