@@ -39,6 +39,15 @@ describe('parameters', () => {
       @IsString({ each: true })
       types: string[]
     }
+    class AdditionalQueryParams {
+      @IsBoolean()
+      @IsOptional()
+      includeRelationships: boolean
+
+      @IsBoolean()
+      @IsOptional()
+      includePets: boolean
+    }
 
     @JsonController('/users')
     // @ts-ignore: not referenced
@@ -53,6 +62,7 @@ describe('parameters', () => {
         @HeaderParam('Authorization', { required: true })
         _authorization: string,
         @QueryParams() _queryRef?: ListUsersQueryParams,
+        @QueryParams() _queryRef2?: AdditionalQueryParams,
         @HeaderParams() _headerParams?: ListUsersHeaderParams
       ) {
         return
@@ -161,7 +171,7 @@ describe('parameters', () => {
     })
   })
 
-  it('parses query param ref from @QueryParams decorator', () => {
+  it('parses query param refs from @QueryParams decorator', () => {
     expect(getQueryParams(route, schemas)).toEqual([
       // limit comes from @QueryParam
       {
@@ -193,6 +203,22 @@ describe('parameters', () => {
             type: 'string',
           },
           type: 'array',
+        },
+      },
+      {
+        in: 'query',
+        name: 'includeRelationships',
+        required: false,
+        schema: {
+          type: 'boolean',
+        },
+      },
+      {
+        in: 'query',
+        name: 'includePets',
+        required: false,
+        schema: {
+          type: 'boolean',
         },
       },
     ])
