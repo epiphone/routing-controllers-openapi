@@ -54,7 +54,7 @@ export function getOperation(
     .reduce((acc, [key, value]) => {
       acc[key] = value
       return acc
-    }, ({} as unknown) as oa.OperationObject)
+    }, {} as unknown as oa.OperationObject)
 
   return applyOpenAPIDecorator(cleanedOperation, route)
 }
@@ -130,7 +130,7 @@ export function getPathParams(route: IRoute): oa.ParameterObject[] {
       const param: oa.ParameterObject = {
         in: 'path',
         name,
-        required: !token.optional,
+        required: token.modifier !== '?',
         schema: { type: 'string' },
       }
 
