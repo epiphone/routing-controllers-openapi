@@ -8,8 +8,8 @@
     "openapi",
     "swagger"
   ],
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "index.js",
+  "types": "index.d.ts",
   "repository": "git@github.com:spicemc/routing-controllers-extended-openapi",
   "license": "MIT",
   "scripts": {
