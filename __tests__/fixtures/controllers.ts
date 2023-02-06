@@ -18,6 +18,8 @@ import {
   Put,
   QueryParam,
   QueryParams,
+  UploadedFile,
+  UploadedFiles,
 } from 'routing-controllers'
 
 import { OpenAPI, ResponseSchema } from '../../src'
@@ -37,6 +39,11 @@ export class CreateNestedBody {
 export class CreatePostBody {
   @IsString({ each: true })
   content: string[]
+}
+
+export class CreateUserPostImagesBody {
+  @IsString()
+  description: string
 }
 
 export class ListUsersQueryParams {
@@ -154,6 +161,11 @@ export class UsersController {
   ) {
     return
   }
+
+  @Put('/:userId/avatar')
+  putUserAvatar(@UploadedFile('image') _image: any) {
+    return
+  }
 }
 
 @Controller('/users/:userId/posts')
@@ -168,6 +180,15 @@ export class UserPostsController {
 
   @Patch('/:postId')
   patchUserPost(@BodyParam('token') _token: string) {
+    return
+  }
+
+  @Post('/:postId/images')
+  createUserPostImages(
+    @Body({ required: true }) _body: CreateUserPostImagesBody,
+    @BodyParam('token') _token: string,
+    @UploadedFiles('images') _images: any[]
+  ) {
     return
   }
 }

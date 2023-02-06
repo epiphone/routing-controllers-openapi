@@ -191,19 +191,43 @@ export function getQueryParams(
   return queries
 }
 
+function getNamedParamSchema(
+  param: ParamMetadataArgs
+): oa.SchemaObject | oa.ReferenceObject {
+  const { type } = param
+  if (type === 'file') {
+    return { type: 'string', format: 'binary' }
+  }
+  if (type === 'files') {
+    return {
+      type: 'array',
+      items: {
+        type: 'string',
+        format: 'binary',
+      },
+    }
+  }
+  return getParamSchema(param)
+}
+
 /**
  * Return OpenAPI requestBody of given route, if it has one.
  */
 export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
   const bodyParamMetas = route.params.filter((d) => d.type === 'body-param')
-  const bodyParamsSchema: oa.SchemaObject | null =
-    bodyParamMetas.length > 0
-      ? bodyParamMetas.reduce(
+  const uploadFileMetas = route.params.filter((d) =>
+    ['file', 'files'].includes(d.type)
+  )
+  const namedParamMetas = [...bodyParamMetas, ...uploadFileMetas]
+
+  const namedParamsSchema: oa.SchemaObject | null =
+    namedParamMetas.length > 0
+      ? namedParamMetas.reduce(
           (acc: oa.SchemaObject, d) => ({
             ...acc,
             properties: {
               ...acc.properties,
-              [d.name!]: getParamSchema(d),
+              [d.name!]: getNamedParamSchema(d),
             },
             required: isRequired(d, route)
               ? [...(acc.required || []), d.name!]
@@ -213,8 +237,10 @@ export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
         )
       : null
 
-  const bodyMeta = route.params.find((d) => d.type === 'body')
+  const contentType =
+    uploadFileMetas.length > 0 ? 'multipart/form-data' : 'application/json'
 
+  const bodyMeta = route.params.find((d) => d.type === 'body')
   if (bodyMeta) {
     const bodySchema = getParamSchema(bodyMeta)
     const { $ref } =
@@ -222,18 +248,18 @@ export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
 
     return {
       content: {
-        'application/json': {
-          schema: bodyParamsSchema
-            ? { allOf: [bodySchema, bodyParamsSchema] }
+        [contentType]: {
+          schema: namedParamsSchema
+            ? { allOf: [bodySchema, namedParamsSchema] }
             : bodySchema,
         },
       },
       description: ($ref || '').split('/').pop(),
       required: isRequired(bodyMeta, route),
     }
-  } else if (bodyParamsSchema) {
+  } else if (namedParamsSchema) {
     return {
-      content: { 'application/json': { schema: bodyParamsSchema } },
+      content: { [contentType]: { schema: namedParamsSchema } },
     }
   }
 }
