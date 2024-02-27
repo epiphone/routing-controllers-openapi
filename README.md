@@ -295,6 +295,7 @@ will generate
 - `@Get`, `@Post` and other action decorators
 - Parse path parameters straight from path strings and optionally supplement with `@Param` decorator
   - Regex and optional path parameters (e.g. `/users/:id(\d+)/:type?`) are also supported
+  - Note that express >=40's no wildcard asterisk (`*`) - use parameters instead (`(.*)` or `:splat*`)
 - `@QueryParam` and `@QueryParams`
 - `@HeaderParam` and `@HeaderParams`
 - `@Body` and `@BodyParam`
