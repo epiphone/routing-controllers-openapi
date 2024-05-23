@@ -346,6 +346,9 @@ function getParamSchema(
     return { items, type: 'array' }
   }
   if (explicitType) {
+    if (explicitType.name === 'integer') {
+      return { type: 'integer' }
+    }
     return { $ref: '#/components/schemas/' + explicitType.name }
   }
   if (typeof type === 'function') {
