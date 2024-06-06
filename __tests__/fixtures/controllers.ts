@@ -34,10 +34,12 @@ export class CreateNestedBody {
   users: CreateUserBody[]
 }
 
-export class CreatePostBody {
+class CreatePostBodyBase {
   @IsString({ each: true })
   content: string[]
 }
+
+export class CreatePostBody extends CreatePostBodyBase {}
 
 export class ListUsersQueryParams {
   @IsOptional()
@@ -130,7 +132,7 @@ export class UsersController {
 
   @Post('/:userId/posts')
   createUserPost(
-    @Body({ required: true }) _body: CreatePostBody,
+    @Body({ required: true, type: CreatePostBody }) _body: CreatePostBody,
     @BodyParam('token') _token: string
   ) {
     return

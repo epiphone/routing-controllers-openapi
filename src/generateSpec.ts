@@ -9,6 +9,9 @@ import { ParamMetadataArgs } from 'routing-controllers/types/metadata/args/Param
 
 import { applyOpenAPIDecorator } from './decorators'
 import { IRoute } from './index'
+import { targetConstructorToSchema } from 'class-validator-jsonschema'
+
+const { defaultMetadataStorage } = require('class-transformer/cjs/storage')
 
 /** Return full Express path of given route. */
 export function getFullExpressPath(route: IRoute): string {
@@ -37,11 +40,11 @@ export function getOperation(
   const operation: oa.OperationObject = {
     operationId: getOperationId(route),
     parameters: [
-      ...getHeaderParams(route),
-      ...getPathParams(route),
+      ...getHeaderParams(route, schemas),
+      ...getPathParams(route, schemas),
       ...getQueryParams(route, schemas),
     ],
-    requestBody: getRequestBody(route) || undefined,
+    requestBody: getRequestBody(route, schemas) || undefined,
     responses: getResponses(route),
     summary: getSummary(route),
     tags: getTags(route),
@@ -86,11 +89,14 @@ export function getPaths(
 /**
  * Return header parameters of given route.
  */
-export function getHeaderParams(route: IRoute): oa.ParameterObject[] {
+export function getHeaderParams(
+  route: IRoute,
+  schemas: { [p: string]: oa.SchemaObject }
+): oa.ParameterObject[] {
   const headers: oa.ParameterObject[] = route.params
     .filter((p) => p.type === 'header')
     .map((headerMeta) => {
-      const schema = getParamSchema(headerMeta) as oa.SchemaObject
+      const schema = getParamSchema(headerMeta, schemas) as oa.SchemaObject
       return {
         in: 'header' as oa.ParameterLocation,
         name: headerMeta.name || '',
@@ -101,7 +107,7 @@ export function getHeaderParams(route: IRoute): oa.ParameterObject[] {
 
   const headersMeta = route.params.find((p) => p.type === 'headers')
   if (headersMeta) {
-    const schema = getParamSchema(headersMeta) as oa.ReferenceObject
+    const schema = getParamSchema(headersMeta, schemas) as oa.ReferenceObject
     headers.push({
       in: 'header',
       name: schema.$ref.split('/').pop() || '',
@@ -119,7 +125,10 @@ export function getHeaderParams(route: IRoute): oa.ParameterObject[] {
  * Path parameters are first parsed from the path string itself, and then
  * supplemented with possible @Param() decorator values.
  */
-export function getPathParams(route: IRoute): oa.ParameterObject[] {
+export function getPathParams(
+  route: IRoute,
+  schemas: { [p: string]: oa.SchemaObject }
+): oa.ParameterObject[] {
   const path = getFullExpressPath(route)
   const tokens = pathToRegexp.parse(path)
 
@@ -142,7 +151,7 @@ export function getPathParams(route: IRoute): oa.ParameterObject[] {
         (p) => p.name === name && p.type === 'param'
       )
       if (meta) {
-        const metaSchema = getParamSchema(meta)
+        const metaSchema = getParamSchema(meta, schemas)
         param.schema =
           'type' in metaSchema ? { ...param.schema, ...metaSchema } : metaSchema
       }
@@ -161,7 +170,7 @@ export function getQueryParams(
   const queries: oa.ParameterObject[] = route.params
     .filter((p) => p.type === 'query')
     .map((queryMeta) => {
-      const schema = getParamSchema(queryMeta) as oa.SchemaObject
+      const schema = getParamSchema(queryMeta, schemas) as oa.SchemaObject
       return {
         in: 'query' as oa.ParameterLocation,
         name: queryMeta.name || '',
@@ -172,7 +181,10 @@ export function getQueryParams(
 
   const queriesMeta = route.params.find((p) => p.type === 'queries')
   if (queriesMeta) {
-    const paramSchema = getParamSchema(queriesMeta) as oa.ReferenceObject
+    const paramSchema = getParamSchema(
+      queriesMeta,
+      schemas
+    ) as oa.ReferenceObject
     // the last segment after '/'
     const paramSchemaName = paramSchema.$ref.split('/').pop() || ''
     const currentSchema = schemas[paramSchemaName]
@@ -194,7 +206,10 @@ export function getQueryParams(
 /**
  * Return OpenAPI requestBody of given route, if it has one.
  */
-export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
+export function getRequestBody(
+  route: IRoute,
+  schemas: { [p: string]: oa.SchemaObject }
+): oa.RequestBodyObject | void {
   const bodyParamMetas = route.params.filter((d) => d.type === 'body-param')
   const bodyParamsSchema: oa.SchemaObject | null =
     bodyParamMetas.length > 0
@@ -203,7 +218,7 @@ export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
             ...acc,
             properties: {
               ...acc.properties,
-              [d.name!]: getParamSchema(d),
+              [d.name!]: getParamSchema(d, schemas),
             },
             required: isRequired(d, route)
               ? [...(acc.required || []), d.name!]
@@ -216,7 +231,7 @@ export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
   const bodyMeta = route.params.find((d) => d.type === 'body')
 
   if (bodyMeta) {
-    const bodySchema = getParamSchema(bodyMeta)
+    const bodySchema = getParamSchema(bodyMeta, schemas)
     const { $ref } =
       'items' in bodySchema && bodySchema.items ? bodySchema.items : bodySchema
 
@@ -330,7 +345,8 @@ function isRequired(meta: { required?: boolean }, route: IRoute) {
  * reflection.
  */
 function getParamSchema(
-  param: ParamMetadataArgs
+  param: ParamMetadataArgs,
+  schemas: { [p: string]: oa.SchemaObject }
 ): oa.SchemaObject | oa.ReferenceObject {
   const { explicitType, index, object, method } = param
 
@@ -343,9 +359,21 @@ function getParamSchema(
     const items = explicitType
       ? { $ref: '#/components/schemas/' + explicitType.name }
       : { type: 'object' as const }
+    if (!(explicitType.name in schemas)) {
+      schemas[explicitType.name] = targetConstructorToSchema(explicitType, {
+        classTransformerMetadataStorage: defaultMetadataStorage,
+        refPointerPrefix: '#/components/schemas/',
+      }) as any
+    }
     return { items, type: 'array' }
   }
   if (explicitType) {
+    if (!(explicitType.name in schemas)) {
+      schemas[explicitType.name] = targetConstructorToSchema(explicitType, {
+        classTransformerMetadataStorage: defaultMetadataStorage,
+        refPointerPrefix: '#/components/schemas/',
+      }) as any
+    }
     return { $ref: '#/components/schemas/' + explicitType.name }
   }
   if (typeof type === 'function') {
@@ -359,6 +387,12 @@ function getParamSchema(
     } else if (type.prototype === Boolean.prototype) {
       return { type: 'boolean' }
     } else if (type.name !== 'Object') {
+      if (!(type.name in schemas)) {
+        schemas[type.name] = targetConstructorToSchema(type, {
+          classTransformerMetadataStorage: defaultMetadataStorage,
+          refPointerPrefix: '#/components/schemas/',
+        }) as any
+      }
       return { $ref: '#/components/schemas/' + type.name }
     }
   }
