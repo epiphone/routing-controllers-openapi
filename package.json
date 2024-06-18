@@ -29,6 +29,9 @@
     "singleQuote": true
   },
   "dependencies": {
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "class-validator-jsonschema": "^5.0.1",
     "lodash.capitalize": "^4.2.1",
     "lodash.merge": "^4.6.2",
     "lodash.startcase": "^4.4.0",
@@ -47,9 +50,6 @@
     "@types/reflect-metadata": "^0.1.0",
     "@types/rimraf": "^3.0.0",
     "@types/validator": "^13.7.10",
-    "class-transformer": "^0.5.1",
-    "class-validator": "^0.13.2",
-    "class-validator-jsonschema": "^3.1.1",
     "codecov": "^3.8.1",
     "jest": "^29.3.1",
     "prettier": "^2.8.0",
