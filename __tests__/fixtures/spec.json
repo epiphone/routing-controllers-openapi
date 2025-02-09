@@ -454,6 +454,7 @@
             "name": "userId",
             "required": true,
             "schema": {
+              "pattern": "[^\\/#\\?]+?",
               "type": "string"
             }
           },
@@ -462,6 +463,7 @@
             "name": "postId",
             "required": true,
             "schema": {
+              "pattern": "[^\\/#\\?]+?",
               "type": "string"
             }
           }
@@ -592,6 +594,7 @@
             "name": "userId",
             "required": true,
             "schema": {
+              "pattern": "[^\\/#\\?]+?",
               "type": "string"
             }
           }
