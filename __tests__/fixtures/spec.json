@@ -59,6 +59,17 @@
         ],
         "type": "object"
       },
+      "CreateUserPostImagesBody": {
+        "properties": {
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "description"
+        ],
+        "type": "object"
+      },
       "ListUsersHeaderParams": {
         "properties": {
           "Authorization": {
@@ -434,6 +445,72 @@
         ]
       }
     },
+    "/api/users/{userId}/posts/{postId}/images": {
+      "post": {
+        "operationId": "UserPostsController.createUserPostImages",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "postId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateUserPostImagesBody"
+                  },
+                  {
+                    "properties": {
+                      "images": {
+                        "items": {
+                          "format": "binary",
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "token": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [],
+                    "type": "object"
+                  }
+                ]
+              }
+            }
+          },
+          "description": "CreateUserPostImagesBody",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/html; charset=utf-8": {}
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Create user post images",
+        "tags": [
+          "User Posts"
+        ]
+      }
+    },
     "/api/users/{version}": {
       "delete": {
         "operationId": "UsersController.deleteUsersByVersion",
@@ -501,6 +578,49 @@
           }
         },
         "summary": "Get user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/{userId}/avatar": {
+      "put": {
+        "operationId": "UsersController.putUserAvatar",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "image": {
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {}
+            },
+            "description": "Successful response"
+          }
+        },
+        "summary": "Put user avatar",
         "tags": [
           "Users"
         ]
