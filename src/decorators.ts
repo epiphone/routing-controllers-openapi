@@ -1,10 +1,5 @@
 import _merge from 'lodash.merge'
-import {
-  OperationObject,
-  ReferenceObject,
-  ResponsesObject,
-  SchemaObject,
-} from 'openapi3-ts'
+import { OperationObject, ReferenceObject, ResponsesObject } from 'openapi3-ts'
 import 'reflect-metadata'
 
 import { getContentType, getStatusCode, IRoute } from './index'
@@ -115,9 +110,7 @@ export function ResponseSchema(
       const reference: ReferenceObject = {
         $ref: `#/components/schemas/${responseSchemaName}`,
       }
-      const schema: SchemaObject = isArray
-        ? { items: reference, type: 'array' }
-        : reference
+      const schema = isArray ? { items: reference, type: 'array' } : reference
       const responses: ResponsesObject = {
         [statusCode]: {
           content: {

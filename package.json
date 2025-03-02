@@ -14,14 +14,13 @@
   "author": "Aleksi Pekkala <aleksipekkala@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "clean": "rimraf coverage build",
+    "clean": "rimraf build",
     "build": "npm run clean && tsc -p tsconfig.release.json",
     "format": "prettier --write {src,__tests__}/**/*.ts",
     "test:format": "prettier --check {src,__tests__}/**/*.ts",
     "test:lint": "tslint --project . src/**/*.ts",
     "prepare": "npm run build",
-    "send-coverage": "codecov -f coverage/*.json",
-    "test": "jest --coverage",
+    "test": "jest",
     "test:watch": "jest --watch"
   },
   "prettier": {
@@ -32,7 +31,7 @@
     "lodash.capitalize": "^4.2.1",
     "lodash.merge": "^4.6.2",
     "lodash.startcase": "^4.4.0",
-    "openapi3-ts": "^2.0.2",
+    "openapi3-ts": "^3.0.0",
     "path-to-regexp": "^6.2.1",
     "reflect-metadata": "^0.1.13",
     "tslib": "^2.4.1"
@@ -50,7 +49,6 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
     "class-validator-jsonschema": "^3.1.1",
-    "codecov": "^3.8.1",
     "jest": "^29.3.1",
     "prettier": "^2.8.0",
     "rimraf": "^3.0.2",

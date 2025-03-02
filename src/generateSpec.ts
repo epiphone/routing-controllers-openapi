@@ -32,7 +32,7 @@ export function getFullPath(route: IRoute): string {
  */
 export function getOperation(
   route: IRoute,
-  schemas: { [p: string]: oa.SchemaObject }
+  schemas: { [p: string]: oa.SchemaObject | oa.ReferenceObject }
 ): oa.OperationObject {
   const operation: oa.OperationObject = {
     operationId: getOperationId(route),
@@ -52,7 +52,7 @@ export function getOperation(
       ([_, value]) => value && (value.length || Object.keys(value).length)
     )
     .reduce((acc, [key, value]) => {
-      acc[key] = value
+      acc[key as keyof oa.OperationObject] = value
       return acc
     }, {} as unknown as oa.OperationObject)
 
@@ -71,7 +71,7 @@ export function getOperationId(route: IRoute): string {
  */
 export function getPaths(
   routes: IRoute[],
-  schemas: { [p: string]: oa.SchemaObject }
+  schemas: { [p: string]: oa.SchemaObject | oa.ReferenceObject }
 ): oa.PathObject {
   const routePaths = routes.map((route) => ({
     [getFullPath(route)]: {
@@ -156,7 +156,7 @@ export function getPathParams(route: IRoute): oa.ParameterObject[] {
  */
 export function getQueryParams(
   route: IRoute,
-  schemas: { [p: string]: oa.SchemaObject }
+  schemas: { [p: string]: oa.SchemaObject | oa.ReferenceObject }
 ): oa.ParameterObject[] {
   const queries: oa.ParameterObject[] = route.params
     .filter((p) => p.type === 'query')
@@ -177,15 +177,17 @@ export function getQueryParams(
     const paramSchemaName = paramSchema.$ref.split('/').pop() || ''
     const currentSchema = schemas[paramSchemaName]
 
-    for (const [name, schema] of Object.entries(
-      currentSchema?.properties || {}
-    )) {
-      queries.push({
-        in: 'query',
-        name,
-        required: currentSchema.required?.includes(name),
-        schema,
-      })
+    if (oa.isSchemaObject(currentSchema)) {
+      for (const [name, schema] of Object.entries(
+        currentSchema?.properties || {}
+      )) {
+        queries.push({
+          in: 'query',
+          name,
+          required: currentSchema.required?.includes(name),
+          schema,
+        })
+      }
     }
   }
   return queries
@@ -243,8 +245,9 @@ export function getRequestBody(route: IRoute): oa.RequestBodyObject | void {
   const bodyMeta = route.params.find((d) => d.type === 'body')
   if (bodyMeta) {
     const bodySchema = getParamSchema(bodyMeta)
-    const { $ref } =
+    const items =
       'items' in bodySchema && bodySchema.items ? bodySchema.items : bodySchema
+    const $ref = oa.isReferenceObject(items) ? items.$ref : ''
 
     return {
       content: {
@@ -308,7 +311,7 @@ export function getResponses(route: IRoute): oa.ResponsesObject {
  */
 export function getSpec(
   routes: IRoute[],
-  schemas: { [p: string]: oa.SchemaObject }
+  schemas: { [p: string]: oa.SchemaObject | oa.ReferenceObject }
 ): oa.OpenAPIObject {
   return {
     components: { schemas: {} },
