@@ -32,7 +32,7 @@
     "lodash.capitalize": "^4.2.1",
     "lodash.merge": "^4.6.2",
     "lodash.startcase": "^4.4.0",
-    "openapi3-ts": "^2.0.2",
+    "openapi3-ts": "^3.0.0",
     "path-to-regexp": "^6.2.1",
     "reflect-metadata": "^0.1.13",
     "tslib": "^2.4.1"
