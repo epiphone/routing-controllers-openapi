@@ -1,5 +1,10 @@
 import _merge from 'lodash.merge'
-import { OperationObject, ReferenceObject, ResponsesObject } from 'openapi3-ts'
+import {
+  ExamplesObject,
+  OperationObject,
+  ReferenceObject,
+  ResponsesObject,
+} from 'openapi3-ts'
 import 'reflect-metadata'
 
 import { getContentType, getStatusCode, IRoute } from './index'
@@ -91,6 +96,7 @@ export function ResponseSchema(
     description?: string
     statusCode?: string | number
     isArray?: boolean
+    examples?: ExamplesObject
   } = {}
 ) {
   const setResponseSchema = (source: OperationObject, route: IRoute) => {
@@ -98,6 +104,7 @@ export function ResponseSchema(
     const description = options.description || ''
     const isArray = options.isArray || false
     const statusCode = (options.statusCode || getStatusCode(route)) + ''
+    const examples = options.examples || undefined
 
     let responseSchemaName = ''
     if (typeof responseClass === 'function' && responseClass.name) {
@@ -110,12 +117,22 @@ export function ResponseSchema(
       const reference: ReferenceObject = {
         $ref: `#/components/schemas/${responseSchemaName}`,
       }
+
       const schema = isArray ? { items: reference, type: 'array' } : reference
+
+      const oldExamples =
+        source.responses[statusCode]?.content[contentType]?.examples
+        
+      const newExamples = oldExamples
+        ? { ...oldExamples, ...examples }
+        : examples
+
       const responses: ResponsesObject = {
         [statusCode]: {
           content: {
             [contentType]: {
               schema,
+              examples: newExamples,
             },
           },
           description,
