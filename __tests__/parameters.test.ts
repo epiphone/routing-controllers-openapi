@@ -199,7 +199,7 @@ describe('parameters', () => {
   })
 
   it('parses header param from @HeaderParam decorator', () => {
-    expect(getHeaderParams(route)[0]).toEqual({
+    expect(getHeaderParams(route, schemas)[0]).toEqual({
       in: 'header',
       name: 'Authorization',
       required: true,
@@ -208,11 +208,76 @@ describe('parameters', () => {
   })
 
   it('parses header param ref from @HeaderParams decorator', () => {
-    expect(getHeaderParams(route)[1]).toEqual({
+    expect(getHeaderParams(route, schemas)[1]).toEqual({
       in: 'header',
       name: 'ListUsersHeaderParams',
       required: false,
       schema: { $ref: '#/components/schemas/ListUsersHeaderParams' },
     })
+  })
+
+  it('should handle @HeaderParams with types without $ref', () => {
+    interface HeadersWithoutRef {
+      [key: string]: string
+    }
+
+    @JsonController('/test-no-ref')
+    // @ts-ignore: not referenced
+    class NoRefController {
+      @Get('/')
+      testNoRef(@HeaderParams() _headers: HeadersWithoutRef) {
+        return
+      }
+    }
+
+    const storage = getMetadataArgsStorage()
+    const testRoute = parseRoutes(storage).find((r) => r.action.method === 'testNoRef')!
+
+    expect(() => getHeaderParams(testRoute, schemas)).not.toThrow()
+    const headers = getHeaderParams(testRoute, schemas)
+    expect(headers).toEqual([])
+  })
+
+  it('expands @HeaderParams with properties into individual headers', () => {
+    class ExpandableHeaders {
+      @IsString()
+      Authorization: string
+
+      @IsOptional()
+      @IsString()
+      'X-Request-ID': string
+    }
+
+    @JsonController('/test-expand')
+    // @ts-ignore: not referenced
+    class ExpandController {
+      @Get('/')
+      testExpand(@HeaderParams() _headers: ExpandableHeaders) {
+        return
+      }
+    }
+
+    const storage = getMetadataArgsStorage()
+    const testRoute = parseRoutes(storage).find((r) => r.action.method === 'testExpand')!
+    const testSchemas = validationMetadatasToSchemas({
+      classTransformerMetadataStorage: defaultMetadataStorage,
+      refPointerPrefix: '#/components/schemas/',
+    })
+
+    const headers = getHeaderParams(testRoute, testSchemas)
+    expect(headers).toEqual([
+      {
+        in: 'header',
+        name: 'Authorization',
+        required: true,
+        schema: { type: 'string' },
+      },
+      {
+        in: 'header',
+        name: 'X-Request-ID',
+        required: false,
+        schema: { type: 'string' },
+      },
+    ])
   })
 })

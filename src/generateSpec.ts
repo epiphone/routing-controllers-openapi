@@ -37,7 +37,7 @@ export function getOperation(
   const operation: oa.OperationObject = {
     operationId: getOperationId(route),
     parameters: [
-      ...getHeaderParams(route),
+      ...getHeaderParams(route, schemas),
       ...getPathParams(route),
       ...getQueryParams(route, schemas),
     ],
@@ -86,7 +86,10 @@ export function getPaths(
 /**
  * Return header parameters of given route.
  */
-export function getHeaderParams(route: IRoute): oa.ParameterObject[] {
+export function getHeaderParams(
+  route: IRoute,
+  schemas: { [p: string]: oa.SchemaObject | oa.ReferenceObject }
+): oa.ParameterObject[] {
   const headers: oa.ParameterObject[] = route.params
     .filter((p) => p.type === 'header')
     .map((headerMeta) => {
@@ -100,14 +103,34 @@ export function getHeaderParams(route: IRoute): oa.ParameterObject[] {
     })
 
   const headersMeta = route.params.find((p) => p.type === 'headers')
+
   if (headersMeta) {
-    const schema = getParamSchema(headersMeta) as oa.ReferenceObject
-    headers.push({
-      in: 'header',
-      name: schema.$ref.split('/').pop() || '',
-      required: isRequired(headersMeta, route),
-      schema,
-    })
+    const paramSchema = getParamSchema(headersMeta)
+
+    // if schema has a $ref, check if it should be expanded into individual properties
+    if ('$ref' in paramSchema && paramSchema.$ref) {
+      const paramSchemaName = paramSchema.$ref.split('/').pop() || ''
+      const currentSchema = schemas[paramSchemaName]
+
+      // if the schema exists and has properties, expand them into individual header params
+      if (currentSchema && oa.isSchemaObject(currentSchema) && currentSchema.properties) {
+        for (const [name, schema] of Object.entries(currentSchema.properties)) {
+          headers.push({
+            in: 'header',
+            name,
+            required: currentSchema.required?.includes(name) || false,
+            schema,
+          })
+        }
+      } else {
+        headers.push({
+          in: 'header',
+          name: paramSchemaName,
+          required: isRequired(headersMeta, route),
+          schema: paramSchema,
+        })
+      }
+    }
   }
 
   return headers

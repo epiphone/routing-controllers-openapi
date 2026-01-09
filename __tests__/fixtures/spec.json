@@ -223,10 +223,18 @@
         "parameters": [
           {
             "in": "header",
-            "name": "ListUsersHeaderParams",
+            "name": "Authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Correlation-ID",
             "required": false,
             "schema": {
-              "$ref": "#/components/schemas/ListUsersHeaderParams"
+              "type": "string"
             }
           },
           {
