@@ -26,7 +26,13 @@ describe('parameters', () => {
   let schemas: { [p: string]: SchemaObject }
 
   beforeAll(() => {
-    class ListUsersHeaderParams {}
+    class ListUsersHeaderParams {
+      @IsString()
+      deviceId: number
+
+      @IsString()
+      acceptLanguage: number
+    }
 
     class ListUsersQueryParams {
       @IsNumber()
@@ -199,7 +205,7 @@ describe('parameters', () => {
   })
 
   it('parses header param from @HeaderParam decorator', () => {
-    expect(getHeaderParams(route)[0]).toEqual({
+    expect(getHeaderParams(route, schemas)[0]).toEqual({
       in: 'header',
       name: 'Authorization',
       required: true,
@@ -207,12 +213,31 @@ describe('parameters', () => {
     })
   })
 
-  it('parses header param ref from @HeaderParams decorator', () => {
-    expect(getHeaderParams(route)[1]).toEqual({
-      in: 'header',
-      name: 'ListUsersHeaderParams',
-      required: false,
-      schema: { $ref: '#/components/schemas/ListUsersHeaderParams' },
-    })
+  it('parses header param ref from @HeaderParams decorator', () => { // here
+    expect(getHeaderParams(route, schemas)).toEqual([
+      // Authorization comes from @HeaderParam
+      {
+        in: 'header',
+        name: 'Authorization',
+        required: true,
+        schema: { type: 'string' },
+      },
+      {
+        in: 'header',
+        name: 'deviceId',
+        required: true,
+        schema: {
+          type: 'string'
+        }
+      },
+      {
+        in: 'header',
+        name: 'acceptLanguage',
+        required: true,
+        schema: {
+          type: 'string'
+        }
+      }
+    ])
   })
 })
