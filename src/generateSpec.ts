@@ -113,7 +113,11 @@ export function getHeaderParams(
       const currentSchema = schemas[paramSchemaName]
 
       // if the schema exists and has properties, expand them into individual header params
-      if (currentSchema && oa.isSchemaObject(currentSchema) && currentSchema.properties) {
+      if (
+        currentSchema &&
+        oa.isSchemaObject(currentSchema) &&
+        currentSchema.properties
+      ) {
         for (const [name, schema] of Object.entries(currentSchema.properties)) {
           headers.push({
             in: 'header',
