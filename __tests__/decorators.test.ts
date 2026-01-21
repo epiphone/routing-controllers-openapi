@@ -210,6 +210,69 @@ describe('decorators', () => {
       fourResponseSchemasMixedStatusCodeWithTwoArraySchemas() {
         return
       }
+
+      @Get('/responseSchemaExamples')
+      @ResponseSchema('BadRequestErrorObject', {
+        statusCode: 400,
+        examples: {
+          TENANT_NOT_FOUND: {
+            value: {
+              error: {
+                reason: 'TENANT_NOT_FOUND',
+                message: 'We could not find the requested tenant id.',
+              },
+            },
+          },
+          USER_NOT_FOUND: {
+            value: {
+              error: {
+                reason: 'USER_NOT_FOUND',
+                message: 'We could not find the requested user id.',
+              },
+            },
+          },
+        },
+      })
+      responseSchemaExamples() {
+        return
+      }
+
+      @Get('/responseSchemaMultipleExamples')
+      @ResponseSchema('BadRequestErrorObject1', {
+        statusCode: 400,
+        examples: {
+          TENANT_NOT_FOUND: {
+            value: {
+              error: {
+                reason: 'TENANT_NOT_FOUND',
+                message: 'We could not find the requested tenant id.',
+              },
+            },
+          },
+          USER_NOT_FOUND: {
+            value: {
+              error: {
+                reason: 'USER_NOT_FOUND',
+                message: 'We could not find the requested user id.',
+              },
+            },
+          },
+        },
+      })
+      @ResponseSchema('BadRequestErrorObject2', {
+        statusCode: 400,
+        examples: {
+          BANK_NOT_FOUND: {
+            value: {
+              error: 'Bad request',
+              message: 'We could not find the requested bank id.',
+            },
+          },
+        },
+      })
+      responseSchemaMultipleExamples() {
+        return
+      }
     }
 
     @Controller('/usershtml')
@@ -587,6 +650,95 @@ describe('decorators', () => {
           'application/json': {
             schema: {
               $ref: '#/components/schemas/BadRequestObject4',
+            },
+          },
+        },
+        description: '',
+      },
+    })
+  })
+
+  it('applies @ResponseSchema using examples from options object', () => {
+    const operation = getOperation(routes.responseSchemaExamples, {})
+    expect(operation.responses).toEqual({
+      '200': {
+        content: {
+          'application/json': {},
+        },
+        description: 'Successful response',
+      },
+      '400': {
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/BadRequestErrorObject',
+            },
+            examples: {
+              TENANT_NOT_FOUND: {
+                value: {
+                  error: {
+                    message: 'We could not find the requested tenant id.',
+                    reason: 'TENANT_NOT_FOUND',
+                  },
+                },
+              },
+              USER_NOT_FOUND: {
+                value: {
+                  error: {
+                    message: 'We could not find the requested user id.',
+                    reason: 'USER_NOT_FOUND',
+                  },
+                },
+              },
+            },
+          },
+        },
+        description: '',
+      },
+    })
+  })
+
+  it('applies multiple @ResponseSchema with same status code using examples from options objects', () => {
+    const operation = getOperation(routes.responseSchemaMultipleExamples, {})
+    expect(operation.responses).toEqual({
+      '200': {
+        content: {
+          'application/json': {},
+        },
+        description: 'Successful response',
+      },
+      '400': {
+        content: {
+          'application/json': {
+            schema: {
+              oneOf: [
+                { $ref: '#/components/schemas/BadRequestErrorObject1' },
+                { $ref: '#/components/schemas/BadRequestErrorObject2' },
+              ],
+            },
+            examples: {
+              TENANT_NOT_FOUND: {
+                value: {
+                  error: {
+                    message: 'We could not find the requested tenant id.',
+                    reason: 'TENANT_NOT_FOUND',
+                  },
+                },
+              },
+              USER_NOT_FOUND: {
+                value: {
+                  error: {
+                    message: 'We could not find the requested user id.',
+                    reason: 'USER_NOT_FOUND',
+                  },
+                },
+              },
+              BANK_NOT_FOUND: {
+                value: {
+                  error: 'Bad request',
+                  message: 'We could not find the requested bank id.',
+                },
+              },
             },
           },
         },
