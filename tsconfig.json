@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "esnext",
     "moduleResolution": "node",
     "module": "commonjs",
     "importHelpers": true,
@@ -8,9 +8,7 @@
     "listFiles": false,
     "traceResolution": false,
     "pretty": true,
-    "lib" : [
-      "es6"
-    ],
+    "lib": ["ESNext"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
@@ -22,9 +20,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "include": [
-    "src/**/*",
-    "__tests__/**/*"
-  ],
+  "include": ["src/**/*", "__tests__/**/*"],
   "compileOnSave": false
 }
